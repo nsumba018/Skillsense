@@ -1,0 +1,68 @@
+field,description,type,source,datasets
+record_id,Unique record identifier,string,Generated,All cleaned datasets
+source,Source website,string,Raw,All datasets
+source_url,Original URL of the job posting,string,Raw,Raw/cleaned datasets
+source_job_id,Job ID from source website,string,Raw,Raw/cleaned datasets
+raw_hash,SHA256 hash of raw HTML,string,Computed,Raw dataset
+content_hash,MD5 hash of title+company+location+date,string,Computed,Cleaned dataset
+title,Original job title as posted,string,Raw,All datasets
+original_job_title,Preserved original title (same as title),string,Raw,ICT dataset
+company,Employer/organization name,string,Raw,All datasets
+description,Job description text,string,Raw,Cleaned dataset
+responsibilities,Key responsibilities,string,Extracted,Cleaned dataset
+requirements,Job requirements,string,Extracted,Cleaned dataset
+qualifications,Required qualifications,string,Extracted,Cleaned dataset
+raw_text,Full text of the posting,string,Raw,Cleaned dataset
+is_ict,Whether the job is classified as ICT,boolean,Classified,All datasets
+ict_role_confidence,Confidence of ICT classification (0-1),float,Classified,All datasets
+classification_reason,Reason for ICT classification,string,Classified,All datasets
+sector,Sector classification (ICT or Non-ICT),string,Classified,All datasets
+normalized_role,SkillSense normalized role name,string,Normalized,ICT datasets
+role_family,Role family/group name,string,Normalized,ICT datasets
+role_group,Related role group,string,Normalized,ICT datasets
+role_level,Seniority level (Entry/Mid/Senior/Management),string,Normalized,ICT datasets
+role_normalization_confidence,Confidence of role normalization (0-1),float,Normalized,ICT datasets
+is_duplicate,Whether this record is a duplicate,boolean,Computed,All datasets
+duplicate_group_id,Group ID for duplicate records,integer,Computed,All datasets
+duplicate_confidence,Confidence of duplicate detection (0-1),float,Computed,All datasets
+canonical_job_id,Record ID of canonical (non-duplicate) version,string,Computed,All datasets
+location_raw,Original location text,string,Raw,All datasets
+city,Normalized city name,string,Normalized,All datasets
+district,Rwanda district,string,Normalized,All datasets
+province,Rwanda province,string,Normalized,All datasets
+region,Broad geographic region,string,Normalized,All datasets
+country,Country (default: Rwanda),string,Normalized,All datasets
+remote_flag,Whether remote work is indicated,boolean,Extracted,All datasets
+location_type,On-site / Remote / Hybrid,string,Extracted,All datasets
+industry_raw,Original industry/category text,string,Raw,All datasets
+industry_normalized,Normalized industry category,string,Normalized,All datasets
+minimum_experience_years,Minimum years of experience required,integer,Extracted,All datasets
+maximum_experience_years,Maximum years of experience,integer,Extracted,All datasets
+experience_category,Experience level category,string,Normalized,All datasets
+education_level,Required education level,string,Normalized,All datasets
+degree_field,Required field of study,string,Extracted,All datasets
+employment_type_normalized,Normalized employment type,string,Normalized,All datasets
+contract_type_normalized,Normalized contract type,string,Normalized,All datasets
+full_time,Full-time indicator,boolean,Extracted,All datasets
+permanent,Permanent contract indicator,boolean,Extracted,All datasets
+posted_date,Job posting publication date,date,Raw/Parsed,All datasets
+closing_date,Application deadline,date,Raw/Parsed,All datasets
+scraped_at,When the posting was collected,datetime,Generated,All datasets
+year,Year from posted_date,integer,Derived,Analytical datasets
+month,Month from posted_date,integer,Derived,Analytical datasets
+quarter,Quarter from posted_date,integer,Derived,Analytical datasets
+year_month,Year-month period (YYYY-MM),string,Derived,Analytical datasets
+job_posting_count,Number of job postings,integer,Aggregated,Analytical/Modeling
+unique_employer_count,Number of unique employers,integer,Aggregated,Analytical/Modeling
+role_share_within_ict,Role share of total ICT demand (%),float,Computed,Analytical/Modeling
+rolling_3m_demand,3-month rolling average demand,float,Computed,Modeling
+rolling_6m_demand,6-month rolling average demand,float,Computed,Modeling
+rolling_12m_demand,12-month rolling average demand,float,Computed,Modeling
+mom_growth,Month-over-month growth rate,float,Computed,Modeling
+target_demand_1_month,Demand 1 month ahead,integer,Shifted,Modeling
+target_demand_6_month,Demand 6 months ahead,integer,Shifted,Modeling
+target_demand_12_month,Demand 12 months ahead,integer,Shifted,Modeling
+skill_name_normalized,Normalized skill name,string,Extracted,Skill datasets
+skill_category,Skill category,string,Classified,Skill datasets
+skill_requirement_type,Required / Preferred / Mentioned,string,Extracted,Skill datasets
+skill_share_within_role,Skill frequency within role (%),float,Computed,Role-skill dataset

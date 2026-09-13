@@ -1,0 +1,60 @@
+year,month,year_month,skill_name_normalized,skill_category,posting_count,employer_count
+2026,6,2026-06,Communication,Soft Skills,1,1
+2026,6,2026-06,Leadership,Soft Skills,4,3
+2026,6,2026-06,Next.js,Frameworks,1,1
+2026,6,2026-06,PMP,Certifications,1,1
+2026,6,2026-06,PRINCE2,Certifications,1,1
+2026,6,2026-06,Problem Solving,Soft Skills,1,1
+2026,6,2026-06,Project Management,Business / Functional Skills,3,3
+2026,7,2026-07,Problem Solving,Soft Skills,1,1
+2026,8,2026-08,AWS,Cloud,1,1
+2026,8,2026-08,Agile,Software Engineering,2,2
+2026,8,2026-08,Ansible,DevOps,1,1
+2026,8,2026-08,Azure,Cloud,1,1
+2026,8,2026-08,Bash/Shell,Programming Languages,2,1
+2026,8,2026-08,CI/CD,DevOps,4,2
+2026,8,2026-08,Communication,Soft Skills,1,1
+2026,8,2026-08,Data Warehousing,Data & Analytics,1,1
+2026,8,2026-08,Django,Frameworks,1,1
+2026,8,2026-08,Docker,DevOps,2,1
+2026,8,2026-08,ETL,Data & Analytics,1,1
+2026,8,2026-08,Encryption,Cybersecurity,1,1
+2026,8,2026-08,FastAPI,Frameworks,1,1
+2026,8,2026-08,GCP,Cloud,1,1
+2026,8,2026-08,Git,Tools,2,2
+2026,8,2026-08,GitHub,Tools,3,1
+2026,8,2026-08,GitHub Actions,DevOps,3,1
+2026,8,2026-08,GitLab,Tools,3,1
+2026,8,2026-08,GitLab CI,DevOps,3,1
+2026,8,2026-08,Grafana,DevOps,1,1
+2026,8,2026-08,GraphQL,Software Engineering,1,1
+2026,8,2026-08,HTML/CSS,Programming Languages,1,1
+2026,8,2026-08,JavaScript,Programming Languages,2,2
+2026,8,2026-08,Jenkins,DevOps,2,1
+2026,8,2026-08,Kubernetes,DevOps,2,1
+2026,8,2026-08,LAN/WAN,Networking,1,1
+2026,8,2026-08,Linux,Operating Systems,1,1
+2026,8,2026-08,Microservices,Software Engineering,4,1
+2026,8,2026-08,MongoDB,Databases,1,1
+2026,8,2026-08,MySQL,Databases,3,2
+2026,8,2026-08,Next.js,Frameworks,1,1
+2026,8,2026-08,Node.js,Frameworks,1,1
+2026,8,2026-08,Oracle DB,Databases,3,2
+2026,8,2026-08,PostgreSQL,Databases,3,2
+2026,8,2026-08,Postman,Tools,1,1
+2026,8,2026-08,Power BI,Data & Analytics,1,1
+2026,8,2026-08,Problem Solving,Soft Skills,2,2
+2026,8,2026-08,Prometheus,DevOps,1,1
+2026,8,2026-08,Python,Programming Languages,3,2
+2026,8,2026-08,REST APIs,Software Engineering,2,1
+2026,8,2026-08,React,Frameworks,2,2
+2026,8,2026-08,Redis,Databases,1,1
+2026,8,2026-08,SQL,Programming Languages,3,2
+2026,8,2026-08,SQL Server,Databases,3,2
+2026,8,2026-08,Scrum,Software Engineering,1,1
+2026,8,2026-08,TDD,Software Engineering,1,1
+2026,8,2026-08,Tableau,Data & Analytics,1,1
+2026,8,2026-08,TailwindCSS,Frameworks,1,1
+2026,8,2026-08,Teamwork,Soft Skills,1,1
+2026,8,2026-08,Terraform,DevOps,1,1
+2026,8,2026-08,TypeScript,Programming Languages,1,1
