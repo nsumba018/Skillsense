@@ -1,0 +1,77 @@
+normalized_role,role_group,skill_name_normalized,skill_category,year_month,posting_count,employer_count,role_total,skill_share_within_role
+Data Analyst,Data & Analytics,Bash/Shell,Programming Languages,2026-08,1,1,1,100.0
+Data Analyst,Data & Analytics,Data Warehousing,Data & Analytics,2026-08,1,1,1,100.0
+Data Analyst,Data & Analytics,ETL,Data & Analytics,2026-08,1,1,1,100.0
+Data Analyst,Data & Analytics,Microservices,Software Engineering,2026-08,1,1,1,100.0
+Data Analyst,Data & Analytics,MySQL,Databases,2026-08,1,1,1,100.0
+Data Analyst,Data & Analytics,Oracle DB,Databases,2026-08,1,1,1,100.0
+Data Analyst,Data & Analytics,Power BI,Data & Analytics,2026-08,1,1,1,100.0
+Data Analyst,Data & Analytics,Python,Programming Languages,2026-08,1,1,1,100.0
+Data Analyst,Data & Analytics,SQL,Programming Languages,2026-08,1,1,1,100.0
+Data Analyst,Data & Analytics,SQL Server,Databases,2026-08,1,1,1,100.0
+Data Analyst,Data & Analytics,Tableau,Data & Analytics,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,AWS,Cloud,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,Ansible,DevOps,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,Azure,Cloud,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,Bash/Shell,Programming Languages,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,CI/CD,DevOps,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,Docker,DevOps,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,GCP,Cloud,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,GitHub,Tools,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,GitHub Actions,DevOps,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,GitLab,Tools,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,GitLab CI,DevOps,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,Grafana,DevOps,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,Jenkins,DevOps,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,Kubernetes,DevOps,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,Linux,Operating Systems,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,Microservices,Software Engineering,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,Prometheus,DevOps,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,Python,Programming Languages,2026-08,1,1,1,100.0
+DevOps / Cloud Engineer,Cloud & DevOps,Terraform,DevOps,2026-08,1,1,1,100.0
+IT Officer / ICT Administrator,IT Operations & Support,LAN/WAN,Networking,2026-08,1,1,1,100.0
+Software Developer / Software Engineer,Software Development,Agile,Software Engineering,2026-08,2,2,3,66.67
+Software Developer / Software Engineer,Software Development,CI/CD,DevOps,2026-08,3,2,3,100.0
+Software Developer / Software Engineer,Software Development,Communication,Soft Skills,2026-06,1,1,4,25.0
+Software Developer / Software Engineer,Software Development,Communication,Soft Skills,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,Django,Frameworks,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,Docker,DevOps,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,Encryption,Cybersecurity,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,FastAPI,Frameworks,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,Git,Tools,2026-08,2,2,3,66.67
+Software Developer / Software Engineer,Software Development,GitHub,Tools,2026-08,2,1,3,66.67
+Software Developer / Software Engineer,Software Development,GitHub Actions,DevOps,2026-08,2,1,3,66.67
+Software Developer / Software Engineer,Software Development,GitLab,Tools,2026-08,2,1,3,66.67
+Software Developer / Software Engineer,Software Development,GitLab CI,DevOps,2026-08,2,1,3,66.67
+Software Developer / Software Engineer,Software Development,GraphQL,Software Engineering,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,HTML/CSS,Programming Languages,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,JavaScript,Programming Languages,2026-08,2,2,3,66.67
+Software Developer / Software Engineer,Software Development,Jenkins,DevOps,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,Kubernetes,DevOps,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,Leadership,Soft Skills,2026-06,4,3,4,100.0
+Software Developer / Software Engineer,Software Development,Microservices,Software Engineering,2026-08,2,1,3,66.67
+Software Developer / Software Engineer,Software Development,MongoDB,Databases,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,MySQL,Databases,2026-08,2,2,3,66.67
+Software Developer / Software Engineer,Software Development,Next.js,Frameworks,2026-06,1,1,4,25.0
+Software Developer / Software Engineer,Software Development,Next.js,Frameworks,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,Node.js,Frameworks,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,Oracle DB,Databases,2026-08,2,2,3,66.67
+Software Developer / Software Engineer,Software Development,PMP,Certifications,2026-06,1,1,4,25.0
+Software Developer / Software Engineer,Software Development,PRINCE2,Certifications,2026-06,1,1,4,25.0
+Software Developer / Software Engineer,Software Development,PostgreSQL,Databases,2026-08,3,2,3,100.0
+Software Developer / Software Engineer,Software Development,Postman,Tools,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,Problem Solving,Soft Skills,2026-06,1,1,4,25.0
+Software Developer / Software Engineer,Software Development,Problem Solving,Soft Skills,2026-07,1,1,1,100.0
+Software Developer / Software Engineer,Software Development,Problem Solving,Soft Skills,2026-08,2,2,3,66.67
+Software Developer / Software Engineer,Software Development,Project Management,Business / Functional Skills,2026-06,3,3,4,75.0
+Software Developer / Software Engineer,Software Development,Python,Programming Languages,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,REST APIs,Software Engineering,2026-08,2,1,3,66.67
+Software Developer / Software Engineer,Software Development,React,Frameworks,2026-08,2,2,3,66.67
+Software Developer / Software Engineer,Software Development,Redis,Databases,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,SQL,Programming Languages,2026-08,2,2,3,66.67
+Software Developer / Software Engineer,Software Development,SQL Server,Databases,2026-08,2,2,3,66.67
+Software Developer / Software Engineer,Software Development,Scrum,Software Engineering,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,TDD,Software Engineering,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,TailwindCSS,Frameworks,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,Teamwork,Soft Skills,2026-08,1,1,3,33.33
+Software Developer / Software Engineer,Software Development,TypeScript,Programming Languages,2026-08,1,1,3,33.33

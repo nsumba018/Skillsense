@@ -1,0 +1,7 @@
+year,month,year_month,normalized_role,role_group,job_posting_count,unique_employer_count,monthly_ict_total,role_share_within_ict,rolling_3m_demand,rolling_6m_demand,rolling_12m_demand,mom_growth,average_experience_required,share_entry_level,share_bachelor_required,share_master_required,remote_share,permanent_contract_share,fixed_term_share,target_demand_1_month,target_demand_3_month,target_demand_6_month,target_demand_12_month,sector
+2026.0,6.0,2026-06,Software Developer / Software Engineer,Software Development,4,3,4,100.0,4.0,4.0,4.0,,5.0,0.0,50.0,50.0,0.0,0.0,0.0,1.0,,,,ICT
+2026.0,7.0,2026-07,Software Developer / Software Engineer,Software Development,1,1,1,100.0,2.5,2.5,2.5,-0.75,5.0,0.0,100.0,0.0,0.0,0.0,0.0,3.0,,,,ICT
+2026.0,8.0,2026-08,Data Analyst,Data & Analytics,1,1,6,16.67,1.0,1.0,1.0,,5.0,0.0,100.0,0.0,0.0,0.0,0.0,,,,,ICT
+2026.0,8.0,2026-08,DevOps / Cloud Engineer,Cloud & DevOps,1,1,6,16.67,1.0,1.0,1.0,,1.0,0.0,100.0,0.0,0.0,0.0,0.0,,,,,ICT
+2026.0,8.0,2026-08,IT Officer / ICT Administrator,IT Operations & Support,1,1,6,16.67,1.0,1.0,1.0,,1.0,0.0,100.0,0.0,0.0,0.0,0.0,,,,,ICT
+2026.0,8.0,2026-08,Software Developer / Software Engineer,Software Development,3,2,6,50.0,2.67,2.67,2.67,2.0,3.0,0.0,66.66666666666666,33.33333333333333,0.0,0.0,0.0,,,,,ICT
