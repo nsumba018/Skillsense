@@ -1,0 +1,18 @@
+role_group,role_family,normalized_role,posting_count,unique_employers,example_titles
+Cloud & DevOps,Cloud & DevOps,DevOps / Cloud Engineer,9,2,DevOps Engineer (M/F) | AWS Cloud Architect (M/F) | AWS Solutions Architect (M/F) | AZURE Solutions Architect (M/F) | Cloud Architect (M/F)
+Software Development,Software Development,Backend Developer,9,1,DOTNET Developer (M/F) | JAVA Developer (M/F) | JAVA JEE Developer (M/F) | LARAVEL Developer (M/F) | NODE.JS Developer (M/F)
+Systems Analysis,Systems Analysis,Systems Analyst / IT Business Analyst,5,1,SAP ABAP Consultant (M/F) | SAP FI-CO/PS Consultant (M/F) | SAP EHS Consultant (M/F) | Senior SAP Consultant (M/F) | SAP MM/SD/EWM/PP/QM/CAR Consultant (M/F)
+Software Development,Software Development,Frontend / Web Developer,4,1,ANGULAR Developer (M/F) | JAVASCRIPT Developer (M/F) | REACT Developer (M/F) | UX / UI Designer (M/F)
+Software Quality,Software Quality,QA / Software Test Engineer,4,2,QA Tester (M/F) | Test and Validation Engineer (M/F) | Test Automation Engineer (M/F) | Quality Assurance (QA) Engineer
+Software Development,Software Development,Mobile App Developer,4,1,IOS Developer (M/F) | KOTLIN Developer (M/F) | OBJECTIVE-C Developer (M/F) | SWIFT Developer (M/F)
+Systems & Infrastructure,Systems & Infrastructure,Systems Administrator,4,1,Cloud System Administrator (M/F) | Cloud System Integrator (M/F) | Z/OS System Engineer Senior Storage(M/F) | Middleware System Engineer Z/OS (M/F)
+Software Development,Software Development,Full-Stack Developer,3,3,Solution Engineer | FullStack Developer | Full Stack Software Engineer
+Software Development,Software Development,Software Developer / Software Engineer,3,3,PHP Larval Debug Code | Software Developer | Technical Advisor Software Developer
+Networks,Networks,Network Engineer / Network Administrator,2,2,Network and Security Engineer | Network Architect (M/F)
+ICT Management,ICT Management,ICT Manager / IT Manager,2,2,Digital Project Manager | Responsable Informatique
+Data & Analytics,Data & Analytics,Data Engineer,2,1,DATASTAGE Architect (M/F) | GENESYS Architect (M/F)
+Data & Database,Data & Database,Database Administrator,1,1,DBA IMS/DB2 Z/OS(M/F)
+IT Governance & Audit,IT Governance & Audit,IT Auditor / IT Governance & Risk,1,1,IT Internal Auditor
+Cybersecurity,Cybersecurity,Cybersecurity Analyst / Security Engineer,1,1,Cyber Security Engineer (M/F)
+Data & Analytics,Data & Analytics,Data Analyst,1,1,"Specialist, Data Analyst"
+Systems & Infrastructure,IT Operations & Support,IT Officer / ICT Administrator,1,1,IT Officer
