@@ -57,7 +57,7 @@ When complete, SkillSense will:
 - [x] ICT taxonomy: 22 roles across 12 groups (Layer 1)
 - [x] Emerging roles taxonomy defined: 8 roles for Layer 2
 - [x] All output files generated (cleaned, normalization, analytical, reports)
-- [x] SESSION_LOG.md with reproducible steps for all data work
+- [ ] SESSION_LOG.md with reproducible steps for all data work — **not in repo**
 - [x] PROJECT_SPEC.md updated with two-layer architecture
 
 **Key files:**

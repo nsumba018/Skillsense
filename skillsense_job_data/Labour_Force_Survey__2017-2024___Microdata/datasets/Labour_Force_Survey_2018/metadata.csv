@@ -1,0 +1,191 @@
+column_name,data_type,description
+id,BIGINT,Row ID
+psu_no,BIGINT,PSU NUMBER
+pid,DOUBLE,Personal ID
+ur,DOUBLE,Urban and Rural
+phase,DOUBLE,Data collection round
+province,DOUBLE,Province
+district,DOUBLE,"District: Numeric code (11-57) representing the respondent's district in Rwanda. The first digit corresponds to the province (1-5), and the second digit identifies the district within that province. 11 = Nyarugenge, 12 = Gasabo, 13 = Kicukiro, 21 = Nyanza, 22 = Gisagara, 23 = Nyaruguru, 24 = Huye, 25 = Nyamagabe, 26 = Ruhango, 27 = Muhanga, 28 = Kamonyi, 31 = Karongi, 32 = Rutsiro, 33 = Rubavu, 34 = Nyabihu, 35 = Ngororero, 36 = Rusizi, 37 = Nyamasheke, 41 = Rulindo, 42 = Gakenke, 43 = Musanze, 44 = Burera, 45 = Gicumbi, 51 = Rwamagana, 52 = Nyagatare, 53 = Gatsibo, 54 = Kayonza, 55 = Kirehe, 56 = Ngoma, 57 = Bugesera."
+weight,DOUBLE,Round_weight
+weight2,DOUBLE,Annual_weight
+samehh,BIGINT,The same Household Visited last time?
+hhrg,BIGINT,Rotation Group
+a01,BIGINT,Sex
+a02,BIGINT,Relationship
+a03m,BIGINT,Date of birth Month
+a03y,BIGINT,date of birth year
+a04,BIGINT,Age at last birthday
+a05,DOUBLE,Present marital status
+a06,DOUBLE,Do you have difficulty seeing even if wearing glasses?
+a07,DOUBLE,Do you have difficulty hearing even if using a hearing aid?
+a08,DOUBLE,Do you have difficulty walking or climbing steps?
+a09,DOUBLE,Do you have difficulty remembering or concentrating?
+a10,DOUBLE,Do you have difficulty washing all over or dressing?
+a11,DOUBLE,Using your usual language do you have difficulty communicating for example understanding or being understood?
+a12,BIGINT,What is nationality?
+a13,BIGINT,Residential Status in Rwanda
+a14a,BIGINT,Country/Area of birth
+a14b,DOUBLE,"District of birth: Numeric code (11-57) representing the respondent's district of birth in Rwanda. The first digit corresponds to the province (1-5), and the second digit identifies the district within that province. 11 = Nyarugenge, 12 = Gasabo, 13 = Kicukiro, 21 = Nyanza, 22 = Gisagara, 23 = Nyaruguru, 24 = Huye, 25 = Nyamagabe, 26 = Ruhango, 27 = Muhanga, 28 = Kamonyi, 31 = Karongi, 32 = Rutsiro, 33 = Rubavu, 34 = Nyabihu, 35 = Ngororero, 36 = Rusizi, 37 = Nyamasheke, 41 = Rulindo, 42 = Gakenke, 43 = Musanze, 44 = Burera, 45 = Gicumbi, 51 = Rwamagana, 52 = Nyagatare, 53 = Gatsibo, 54 = Kayonza, 55 = Kirehe, 56 = Ngoma, 57 = Bugesera."
+a18,DOUBLE,Kind of place he/she lived in prior to arriving here?
+a19,DOUBLE,How long did he/she live in the previous location prior to arriving here?
+a20,DOUBLE,Reason to move away from previous location
+a21,BIGINT,Has he/she been away from home in this last 12 months?
+a22,DOUBLE,Months during the past 12 months has he/she been away from this HH
+a23,DOUBLE,While absent is/was he/she a member of another household?
+a24,BIGINT,Is he/she household member?
+b01,DOUBLE,IS [NAME] currently studying?
+b02a,DOUBLE,What is the Highest educational level is/ have [NAME] attending / attended?
+b02b,DOUBLE,How many years have you completed in that level of education?
+b03,DOUBLE,Highest certificate obtained
+b04,DOUBLE,The place of the highest qualification attained
+b05a,TEXT,Area of specialization
+b06,DOUBLE,Ability to read and write
+b07,DOUBLE,Currently attending any trade or technical Skills school
+b08,DOUBLE,Did you learn any Trade or Technical vocational course?
+b09,DOUBLE,How long will/did this Training take?
+b10,DOUBLE,Type of technical skills learned?
+b11,DOUBLE,Where did acquire these skills
+b12,DOUBLE,Who was the main sponsor for this course?
+b13,DOUBLE,Did [NAME] complete the course?
+b13a,DOUBLE,In which year did complete this course?
+b14,DOUBLE,What happened after you completed the course?
+b15,DOUBLE,At what level could you use of computer?
+b16a,DOUBLE,At what level could speak English
+b16b,DOUBLE,At what level could speak French
+b16c,DOUBLE,At what level could speak Swahili
+c01,DOUBLE,During the last 7 days did he/she do any work for wage salary commission tips
+c02,DOUBLE,During the past 7 days did run or do any kind of business farming or ot
+c03,DOUBLE,During the past 7 days did help unpaid in a business owned by a househol
+c04,DOUBLE,Was this work in agriculture farming or fishing?
+c05,DOUBLE,In general are the products obtained from this activity for sale or for family
+c06,DOUBLE,During the last 7 days did have a paid job or a business from which he/s
+c07,DOUBLE,What was the main reason was absent from work during the last 7 days?
+c08,DOUBLE,What is the expected total absence from work for?
+c09,DOUBLE,Does continue receiving an income from his/her job during absence?
+c10,DOUBLE,Did [NAME] have any other paid job or business or performed any secondary activi
+c11a,DOUBLE,How many hours does [NAME] usually work per week?Main job/activity
+c11b,DOUBLE,How many hours does [NAME] usually work per week?Secondary job/activity
+c12a,DOUBLE,During the past 7 days how many days did actually work?Main job/activity
+c12b,DOUBLE,During the past 7 days how many days did actually work?Secondary job/act
+c13a,DOUBLE,During the past 7 days how many hours per day did actually worked?Main j
+c13b,DOUBLE,During the past 7 days how many hours per day did actually worked?second
+c14,DOUBLE,How many hours did [NAME) usually worked at all jobs combined?
+c15,DOUBLE,What was the main reason usually worked long hours per week?
+c16,DOUBLE,During the last 4 weeks did look for additional or other work?
+c17,DOUBLE,Would want to work more hours per week than usualy worked provided the extra hou
+c18,DOUBLE,If an opportunity for additional work became available could start working
+c19,DOUBLE,During the last 4 weeks did [NAME] look for any kind of paid job or try to start
+c20,DOUBLE,Has [NAME] already found a job or arranged to start a business in the next 4 wee
+c21a,DOUBLE,Arranging for financial resources applying for permits licences
+c21c,DOUBLE,Seeking the assistance of friends relatives or other types of intermediaries
+c21d,DOUBLE,Registering with or contacting public or private employment services
+c21e,DOUBLE,Applying to employers directly checking at worksites farms factory gates markets
+c21f,DOUBLE,Placing or answering newspaper or online job advertisements
+c21g,DOUBLE,Placing and updating resumes on professional or social networking sites online
+c21h,DOUBLE,No method
+c21l,DOUBLE,Other
+c22,DOUBLE,For how long has [NAME] been without work and trying to find a paid job or start
+c23,DOUBLE,Would [NAME] want to work if a paid job or business opportunity became availabl
+c24,DOUBLE,What was the main reason did not try to find a paid job or start a busine
+c25,DOUBLE,If a paid job or business opportunity become available could [NAME] have starte
+c26,DOUBLE,What is the mean reason why could not start working in the last 7 days o
+indd01,DOUBLE,ISCO High level
+isco2d,DOUBLE,Isco_2digits_mainjob
+c21b,DOUBLE,Looking for land premises machinery supplies farming inputs
+d01b2,DOUBLE,Main tasks and duties
+d02,DOUBLE,What do you think could be the minimum level of education to carry out the job
+indd03,DOUBLE,ISIC High level
+isic2d,DOUBLE,Isic_2digits_mainjob
+d04,DOUBLE,Does work in....
+d05,DOUBLE,In this job is [NAME] working as...
+d06,DOUBLE,Have [NAME] been employed on the basis of:
+d07,DOUBLE,Is [NAME]'s contract or agreement :
+d08,DOUBLE,The duration of the contract or agreement?
+d09a,DOUBLE,Does employer pay contributions on [NAME]?s behalf to social security fund
+d09b,DOUBLE,Does employer pay contributions on [NAME]?s behalf to health insurance fund
+d10a,DOUBLE,Benefits paid for annual leave
+d10b,DOUBLE,Benefits paid for sick leave
+d10c,DOUBLE,Benefits paid for maternity/paternity leave
+d10d,DOUBLE,Is's salary subjected to deduction of taxe
+d11,DOUBLE,Does [NAME] belong to any trade union or syndicate
+d20,DOUBLE,Is the business/establishment where [NAME] works registered with the RRA or pay
+d21,DOUBLE,In order to report to an authority does the business/establishment where
+d22a,DOUBLE,How many regular paid or unpaid employees including [NAME] work at [NAME]'s pl
+d22b,DOUBLE,How many regular paid or unpaid employees including [NAME] work at [NAME]'s pl
+d23,DOUBLE,In what type of place does [NAME] usually work?
+d25,DOUBLE,In day to day work does [NAME] need the computer to perform his/her duties?
+d26,DOUBLE,Does use computer in his/her day to day work?
+inde01,DOUBLE,ISCO High level_secondary
+isco2e,DOUBLE,Isco_2digits_secondjob
+inde02,DOUBLE,ISIC High level_secondary
+isic2e,DOUBLE,Isic_2digits_secondjob
+d27,DOUBLE,Is a secondary paid job or business/activity reported
+e01b1,DOUBLE,Main tasks and duties
+e02,DOUBLE,What is the name of?s workplace at his/her secondary job/activity?
+e03,DOUBLE,In his/her secondary job/activity does work in...
+e04,DOUBLE,In his/her secondary job/business does work as...
+e05a,DOUBLE,Does the employer pay contributions on's behalf to social security fund?
+e05b,DOUBLE,Does the employer pay contributions on'sbehalf to health insurance?
+e06a,DOUBLE,Is paid annual leave
+e06b,DOUBLE,Is paid sick leave.
+e06c,DOUBLE,IsPaid maternity/paternity leave?
+e07,DOUBLE,Is the business/establishment where works for registered with the RRA or
+e08,DOUBLE,Does [NAME]'s employer keep any written records or accounts?
+e09a,DOUBLE,Including how many regular paid or unpaid employees
+e09b,DOUBLE,Including how many regular paid or unpaid employees
+e10,DOUBLE,In what type of place does usually work?
+e11,DOUBLE,Apart from the main job:how many Job did had in the last 7 days?
+indf03,DOUBLE,ISCO High level_past
+isco2f,DOUBLE,Isco_2digits_pastjob
+indf04,DOUBLE,ISIC High level_past
+isic2f,DOUBLE,Isic_2digits_pastjob
+f01,DOUBLE,Has [NAME] ever worked previously for a wage salary or for other income in cash
+f02,DOUBLE,The main reason to stop working in his/her last paid job / business?
+f04a,DOUBLE,What was the name of?s workplace at his/her job/activity?
+f05,DOUBLE,What is main source of income at present?
+f06,DOUBLE,In your opinion which of the following best describes your main status at present
+f07,DOUBLE,What Competencies do you need to increase your employment opportunities?
+g01,DOUBLE,In the last 7 days how many hours did [NAME] spend collecting firewood for the
+g02,DOUBLE,In the last 7 days how many hours did [NAME] spend fetching water for the house
+g03,DOUBLE,In the last 7 days how many hours did [NAME] spend searching for fodder or gra
+g04,DOUBLE,In the last 7 days how many hours did [NAME] spend manufacturing household goods
+g05,DOUBLE,In the last 7 days how many hours did [NAME] spend constructing your dwelling
+g06,DOUBLE,In the last 7 days how many hours did [NAME] spend doing household chores inclu
+g07,DOUBLE,In the last 7 days how many hours did [NAME] spend looking after children and elderly
+h01,DOUBLE,During the last four weeks did he/she do any of the following work mainly for o
+h02,DOUBLE,How many days per week did [NAME] usually worked in these activities?
+h03,DOUBLE,How many hours per day has [NAME] usually worked in these activities?
+h04,DOUBLE,HAS DONE ANY AGRICULTURAL ACTIVITY ?
+h05,DOUBLE,In general did the household sell or barter any part of the goods obtained from
+h06,DOUBLE,About how much does the household regularly sell?
+h07,DOUBLE,What was the net Value in Frw the household get from agricultural activities dur
+h08,DOUBLE,Compared to previous season Was the production below/above average or an avera
+h09,DOUBLE,Do you regularly or sometimes engage paid employee in the farming activity?
+h10,DOUBLE,Excluding family members how many paid employees do you usually engage in thes
+h11a,DOUBLE,Did you get access to the land for the agricultural work by leasing
+h11b,DOUBLE,Did you get access to the land for the agricultural work by Renting
+h11c,DOUBLE,Did you get access to the land for the agricultural work by renting
+h11d,DOUBLE,Did you get access to the land for the agricultural work by renting
+h11e,DOUBLE,Did you get access to the land for the agricultural work by communal rights/publ
+indb05,DOUBLE,Field of education
+status1,DOUBLE,Labour force status with 16+
+wap16,DOUBLE,Working age population
+employed16,DOUBLE,Employment to population ratio
+ur1,DOUBLE,Unemployment rate
+lfpr,DOUBLE,Labour force particiaption rate
+sub,DOUBLE,Subsistance_foodstaff_producers
+tru,DOUBLE,Time related underemployment
+jobsearch,DOUBLE,Not employed with jobseach
+disable,BIGINT,person with disability
+discourage,DOUBLE,Discouraged jobseekers
+willing,DOUBLE,Willing non seeker and not available
+migrant,DOUBLE,Recent migration
+iev2,DOUBLE,Formal and Informal employment for main job
+cash,DOUBLE,Monthly income in cash for employees
+luu,DOUBLE,Labour underutilisation
+luur,DOUBLE,Labour underulilation rate
+lu2,DOUBLE,Combined rate of TRU and unempoyment
+lu3,DOUBLE,Combined rate of unemployment and potential labour force
+trur,DOUBLE,Time related underumployment
+work_agr,DOUBLE,work in agriculture
+prod_sec,DOUBLE,Informal&Formal& household sector employment

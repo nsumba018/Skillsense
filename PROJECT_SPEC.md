@@ -201,7 +201,7 @@ This is the only way new data enters the production system. No automated pipelin
 
 | # | Module | What it does |
 |---|--------|-------------|
-| 1 | **Authentication & RBAC** | JWT auth, role-based access (policy maker, education planner, career advisor, researcher, admin) scoped by institution |
+| 1 | **Authentication & RBAC** | JWT auth, role-based access (career_training_advisor, education_curriculum_planner, labor_market_analyst, admin) scoped by institution |
 | 2 | **Main Dashboard** | Live KPIs — top ICT roles, demand trends, ICT employment share, key alerts |
 | 3 | **Data Upload & Management** | Admin uploads CSVs of job postings. System classifies, normalizes, and stores them. No automated ingestion. |
 | 4 | **Data Processing** | Classification (ICT/non-ICT), role normalization, skill extraction, geographic/industry normalization — runs automatically on uploaded data |
@@ -216,15 +216,14 @@ This is the only way new data enters the production system. No automated pipelin
 | 13 | **Reporting & Analytics** | Exportable reports, PDF generation, analytics summaries |
 | 14 | **User & Security Management** | Admin panel for users, roles, permissions, audit logs |
 
-### User Roles
+### User Roles (4 roles)
 
-| Role | Access |
-|------|--------|
-| Policy Maker | Dashboard, forecasts, policy planning, reports |
-| Education Planner | Skills gaps, training alignment, curriculum recommendations |
-| Career Advisor | Career guidance, employability scores, role outlooks |
-| Researcher | Full analytics, data exports, historical trends |
-| Admin | Everything + user management + data uploads |
+| Role | Focus | Access |
+|------|-------|--------|
+| Career & Training Advisor | Helping learners/job seekers understand the market | Explore in-demand roles, compare related roles, current/historical demand, 6/12/24-month outlooks, required/emerging skills, training opportunities, AI assistant. Journey: Sector → Role Group → Role → Skills → Demand → Forecast → Employability Outlook → Recommendations |
+| Education / Curriculum Planner | Aligning education with labour-market demand | Upload curricula/bulletins, extract skills from programmes, compare curriculum vs market-demand skills, identify skill gaps, see emerging skills, see role alignment, AI gap explanations. Journey: Curriculum → Skills → Market Demand → Alignment → Gaps → Roles |
+| Labour Market Analyst | Deepest analytics user | Role/group demand analysis, historical/current trends, skill demand, emerging role/skill detection, geographic/industry demand, employment evidence, forecasts, reports, AI analytical exploration. Journey: Sector → Role Group → Role → Historical/Current → Skills → Geography/Industry → Forecast → Analysis |
+| Administrator | Operating and maintaining SkillSense | Data sources, data ingestion, ETL pipeline, data quality, role/skill taxonomies, role-group mappings, user accounts/permissions, curriculum/training uploads, models/model versions, audit logs, system configuration |
 
 ---
 
@@ -300,7 +299,7 @@ These roles have strong global demand but zero or near-zero presence in Rwanda's
 ### Done — Frontend
 
 - [x] Frontend UI shells for ~6 modules (static, mock data)
-- [x] Auth service stub (Express + SQLite, local dev only)
+- [ ] Auth service stub (Express + SQLite, local dev only) — **not built yet**
 
 ### Next — Layer 1 (Local Demand Forecast)
 

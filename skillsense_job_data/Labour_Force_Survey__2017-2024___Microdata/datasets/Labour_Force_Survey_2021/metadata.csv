@@ -1,0 +1,248 @@
+column_name,data_type,description
+id,BIGINT,Row ID
+psu_id,DOUBLE,Primary Sampling Unit
+psu_no,BIGINT,Primary Sampling Unit Number
+qh_no,BIGINT,Questionnaire Number
+hhid,BIGINT,Household Identification
+pid,BIGINT,Personal ID
+code_dis,BIGINT,"District: Numeric code (11-57) representing the respondent's district in Rwanda. The first digit corresponds to the province (1-5), and the second digit identifies the district within that province. 11 = Nyarugenge, 12 = Gasabo, 13 = Kicukiro, 21 = Nyanza, 22 = Gisagara, 23 = Nyaruguru, 24 = Huye, 25 = Nyamagabe, 26 = Ruhango, 27 = Muhanga, 28 = Kamonyi, 31 = Karongi, 32 = Rutsiro, 33 = Rubavu, 34 = Nyabihu, 35 = Ngororero, 36 = Rusizi, 37 = Nyamasheke, 41 = Rulindo, 42 = Gakenke, 43 = Musanze, 44 = Burera, 45 = Gicumbi, 51 = Rwamagana, 52 = Nyagatare, 53 = Gatsibo, 54 = Kayonza, 55 = Kirehe, 56 = Ngoma, 57 = Bugesera."
+hhrg,BIGINT,Rotation Group
+hhgap,DOUBLE,Number of Group Appearance
+hhgac,DOUBLE,Number of Group Acceptance
+consent,BIGINT,Consent
+decode,BIGINT,Data entry code
+sihh,BIGINT,Still in the Household
+a01,BIGINT,Sex
+a02,BIGINT,Relationship
+a04,BIGINT,Age at last birthday
+a05,DOUBLE,Present marital status
+more_person,BIGINT,More person
+a12,BIGINT,What is nationality?
+a13,BIGINT,Residential Status in Rwanda
+a14a,BIGINT,Country/Area of birth
+a14b,DOUBLE,"District of birth: Numeric code (11-57) representing the respondent's district of birth in Rwanda. The first digit corresponds to the province (1-5), and the second digit identifies the district within that province. 11 = Nyarugenge, 12 = Gasabo, 13 = Kicukiro, 21 = Nyanza, 22 = Gisagara, 23 = Nyaruguru, 24 = Huye, 25 = Nyamagabe, 26 = Ruhango, 27 = Muhanga, 28 = Kamonyi, 31 = Karongi, 32 = Rutsiro, 33 = Rubavu, 34 = Nyabihu, 35 = Ngororero, 36 = Rusizi, 37 = Nyamasheke, 41 = Rulindo, 42 = Gakenke, 43 = Musanze, 44 = Burera, 45 = Gicumbi, 51 = Rwamagana, 52 = Nyagatare, 53 = Gatsibo, 54 = Kayonza, 55 = Kirehe, 56 = Ngoma, 57 = Bugesera."
+a15,BIGINT,Since birth has lived in another district for 6 consecutive months?
+a16y,DOUBLE,The period of usual place of residence (last move) - Years
+a17a,DOUBLE,"In what district or foreign country did you live? For district, numeric code (11�57) representing the respondent's previous district in Rwanda. The first digit corresponds to the province (1-5), and the second digit identifies the district within that province. 11 = Nyarugenge, 12 = Gasabo, 13 = Kicukiro, 21 = Nyanza, 22 = Gisagara, 23 = Nyaruguru, 24 = Huye, 25 = Nyamagabe, 26 = Ruhango, 27 = Muhanga, 28 = Kamonyi, 31 = Karongi, 32 = Rutsiro, 33 = Rubavu, 34 = Nyabihu, 35 = Ngororero, 36 = Rusizi, 37 = Nyamasheke, 41 = Rulindo, 42 = Gakenke, 43 = Musanze, 44 = Burera, 45 = Gicumbi, 51 = Rwamagana, 52 = Nyagatare, 53 = Gatsibo, 54 = Kayonza, 55 = Kirehe, 56 = Ngoma, 57 = Bugesera."
+a17b,DOUBLE,"District code: Numeric code (11-57) representing the respondent's district in Rwanda. The first digit corresponds to the province (1-5), and the second digit identifies the district within that province. 11 = Nyarugenge, 12 = Gasabo, 13 = Kicukiro, 21 = Nyanza, 22 = Gisagara, 23 = Nyaruguru, 24 = Huye, 25 = Nyamagabe, 26 = Ruhango, 27 = Muhanga, 28 = Kamonyi, 31 = Karongi, 32 = Rutsiro, 33 = Rubavu, 34 = Nyabihu, 35 = Ngororero, 36 = Rusizi, 37 = Nyamasheke, 41 = Rulindo, 42 = Gakenke, 43 = Musanze, 44 = Burera, 45 = Gicumbi, 51 = Rwamagana, 52 = Nyagatare, 53 = Gatsibo, 54 = Kayonza, 55 = Kirehe, 56 = Ngoma, 57 = Bugesera."
+a18,DOUBLE,Kind of place you lived in prior to arriving here?
+a19,DOUBLE,How long did you live in the previous location prior to arriving here?
+a20,DOUBLE,Reason to move away from previous location
+a21,BIGINT,Have you been away from home in this last 12 months?
+a22,DOUBLE,Months during the past 12 months have you been away from this HH
+a23,DOUBLE,"While absent, are/were you a member of another household?"
+a24,BIGINT,Are you a household member?
+a06,DOUBLE,"Do you have difficulty seeing, even if wearing glasses?"
+a07,DOUBLE,"Do you have difficulty hearing, even if using a hearing aid?"
+a08,DOUBLE,Do you have difficulty walking or climbing steps?
+a09,DOUBLE,Do you have difficulty remembering or concentrating?
+a10,DOUBLE,Do you have difficulty (with self-care such as) washing all over or dressing?
+a11,DOUBLE,"Using your usual language, do you have difficulty communicating, for example understanding or being understood?"
+b01,DOUBLE,Are you a student (are you attending school or would be attending one
+b02a,DOUBLE,What is the highest educational level are/have you attending/attended?
+b02b,DOUBLE,How many years have you completed in that level of education?
+b03,DOUBLE,Highest certificate obtained
+b05a,TEXT,Area of specialization
+b05b,DOUBLE,ESCED code
+b05c,TEXT,ESCED name
+b06,DOUBLE,Ability to read and write
+b07,DOUBLE,Currently attending any trade or technical skills school
+b08,DOUBLE,Did you learn any Trade or Technical vocational course (TVET)?
+b09,DOUBLE,How long will/did this training take?
+b10,DOUBLE,Type of technical skills learned?
+b13,DOUBLE,Did you complete the course?
+b13a,DOUBLE,In which year did you complete this course?
+b14,DOUBLE,What happened after you completed the course?
+b15,DOUBLE,At what level could you use of computer?
+b16a,DOUBLE,At what level could you speak English
+b16b,DOUBLE,At what level could you speak French
+b16c,DOUBLE,At what level could you speak Swahili
+b17,TEXT,Are you able to apply any of the following ICT skills (Choose all applicable skills)
+b17_a,DOUBLE,Are you able to apply: Copying or moving file or folder
+b17_b,DOUBLE,Are you able to apply: Using copy and paste to duplicate or move document
+b17_c,DOUBLE,Are you able to apply: Sending email with attached files
+b17_d,DOUBLE,Are you able to apply: Using basic arithmetic formulae in a spreadsheet
+b17_e,DOUBLE,"Are you able to apply: Connecting and installing new devices (E.g. Modem, printer)"
+b17_f,DOUBLE,Are you able to apply: Transferring files between a computer and other devices
+b17_g,DOUBLE,Are you able to apply: None
+b18,DOUBLE,"Have you in the last three months used any social media (Facebook, WhatsApp, Twitter)"
+b19,DOUBLE,Have you in the last three months used intenet? (for individual use
+c01,DOUBLE,"During the last 7 days, did you do any work for wage, salary, commission, tips"
+c02,DOUBLE,"During the past 7 days, did you run or do any kind of business, farming or ot"
+c03,DOUBLE,"During the past 7 days, did you help unpaid in a business owned by a household member?"
+c04,DOUBLE,"Was this work in agriculture, farming or fishing?"
+c05,DOUBLE,"In general, are the products obtained from this activity for sale or for family use?"
+c06,DOUBLE,"During the last 7 days, did you have a paid job or a business from which you were absent"
+c07,DOUBLE,What was the main reason you were absent from work during the last 7 days?
+c08,DOUBLE,What is the expected total absence from work for you?
+c09,DOUBLE,Do you continue receiving an income from your job during absence?
+c09a,DOUBLE,"Among the following categories, which correspond to your situation"
+c10,DOUBLE,Did you have any other paid job or business or perform any secondary activity
+c11a,DOUBLE,How many hours do you usually work per week? Main job/activity
+c11b,DOUBLE,How many hours do you usually work per week? Secondary job/activity
+c12a,DOUBLE,"During the past 7 days, how many days did you actually work? Main job/activity"
+c12b,DOUBLE,"During the past 7 days, how many days did you actually work? Secondary job/activity"
+c13a,DOUBLE,"During the past 7 days, how many hours per day did you actually work? Main job/activity"
+c13b,DOUBLE,"During the past 7 days, how many hours per day did you actually worked? Secondary job/activity"
+c14,DOUBLE,How many hours did you usually work at all jobs combined?
+c15,DOUBLE,What was the main reason you usually worked long hours per week?
+c16,DOUBLE,"During the last 4 weeks, did you look for additional or other work?"
+c17,DOUBLE,Would want to work more hours per week than usualy worked provided the extra hours
+c18,DOUBLE,"If an opportunity for additional work became available, could you start working"
+c19,DOUBLE,"During the last 4 weeks, did you look for any kind of paid job or try to start"
+c20,DOUBLE,Have you already found a job or arranged to start a business in the next 4 weeks
+c21,TEXT,What did you do in the last 4 weeks to find a paid job or start a business?
+c22,DOUBLE,For how long have you been without work and trying to find a paid job or start
+c23,DOUBLE,Would you want to work if a paid job or business opportunity became available
+c24,DOUBLE,What was the main reason you did not try to find a paid job or start a business
+c25,DOUBLE,"If a paid job or business opportunity become available, could you have started"
+c26,DOUBLE,What is the mean reason why you could not start working in the last 7 days
+c21a,DOUBLE,"Arranging for financial resources, applying for permits, licences"
+c21b,DOUBLE,"Looking for land, premises, machinery, supplies, farming inputs"
+c21c,DOUBLE,"Seeking the assistance of friends, relatives or other types of intermediaries"
+c21d,DOUBLE,Registering with or contacting public or private employment services
+c21e,DOUBLE,"Applying to employers directly, checking at worksites, farms, factory gates, markets"
+c21f,DOUBLE,Placing or answering newspaper or online job advertisements
+c21g,DOUBLE,Placing and updating resumes on professional or social networking sites online
+c21h,DOUBLE,No method
+c21l,DOUBLE,Other - specify
+d01b2,DOUBLE,Main tasks and duties (ISCO CODE)
+d03a,DOUBLE,What is the name of your workplace?
+d03a1,TEXT,Workplace name
+d03b,TEXT,What are the main goods or services produced at your place of work or its main
+d03b1,DOUBLE,Main goods and services (ISIC code)
+d04,DOUBLE,Do you work in...
+d05,DOUBLE,"In this job, are you working as..."
+d06,DOUBLE,Have you been employed on the basis of:
+d07,DOUBLE,Is your contract or agreement:
+d08,DOUBLE,The duration of the contract or agreement?
+d09a,DOUBLE,Does employer pay contributions on your behalf to social security fund
+d09b,DOUBLE,Does employer pay contributions on your behalf to health insurance fund
+d10a,DOUBLE,Benefits paid for annual leave
+d10b,DOUBLE,Benefits paid for sick leave
+d10c,DOUBLE,Benefits paid for maternity/paternity leave
+d10d,DOUBLE,Is your salary subjected to deduction of tax (PAYE)
+d11,DOUBLE,Do you belong to any trade union or syndicate
+d12,DOUBLE,"How much did you earn at main job last time in cash and in kind, before tax"
+d12a,DOUBLE,Amount in Rwandan francs
+d13,DOUBLE,How long did it cover?
+d14,DOUBLE,"Do you receive in-kind payments in main job such as food, agricultural products"
+d15,DOUBLE,What is the value of these in-kind payments?
+d15a,DOUBLE,Amount in Rwandan francs
+d16,DOUBLE,What period did it cover?
+d17,DOUBLE,"Taking into account both cash and in kind payments, would you say the monthly amount"
+d20,DOUBLE,Is the business/establishment where you work registered with the RRA or pay
+d21,DOUBLE,"In order to report to an authority, does the business/establishment where you"
+d23,DOUBLE,In what type of place do you usually work?
+d24a,DOUBLE,How long have you been working (total experience) - Years?
+d28,DOUBLE,"In the past 12 months, have you ever been hurt in an accident while working"
+d29,DOUBLE,"Did this injury result in your being absent or unable to work, for at least"
+d30a,DOUBLE,How long were you away from work (or are likely to be) because of the injury
+d30b,DOUBLE,How long were you away from work (or are likely to be) because of the injury
+d31,DOUBLE,Did you report the injury to the management?
+d32,DOUBLE,Did you receive any financial compensation for the injury?
+d27,DOUBLE,Was a secondary activity reported
+e01b1,DOUBLE,Main tasks and duties (ISCO CODE)
+e02b1,DOUBLE,Main goods or services (ISIC CODE)
+e11,DOUBLE,Apart from the main job: how many jobs did you have in the last 7 days?
+e12,DOUBLE,How much did you earn from other jobs or activities had last week in cash?
+e12b,DOUBLE,Amount in Rwandan francs
+e13,DOUBLE,How long did it cover?
+f01,DOUBLE,"Have you ever worked previously for a wage, salary or for other income in cash"
+f02,DOUBLE,The main reason to stop working in your last paid job/business?
+f03b1,DOUBLE,Main tasks and duties (ISCO CODE)
+f04b,TEXT,What were the main goods or services produced at your workplace
+f04b1,DOUBLE,Main goods and services (ISIC CODE)
+f05,DOUBLE,What is your main source of income at present?
+g01a,DOUBLE,"In the last 7 days, did you spend time collecting firewood for the household?"
+g01,DOUBLE,"In the last 7 days, how many hours did you spend collecting firewood for the household?"
+g02a,DOUBLE,"In the last 7 days, did you spend time on fetching water for the household?"
+g02,DOUBLE,"In the last 7 days, how many hours did you spend fetching water for the household?"
+g03a,DOUBLE,"In the last 7 days, did you spend time on grazing or feeding household animals?"
+g03,DOUBLE,"In the last 7 days, how many hours did you spend searching for fodder or grazing"
+g04a,DOUBLE,"In the last 7 days, did you spend time on manufacturing of goods for family use?"
+g04,DOUBLE,"In the last 7 days, how many hours did you spend manufacturing household goods?"
+g05a,DOUBLE,"In the last 7 days, did you spent time on construction of own building?"
+g05,DOUBLE,"In the last 7 days, how many hours did you spend constructing your dwelling"
+g06a,DOUBLE,"In the last 7 days, did you spend time on doing household chores?"
+g06,DOUBLE,"In the last 7 days, how many hours did you spend doing household chores"
+g07a,DOUBLE,"In the last 7 days, did you take time to look after children or adults"
+g07,DOUBLE,"In the last 7 days, how many hours did you spend looking after children and elderly"
+h00,DOUBLE,How would you describe your main situation on labour market at present?
+h01,DOUBLE,During the last four weeks did you do any of the following work mainly for own use
+h02,DOUBLE,How many hours per week have you worked in these activities in the last 7 days
+h03,DOUBLE,How many hours per week do you usually work in these activities?
+h05,DOUBLE,"In general, did the household sell or barter any part of the goods obtained from these activities"
+h06,DOUBLE,About how much does the household regularly sell?
+h09,DOUBLE,Do you regularly or sometimes engage paid employee in the farming activity?
+h10,DOUBLE,"Excluding family members, how many paid employees do you usually engage in these"
+i01_a,DOUBLE,Main material used in building this house for roof
+i01_b,DOUBLE,Main material used in building this house for exterior walls
+i01_c,DOUBLE,Main material used in building this house for floor
+i02,DOUBLE,How many rooms in your household are used for sleeping?
+i03,DOUBLE,What type of toilet does your household have?
+i04,DOUBLE,What is the main source of energy in your household for lighting?
+i05,DOUBLE,What is the main source of energy in your household for cooking?
+i06a,DOUBLE,What is the main source of water in your household for drinking?
+i06b,DOUBLE,What is the main source of water in your household for other uses?
+i07a,DOUBLE,Does this household own Refrigerator/Freezer?
+i07b,DOUBLE,Does this household own radio?
+i07c,DOUBLE,Does this household own TV set?
+i07d,DOUBLE,Does this household own parabolic antenna?
+i07e,DOUBLE,Does this household own Video/DVD player?
+i07f,DOUBLE,Does this household own Computer and accessories?
+i07g,DOUBLE,Does this household own Music system?
+i07h,DOUBLE,Does this household own Cooker?
+i07i,DOUBLE,Does this household own Sewing machine?
+i07j,DOUBLE,Does this household own Laundry machine?
+i07k,DOUBLE,Does this household own Electric fan?
+i07l,DOUBLE,Does this household own Camera?
+i07m,DOUBLE,Does this household own Mobile phone?
+i07n,DOUBLE,Does this household own Car?
+i07o,DOUBLE,Does this household own Bicycle?
+i07p,DOUBLE,Does this household own Motorcycle?
+i07q,DOUBLE,Does this household own internet connection?
+weight,DOUBLE,Round Weight
+lfs_round,BIGINT,LFS Round
+weight2,DOUBLE,Annual Weight
+lfs_year,BIGINT,Labour Force Survey year
+code_ur,BIGINT,Urban-Rural
+indd01,DOUBLE,ISCO High level
+indd03,DOUBLE,ISIC High level
+status1,DOUBLE,Labour force status with 14+
+indb05,DOUBLE,Field of education
+inde02,DOUBLE,ISIC High level - Secondary
+wap16,DOUBLE,Working age population
+employed16,DOUBLE,Employment to population ratio
+ur1,DOUBLE,Unemployment rate
+lfpr,DOUBLE,Labour force particiaption rate
+sub,DOUBLE,Dimunished Subsistance foodstuff producers
+tru,DOUBLE,Time related underemployment
+plf,DOUBLE,Potential labour force
+luu,DOUBLE,Labour underutilisation
+luur,DOUBLE,Labour underutilisation rate
+disable,BIGINT,person with disability
+discourage,DOUBLE,Discouraged jobseekers
+migrant,DOUBLE,Recent migration
+neetyoung,DOUBLE,NEET 16-30
+is,DOUBLE,Informal & Formal sector employment
+prod_unit,DOUBLE,Production sector unit
+iev2,DOUBLE,Formal and Informal employment for main job
+main_sect,DOUBLE,Economic sector
+indb1,DOUBLE,Years of schooling
+attained,DOUBLE,Level of education completed
+age5,BIGINT,Five years age group
+age10,DOUBLE,Broader age group
+usualhrs,DOUBLE,Usual working hours
+usual_h,DOUBLE,Number of usual hours
+act_hrs,DOUBLE,Number of actual hours worked
+acthrs,DOUBLE,Number of actual hours worked
+ya,DOUBLE,Young/adult
+province,BIGINT,Province
+quintile,DOUBLE,Quintiles
+hr_cshmain,DOUBLE,Hourly wage of employees in main job
+hr_cash,DOUBLE,Hourly wage of employees
+pop,BIGINT,Total population
+tvt2,DOUBLE,General or TVET attainment
+sm,DOUBLE,Search methods
+ud,DOUBLE,Unemployment duration

@@ -1,0 +1,199 @@
+column_name,data_type,description
+id,INT,Row ID
+PSU_NO,SMALLINT,Primary Sampling Unit
+QH_NO,SMALLINT,Questionnaire Number
+HHID,INT,Household Identification
+pid,INT,Personal ID
+province,SMALLINT,"Numeric code (1–5) representing the administrative province of Rwanda where the survey respondent is located. 1 = Kigali City, 2 = Southern Province, 3 = Western Province, 4 = Northern Province, 5 = Eastern Province."
+Code_UR,SMALLINT,"Numeric code (1–2) indicating the residential area type of the respondent. 1 = Urban, 2 = Rural."
+code_dis,SMALLINT,"Numeric code (11–57) representing the respondent's district in Rwanda. The first digit corresponds to the province (1-5), and the second digit identifies the district within that province. 11 = Nyarugenge, 12 = Gasabo, 13 = Kicukiro, 21 = Nyanza, 22 = Gisagara, 23 = Nyaruguru, 24 = Huye, 25 = Nyamagabe, 26 = Ruhango, 27 = Muhanga, 28 = Kamonyi, 31 = Karongi, 32 = Rutsiro, 33 = Rubavu, 34 = Nyabihu, 35 = Ngororero, 36 = Rusizi, 37 = Nyamasheke, 41 = Rulindo, 42 = Gakenke, 43 = Musanze, 44 = Burera, 45 = Gicumbi, 51 = Rwamagana, 52 = Nyagatare, 53 = Gatsibo, 54 = Kayonza, 55 = Kirehe, 56 = Ngoma, 57 = Bugesera."
+lfs_strata,SMALLINT,"Numeric code (111–572) representing the survey stratification unit for the Labour Force Survey. The code encodes geography hierarchically: the first digit indicates the province (1-5), the second digit identifies the district, and the third digit distinguishes urban/rural sub-strata where applicable (0 = no split, 1 = urban, 2 = rural). 111 = Nyarugenge, 121 = Gasabo, 131 = Kicukiro, 210 = Nyanza, 220 = Gisagara, 230 = Nyaruguru, 240 = Huye, 250 = Nyamagabe, 260 = Ruhango, 270 = Muhanga, 281 = Kamonyi_urban, 282 = Kamonyi_rural, 310 = Karongi, 320 = Rutsiro, 331 = Rubavu_urban, 332 = Rubavu_rural, 340 = Nyabihu, 350 = Ngororero, 361 = Rusizi_urban, 362 = Rusizi_rural, 370 = Nyamasheke, 410 = Rulindo, 420 = Gakenke, 431 = Musanze_urban, 432 = Musanze_rural, 440 = Burera, 450 = Gicumbi, 511 = Rwamagana_urban, 512 = Rwamagana_rural, 520 = Nyagatare, 530 = Gatsibo, 540 = Kayonza, 550 = Kirehe, 560 = Ngoma, 571 = Bugesera_urban, 572 = Bugesera_rural."
+LFS_year,SMALLINT,LFS Data Collection Year
+weight2,DOUBLE,Annual Weight
+A01,SMALLINT,"Numeric code (1–2) indicating the sex of the respondent. 1 = Male, 2 = Female."
+A02,SMALLINT,"Numeric code (1–14) indicating the respondent's relationship to the household head. 1 = Household Head, 2 = Spouse (Wife/Husband), 3 = Child (Son/Daughter), 4 = Adopted/Foster/Step child, 5 = Parent (Father/Mother), 6 = Parent-in-law, 7 = Brother or Sister-in-law, 8 = Brother or Sister, 9 = Grandchild, 10 = Son/Daughter-in-law, 11 = Other relative, 12 = Domestic worker, 13 = Non-relative, 14 = Unknown relationship."
+A03M,SMALLINT,"Numeric code (1–12) representing the respondent's month of birth. 1 = January, 2 = February, 3 = March, 4 = April, 5 = May, 6 = June, 7 = July, 8 = August, 9 = September, 10 = October, 11 = November, 12 = December, 98 = Don't Know."
+A03Y,SMALLINT,Date of Birth: Year
+A04,SMALLINT,Age at Last Birthday
+A05,DOUBLE,"Numeric code (1–7) indicating the respondent's present marital status. 1 = Married monogamously, 2 = Married polygamous, 3 = Living together, 4 = Divorced, 5 = Separated, 6 = Single, 7 = Widow/Widower."
+A06,DOUBLE,"Numeric code (1–4) indicating the respondent's level of difficulty seeing, even if wearing glasses. 1 = No difficulty, 2 = Yes, some difficulty, 3 = Yes, a lot of difficulty, 4 = Cannot do at all."
+A07,DOUBLE,"Numeric code (1–4) indicating the respondent's level of difficulty hearing, even if using a hearing aid. 1 = No difficulty, 2 = Yes, some difficulty, 3 = Yes, a lot of difficulty, 4 = Cannot do at all."
+A08,DOUBLE,"Numeric code (1–4) indicating the respondent's level of difficulty walking or climbing steps. 1 = No difficulty, 2 = Yes, some difficulty, 3 = Yes, a lot of difficulty, 4 = Cannot do at all."
+A09,DOUBLE,"Numeric code (1–4) indicating the respondent's level of difficulty remembering or concentrating. 1 = No difficulty, 2 = Yes, some difficulty, 3 = Yes, a lot of difficulty, 4 = Cannot do at all."
+A10,DOUBLE,"Numeric code (1–4) indicating the respondent's level of difficulty with self-care, such as washing all over or dressing. 1 = No difficulty, 2 = Yes, some difficulty, 3 = Yes, a lot of difficulty, 4 = Cannot do at all."
+A11,DOUBLE,"Using your usual language, do you have difficulty communicating, for example understanding or being understood?"
+A12,SMALLINT,What is your nationality?
+A13,SMALLINT,Residential Status in Rwanda
+A14A,SMALLINT,Country/Area of Birth
+A14B,DOUBLE,"District of birth: Numeric code (11-57) representing the respondent's district of birth in Rwanda. The first digit corresponds to the province (1-5), and the second digit identifies the district within that province. 11 = Nyarugenge, 12 = Gasabo, 13 = Kicukiro, 21 = Nyanza, 22 = Gisagara, 23 = Nyaruguru, 24 = Huye, 25 = Nyamagabe, 26 = Ruhango, 27 = Muhanga, 28 = Kamonyi, 31 = Karongi, 32 = Rutsiro, 33 = Rubavu, 34 = Nyabihu, 35 = Ngororero, 36 = Rusizi, 37 = Nyamasheke, 41 = Rulindo, 42 = Gakenke, 43 = Musanze, 44 = Burera, 45 = Gicumbi, 51 = Rwamagana, 52 = Nyagatare, 53 = Gatsibo, 54 = Kayonza, 55 = Kirehe, 56 = Ngoma, 57 = Bugesera."
+A15,SMALLINT,Has your usual place of residence always been in this district?
+A16Y,DOUBLE,The period of usual place of residence (last move) - Years
+A17A,DOUBLE,"In what district or foreign country did you live? For district, numeric code (11�57) representing the respondent's previous district in Rwanda. The first digit corresponds to the province (1-5), and the second digit identifies the district within that province. 11 = Nyarugenge, 12 = Gasabo, 13 = Kicukiro, 21 = Nyanza, 22 = Gisagara, 23 = Nyaruguru, 24 = Huye, 25 = Nyamagabe, 26 = Ruhango, 27 = Muhanga, 28 = Kamonyi, 31 = Karongi, 32 = Rutsiro, 33 = Rubavu, 34 = Nyabihu, 35 = Ngororero, 36 = Rusizi, 37 = Nyamasheke, 41 = Rulindo, 42 = Gakenke, 43 = Musanze, 44 = Burera, 45 = Gicumbi, 51 = Rwamagana, 52 = Nyagatare, 53 = Gatsibo, 54 = Kayonza, 55 = Kirehe, 56 = Ngoma, 57 = Bugesera."
+A17B,DOUBLE,"District code (previous location): Numeric code (11�57) representing the respondent's previous district in Rwanda. The first digit corresponds to the province (1-5), and the second digit identifies the district within that province. 11 = Nyarugenge, 12 = Gasabo, 13 = Kicukiro, 21 = Nyanza, 22 = Gisagara, 23 = Nyaruguru, 24 = Huye, 25 = Nyamagabe, 26 = Ruhango, 27 = Muhanga, 28 = Kamonyi, 31 = Karongi, 32 = Rutsiro, 33 = Rubavu, 34 = Nyabihu, 35 = Ngororero, 36 = Rusizi, 37 = Nyamasheke, 41 = Rulindo, 42 = Gakenke, 43 = Musanze, 44 = Burera, 45 = Gicumbi, 51 = Rwamagana, 52 = Nyagatare, 53 = Gatsibo, 54 = Kayonza, 55 = Kirehe, 56 = Ngoma, 57 = Bugesera."
+A19,DOUBLE,How long did you live in the previous location prior to arriving here?
+A20,DOUBLE,Reason to move away from previous location
+B01,DOUBLE,Are you currently studying?
+B02A,DOUBLE,What is the highest educational level you are attending or have attended?
+B02B,DOUBLE,How many years have you completed in that level of education?
+B07,DOUBLE,Currently attending any trade or technical skills school?
+B08,DOUBLE,Did you learn any Trade or Technical vocational course (TVET)?
+B09,DOUBLE,How long will/did this training take?
+B10,DOUBLE,Type of technical skills learned?
+B13,DOUBLE,Did you complete the course?
+B14,DOUBLE,What happened after you completed the course?
+C01,DOUBLE,"During the last 7 days, did you do any work for wage, salary, commission, tips, or any other pay, in cash or in kind, even if only for one hour? (including paid interns)"
+C02,DOUBLE,"During the past 7 days, did you run or do any kind of business, farming, or other activity to generate income, even if only for one hour?"
+C03,DOUBLE,"During the past 7 days, did you help unpaid in a business owned by a household or family member, or help a member of household or family in his/her paid job, even if only for one hour?"
+C05,DOUBLE,"In general, are the products obtained from this activity for sale or for family use?"
+C06,DOUBLE,"During the last 7 days, did you have a paid job or a business from which you were temporarily absent and for which you expect to return?"
+C07,DOUBLE,What was the main reason you were absent from work during the last 7 days?
+C08,DOUBLE,What is the expected total absence from work for you?
+C09,DOUBLE,Do you continue receiving an income from your job during absence?
+C09A,DOUBLE,"Among the following categories, which correspond to your situation: • Entrepreneur in agriculture • Subsistence agriculture • Help without pay in agriculture"
+C10,DOUBLE,"Did you have any other paid job or business or any secondary activity to generate an income, done for at least one hour during the last 7 days?"
+C10A,DOUBLE,How many jobs other than main job do you posess?
+C11A,DOUBLE,How many hours do you usually work per week? (Main job/activity)
+C11B,DOUBLE,How many hours do you usually work per week? (Secondary job/activity)
+C12A,DOUBLE,"During the past 7 days, how many days did you actually work? (Main job/activity)"
+C12B,DOUBLE,"During the past 7 days, how many days did you actually work? (Secondary job/activity)"
+C13A,DOUBLE,"During the past 7 days, how many hours per day did you actually work? (Main job/activity)"
+C13B,DOUBLE,"During the past 7 days, how many hours per day did you actually work? (Secondary job/activity)"
+C14,DOUBLE,How many hours did you usually work at all jobs combined during the last 7 days?
+C15,DOUBLE,What was the main reason you usually worked long hours per week?
+C16,DOUBLE,"During the last 4 weeks, did you look for additional or other work?"
+C17,DOUBLE,Would you want to work more hours per week than usually worked provided the extra hours are paid or profitable?
+C18,DOUBLE,"If an opportunity for additional work became available, could you start working more hours within the next two weeks?"
+C19,DOUBLE,"During the last 4 weeks, did you look for any kind of paid job or try to start a business?"
+C19A,DOUBLE,"During the last 4 weeks, did you try to start a business?"
+C20,DOUBLE,Have you already found a job or arranged to start a business in the next 4 weeks?
+C20A,DOUBLE,How soon do you expect to start working in this new job or business?
+C21,VARCHAR,What did you do in the last 4 weeks to find a paid job or start a business?
+C21A,DOUBLE,Apply to prospective employers
+C21B,DOUBLE,Place or answer job advertisement
+C21C,DOUBLE,Post/update resume on professional/social networking sites online
+C21D,DOUBLE,Register with employment center (public/private)
+C21E,DOUBLE,Take a test or interview
+C21F,DOUBLE,"Seek help from relatives, friends, others"
+C21G,DOUBLE,Check at factories website
+C21H,DOUBLE,Wait on the street to be recruited
+C21I,DOUBLE,Seek financial help to start a business
+C21J,DOUBLE,"Look for land, building, equipment, materials to start a business"
+C21K,DOUBLE,Apply for permit or licence to start a business
+C21L,DOUBLE,No method
+C21M,DOUBLE,"Other, specify"
+C22,DOUBLE,For how long have you been without work and trying to find a paid job or start a business?
+C23,DOUBLE,Would you want to work if a paid job or business opportunity became available?
+C24,DOUBLE,What was the main reason you did not try to find a paid job or start a business?
+C25,DOUBLE,"If a paid job or business opportunity become available, could you have started work during the last 7 days or within the next two weeks?"
+C26,DOUBLE,What is the main reason why you could not start working in the last 7 days or next two weeks?
+D03A,DOUBLE,What is the name of your workplace?
+D04,DOUBLE,Do you work in...
+D05,DOUBLE,"In this job, are you working as..."
+D05A,DOUBLE,How many persons including you at your work place?
+D05A1,DOUBLE,"Number of persons including you at your workplace, if less than 10?"
+D06,DOUBLE,Have you been employed on the basis of...
+D07,DOUBLE,Is your contract or agreement...
+D08,DOUBLE,The duration of the contract or agreement?
+D09A,DOUBLE,Does employer pay contributions on your behalf to social security fund?
+D10A,DOUBLE,Benefits paid for annual leave?
+D10B,DOUBLE,Benefits paid for sick leave?
+D10C,DOUBLE,Benefits paid for maternity/paternity leave?
+D10D,DOUBLE,Is your salary subjected to deduction of tax (PAYE)?
+D12,DOUBLE,"How much did you earn at main job last time in cash and in kind, before tax?"
+D20,DOUBLE,Is the business/establishment where you work registered with the RRA or paying PAYE/TPR?
+D21,DOUBLE,"In order to report to an authority, does the business/establishment where you work keep written records of accounts?"
+D21A,DOUBLE,What kind of accounts or records does the (business/farm) keep?
+D23,DOUBLE,In what type of place do you usually work?
+D23A,DOUBLE,What means of transportation do you mainly use to commute to your place of work?
+D23B,DOUBLE,How long does it normally take you to get to work?
+D24,DOUBLE,How long have you been working (total experience)?
+D25A,DOUBLE,Is this district the same as the district where you perform your main job?
+D25B,DOUBLE,"In which district do you mainly perform this work? Numeric code (11�57) representing the respondent's work district in Rwanda. The first digit corresponds to the province (1-5), and the second digit identifies the district within that province. 11 = Nyarugenge, 12 = Gasabo, 13 = Kicukiro, 21 = Nyanza, 22 = Gisagara, 23 = Nyaruguru, 24 = Huye, 25 = Nyamagabe, 26 = Ruhango, 27 = Muhanga, 28 = Kamonyi, 31 = Karongi, 32 = Rutsiro, 33 = Rubavu, 34 = Nyabihu, 35 = Ngororero, 36 = Rusizi, 37 = Nyamasheke, 41 = Rulindo, 42 = Gakenke, 43 = Musanze, 44 = Burera, 45 = Gicumbi, 51 = Rwamagana, 52 = Nyagatare, 53 = Gatsibo, 54 = Kayonza, 55 = Kirehe, 56 = Ngoma, 57 = Bugesera."
+F02,DOUBLE,The main reason to stop working in your last paid job / business?
+F05,DOUBLE,What is your main source of income at present?
+G01,DOUBLE,"In the last 7 days, how many hours did you spend collecting firewood for the household, including travel time?"
+G01A,DOUBLE,"In the last 7 days, did you spend time collecting firewood for the household?"
+G02,DOUBLE,"In the last 7 days, how many hours did you spend fetching water for the household, including travel time?"
+G02A,DOUBLE,"In the last 7 days, did you spend time on fetching water for the household?"
+G03,DOUBLE,"In the last 7 days, how many hours did you spend searching for fodder or grazing for the household’s animals?"
+G03A,DOUBLE,"In the last 7 days, did you spent time on grazing or feeding household animals?"
+G04,DOUBLE,"In the last 7 days, how many hours did you spend manufacturing household goods for own or family use (such as furniture, textiles, clothing, footwear, pottery, crafts or other durables, excluding foodstuff)?"
+G04A,DOUBLE,"In the last 7 days, did you spend time on manufacturing of goods for family use?"
+G05,DOUBLE,"In the last 7 days, how many hours did you spend constructing your dwelling, making major repairs on it, farm buildings, private roads, or wells?"
+G05A,DOUBLE,"In the last 7 days, did you spend time on construction of own building?"
+G06,DOUBLE,"In the last 7 days, how many hours did you spend doing household chores including shopping, preparing meals?"
+G06A,DOUBLE,"In the last 7 days, did you spend time on doing household chores?"
+G07,DOUBLE,"In the last 7 days, how many hours did you spend looking after children and elderly?"
+G07A,DOUBLE,"In the last 7 days, did you take time to look after children or adults?"
+H01,DOUBLE,"During the last four weeks did you do any of the following work mainly for own consumption such as farm work, growing fodder, raising or tending animals, fishing, storage such as of flour, dry fish or other food and drink, hunting or gathering foodstuffs, preparing foodstuffs for storage such flour and drinks?"
+H02,DOUBLE,How many days per week did you usually work in these activities?
+H03,DOUBLE,How many hours per day have you usually worked in these activities?
+H05,DOUBLE,"In general, did the household sell or barter any part of the goods obtained from this work?"
+H06,DOUBLE,About how much does the household regularly sell?
+H09,DOUBLE,Do you regularly or sometimes engage paid employee in the farming activity?
+H10,DOUBLE,"Excluding family members, how many paid employees do you usually engage in these agricultural activities?"
+status1,DOUBLE,Labour force status with 16+
+wap16,DOUBLE,Working age population
+employed16,DOUBLE,Employment to population ratio
+UR1,DOUBLE,Unemployment rate
+LFPR,DOUBLE,Labour force participation rate
+sub,DOUBLE,Diminished subsistence foodstuff producers
+TRU,DOUBLE,Time related underemployment
+PLF,DOUBLE,Potential labour force
+youth,DOUBLE,Youth 16 to 24 years old
+young,DOUBLE,Young 16 to 30 years old
+LUU,DOUBLE,Labour underutilisation
+LUUR,DOUBLE,Labour underutilisation rate
+disable,DOUBLE,Person with disability
+discourage,DOUBLE,Discouraged jobseekers
+willing,DOUBLE,Willing non seeker and not available
+migrant,DOUBLE,Recent migration
+neetyouth,DOUBLE,NEET 16-24
+neetyoung,DOUBLE,NEET 16-30
+youngs,DOUBLE,Young status
+main_sect,DOUBLE,Economic sector
+indb1,DOUBLE,Years of schooling
+attained,DOUBLE,Level of education completed
+cash,DOUBLE,Monthly income in cash for employees
+intcash,DOUBLE,Income interval
+age5,SMALLINT,Five years age group
+age10,DOUBLE,Broader age group
+usualhrs,DOUBLE,Usual working hours
+timegood,DOUBLE,Time spent in production of goods
+timeservice,DOUBLE,Time spent in production of services
+hhsize,SMALLINT,Household size
+usual_h,DOUBLE,Number of usual hours
+act_hrs,DOUBLE,Number of actual hours worked
+acthrs,DOUBLE,Actual hours intervals
+YA,DOUBLE,Young/adult
+hr_own,DOUBLE,Total hours in own use
+subhrs,DOUBLE,Time spent in subsistence activities
+hr_cshmain,DOUBLE,Hourly wage of employees in main job
+hr_cash,DOUBLE,Hourly wage of employees
+TVT2,DOUBLE,General or TVET attainment
+Prod_unit,DOUBLE,Production sector unit
+UD,DOUBLE,Unemployment duration
+IEV2,DOUBLE,Formal and informal employment for main job
+head,DOUBLE,Head of the household
+dG01,DOUBLE,Fetch firewood
+dG02,DOUBLE,Fetch water
+dG03,DOUBLE,Searching fodder or grazing
+dG04,DOUBLE,Manufacturing household goods
+dG05,DOUBLE,Repairing household
+dG06,DOUBLE,Cooking and shopping
+dG07,DOUBLE,Looking after children and elderly
+age3,DOUBLE,Selected age group
+TVT,DOUBLE,Attended TVT or not
+age3_16_30,DOUBLE,Youth age groups
+YUR1,DOUBLE,Youth unemployment rate
+indb05,DOUBLE,Field of education
+indd01,DOUBLE,ISCO High Level
+indd03,DOUBLE,ISIC High Level
+EN01,SMALLINT,Main source of energy that your household uses for lighting?
+EN01_OTHERS,VARCHAR,Main source of energy that your household uses for lighting - Other (specify)
+LU2,DOUBLE,Combined rate of unemployment and time-related underemployment (%)
+LU3,DOUBLE,Combined rate of unemployment and potential labour force (%)
+LU4,DOUBLE,Composite measure of labour underutilization (%)
+TRUR,DOUBLE,Time related underemployment rate (%)
+isco2digit,DOUBLE,Occupation activity at two digit
+isic2digitdigit,DOUBLE,Economic activity at two digit

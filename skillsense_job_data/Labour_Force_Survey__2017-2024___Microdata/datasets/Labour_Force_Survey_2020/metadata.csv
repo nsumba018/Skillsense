@@ -1,0 +1,53 @@
+column_name,data_type,description
+id,BIGINT,Row ID
+psu_no,BIGINT,Primary Sampling Unit Number
+pid,DOUBLE,Personal ID
+district,BIGINT,"District: Numeric code (11-57) representing the respondent's district in Rwanda. The first digit corresponds to the province (1-5), and the second digit identifies the district within that province. 11 = Nyarugenge, 12 = Gasabo, 13 = Kicukiro, 21 = Nyanza, 22 = Gisagara, 23 = Nyaruguru, 24 = Huye, 25 = Nyamagabe, 26 = Ruhango, 27 = Muhanga, 28 = Kamonyi, 31 = Karongi, 32 = Rutsiro, 33 = Rubavu, 34 = Nyabihu, 35 = Ngororero, 36 = Rusizi, 37 = Nyamasheke, 41 = Rulindo, 42 = Gakenke, 43 = Musanze, 44 = Burera, 45 = Gicumbi, 51 = Rwamagana, 52 = Nyagatare, 53 = Gatsibo, 54 = Kayonza, 55 = Kirehe, 56 = Ngoma, 57 = Bugesera."
+weight,DOUBLE,Weight
+code_ur,BIGINT,Urban-Rural
+a01,BIGINT,Sex
+a02,BIGINT,Relationship
+a04,BIGINT,Age at last birthday
+d05,DOUBLE,"In this job, are you working as..."
+d24,DOUBLE,How long have you been working (total experience)
+indd03,DOUBLE,ISIC High level
+wap16,DOUBLE,Working age population
+employed16,DOUBLE,Employment to population ratio
+ur1,DOUBLE,Unemployment rate
+lfpr,DOUBLE,Labour force participation rate
+sub,DOUBLE,Dimunished Subsistance foodstuff producers
+jobsearch,BIGINT,Not employed with jobsearch
+plf,DOUBLE,Potential labour force
+youth,DOUBLE,Youth 16 to 24 years old
+young,DOUBLE,Young 16 to 30 years old
+main_sect,DOUBLE,
+attained,DOUBLE,Level of education completed
+cash,DOUBLE,Monthly income in cash for employees
+age5,BIGINT,Five years age group
+age10,DOUBLE,Broader age group
+usualhrs,DOUBLE,Usual working hours
+usual_h,DOUBLE,Number of usual hours
+act_hrs,DOUBLE,Number of actual hours worked
+acthrs,DOUBLE,Actual hours intervals
+ya,DOUBLE,Young/adult
+usualhrsc,DOUBLE,
+usualhc,DOUBLE,
+status1,DOUBLE,Labour force status with 14+
+lfs_round,BIGINT,Labour Force Survey round
+district_1,DOUBLE,
+c21,TEXT,What did you do in the last 4 weeks to find a paid job or start a business?
+tvt,DOUBLE,Attended TVT or not
+a0a,DOUBLE,
+a0b,DOUBLE,
+a0c,DOUBLE,
+a0d,DOUBLE,
+a1a,DOUBLE,
+a1b,DOUBLE,
+i08,DOUBLE,
+i09,DOUBLE,
+i10,DOUBLE,
+i11,DOUBLE,
+i12,DOUBLE,
+lfs_year,BIGINT,Labour Force Survey year
+weight2,DOUBLE,Annual Weight
+d03b1,DOUBLE,Main goods and services (ISIC code)
