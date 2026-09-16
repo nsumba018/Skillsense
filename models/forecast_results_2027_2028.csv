@@ -1,0 +1,61 @@
+role,horizon,forecast_year,forecasted_demand_index,forecasted_share_pct,forecasted_employment_proxy,confidence_lower,confidence_upper,trend_direction
+Software Developer / Software Engineer,1y,2027,88.19,9.68,27392,79.67,96.71,declining
+Backend Developer,1y,2027,79.7,8.75,24753,71.18,88.22,stable
+IT Officer / ICT Administrator,1y,2027,79.68,8.75,24748,71.16,88.2,declining
+IT Support / Help Desk Technician,1y,2027,67.0,7.36,20809,58.48,75.52,growing
+Frontend / Web Developer,1y,2027,61.04,6.7,18958,52.52,69.56,growing
+Data Analyst,1y,2027,60.9,6.69,18914,52.38,69.42,growing
+Network Engineer / Network Administrator,1y,2027,50.97,5.6,15831,42.45,59.49,stable
+Systems Analyst / IT Business Analyst,1y,2027,48.9,5.37,15188,40.38,57.42,stable
+Full-Stack Developer,1y,2027,44.51,4.89,13823,35.99,53.03,stable
+Systems Administrator,1y,2027,44.36,4.87,13777,35.84,52.88,declining
+Database Administrator,1y,2027,39.68,4.36,12324,31.16,48.2,stable
+Mobile App Developer,1y,2027,39.07,4.29,12134,30.55,47.59,stable
+ICT Manager / IT Manager,1y,2027,34.89,3.83,10836,26.37,43.41,declining
+Data Engineer,1y,2027,32.4,3.56,10062,23.88,40.92,growing
+DevOps / Cloud Engineer,1y,2027,32.34,3.55,10045,23.82,40.86,declining
+Data Scientist,1y,2027,24.33,2.67,7556,15.81,32.85,growing
+Other ICT Technical Roles,1y,2027,23.29,2.56,7235,14.77,31.81,growing
+Cybersecurity Analyst / Security Engineer,1y,2027,22.94,2.52,7124,14.42,31.46,growing
+QA / Software Test Engineer,1y,2027,22.52,2.47,6995,14.0,31.04,growing
+IT Auditor / IT Governance & Risk,1y,2027,14.18,1.56,4405,5.66,22.7,growing
+Software Developer / Software Engineer,2y,2028,88.19,9.53,30182,76.83,99.55,declining
+IT Officer / ICT Administrator,2y,2028,72.69,7.85,24876,61.33,84.05,declining
+Backend Developer,2y,2028,72.48,7.83,24807,61.12,83.84,declining
+IT Support / Help Desk Technician,2y,2028,68.56,7.4,23462,57.2,79.92,growing
+Data Analyst,2y,2028,64.73,6.99,22154,53.37,76.09,growing
+Frontend / Web Developer,2y,2028,64.66,6.98,22129,53.3,76.02,growing
+Network Engineer / Network Administrator,2y,2028,51.58,5.57,17653,40.22,62.94,stable
+Systems Analyst / IT Business Analyst,2y,2028,49.31,5.33,16877,37.95,60.67,stable
+Systems Administrator,2y,2028,44.65,4.82,15280,33.29,56.01,declining
+Full-Stack Developer,2y,2028,44.15,4.77,15109,32.79,55.51,declining
+Database Administrator,2y,2028,39.73,4.29,13596,28.37,51.09,stable
+Mobile App Developer,2y,2028,39.17,4.23,13406,27.81,50.53,stable
+ICT Manager / IT Manager,2y,2028,36.4,3.93,12459,25.04,47.76,stable
+Data Engineer,2y,2028,34.36,3.71,11758,23.0,45.72,growing
+DevOps / Cloud Engineer,2y,2028,32.17,3.47,11008,20.81,43.53,declining
+Other ICT Technical Roles,2y,2028,26.4,2.85,9036,15.04,37.76,growing
+Data Scientist,2y,2028,26.32,2.84,9006,14.96,37.68,growing
+Cybersecurity Analyst / Security Engineer,2y,2028,25.92,2.8,8872,14.56,37.28,growing
+QA / Software Test Engineer,2y,2028,25.48,2.75,8718,14.12,36.84,growing
+IT Auditor / IT Governance & Risk,2y,2028,18.91,2.04,6470,7.55,30.27,growing
+Software Developer / Software Engineer,6m,2027,94.1,10.36,27389,88.42,99.78,declining
+IT Officer / ICT Administrator,6m,2027,86.69,9.54,25233,81.01,92.37,declining
+Backend Developer,6m,2027,80.6,8.87,23459,74.92,86.28,stable
+IT Support / Help Desk Technician,6m,2027,64.45,7.09,18759,58.77,70.13,stable
+Frontend / Web Developer,6m,2027,58.97,6.49,17164,53.29,64.65,stable
+Data Analyst,6m,2027,58.75,6.47,17100,53.07,64.43,stable
+Network Engineer / Network Administrator,6m,2027,50.49,5.56,14694,44.81,56.17,stable
+Systems Analyst / IT Business Analyst,6m,2027,49.1,5.4,14292,43.42,54.78,stable
+Systems Administrator,6m,2027,46.08,5.07,13412,40.4,51.76,stable
+Full-Stack Developer,6m,2027,45.6,5.02,13273,39.92,51.28,stable
+Database Administrator,6m,2027,39.44,4.34,11480,33.76,45.12,stable
+Mobile App Developer,6m,2027,38.24,4.21,11129,32.56,43.92,stable
+ICT Manager / IT Manager,6m,2027,36.29,3.99,10564,30.61,41.97,stable
+DevOps / Cloud Engineer,6m,2027,35.22,3.88,10252,29.54,40.9,declining
+Data Engineer,6m,2027,30.7,3.38,8935,25.02,36.38,growing
+QA / Software Test Engineer,6m,2027,21.81,2.4,6348,16.13,27.49,stable
+Other ICT Technical Roles,6m,2027,21.4,2.35,6228,15.72,27.08,growing
+Data Scientist,6m,2027,21.12,2.32,6146,15.44,26.8,growing
+Cybersecurity Analyst / Security Engineer,6m,2027,19.12,2.1,5565,13.44,24.8,growing
+IT Auditor / IT Governance & Risk,6m,2027,10.44,1.15,3039,4.76,16.12,growing
