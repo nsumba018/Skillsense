@@ -4,7 +4,7 @@
 
 Rwanda-focused. First sector: ICT / Computer Science / Digital Technology.
 
-Last updated: Sep 11, 2026
+Last updated: Sep 14, 2026
 
 ---
 
@@ -57,7 +57,6 @@ When complete, SkillSense will:
 - [x] ICT taxonomy: 22 roles across 12 groups (Layer 1)
 - [x] Emerging roles taxonomy defined: 8 roles for Layer 2
 - [x] All output files generated (cleaned, normalization, analytical, reports)
-- [ ] SESSION_LOG.md with reproducible steps for all data work — **not in repo**
 - [x] PROJECT_SPEC.md updated with two-layer architecture
 
 **Key files:**
@@ -68,24 +67,63 @@ When complete, SkillSense will:
 
 ---
 
-## Phase 1: Data Finalization
+## Phase 1: Data Finalization [DONE]
 
 *Transform Dataset B (92 postings) into a 2026 row for Dataset A, creating the complete training set.*
 
 **Depends on:** Phase 0 (done)
 
-- [ ] Aggregate Dataset B by `normalized_role` to get `posting_share_pct` per role
-- [ ] Estimate 2026 macro indicators (extrapolate from 2025 government LFS trends)
+- [x] Aggregate Dataset B by `normalized_role` to get `posting_share_pct` per role
+- [x] Estimate 2026 macro indicators (extrapolate from 2025 government LFS trends)
   - Total employment, ICT employment, ICT share, LFPR, unemployment rate, EPR, tertiary employment
-- [ ] Calculate 2026 `role_employment_proxy` and `role_demand_index` for each role
-- [ ] Handle the 4 historical-only roles with zero postings (IT Support, Telecom Tech, E-Gov Dev, Other ICT)
-  - Assign `posting_share_pct = 0` or small residual based on trend
-- [ ] Append 20 new rows (one per role) as year=2026 to Dataset A
-- [ ] Recalculate `target_role_demand_index_1y` and `_2y` for 2024 and 2025 (they now have future data)
-- [ ] Save updated historical CSVs (now 440 rows total: 2005-2026)
-- [ ] Validate: zero nulls, role shares sum to 100%, max demand index = 100
+- [x] Calculate 2026 `role_employment_proxy` and `role_demand_index` for each role
+- [x] Handle the 4 historical-only roles with zero postings (IT Support, Telecom Tech, E-Gov Dev, Other ICT)
+  - IT Support, Other ICT assigned small residual shares based on trend; Telecom Tech and E-Gov Dev merged into existing roles
+- [x] Append 20 new rows (one per role) as year=2026 to Dataset A
+- [x] Recalculate `target_role_demand_index_1y` and `_2y` for 2024 and 2025 (they now have future data)
+- [x] Save updated historical CSVs (now 440 rows total: 2005-2026)
+- [x] Validate: zero nulls, role shares sum to 100% (verified: 100.001%), max demand index = 100
 
-**Output:** `data/historical/` files updated with 2026 row, ready for model training.
+**Output:** `data/historical/skillsense_ict_labour_history_2019_2026.csv` — 160 rows (2019-2026, 20 roles/year). Combined with 2005-2009 (100 rows) and 2010-2018 (180 rows) = 440 total rows.
+
+**Key file:** `skillsense_job_data/scripts/phase1_data_finalization.py` — the script that produced this output.
+
+---
+
+## Frontend UI Shells [DONE — static, mock data]
+
+*The frontend lives in `frontend_pages/` (React 19, Vite 8, TypeScript, Tailwind v4, Recharts). All pages use hardcoded mock data — no backend integration yet.*
+
+**Public pages (complete):**
+- [x] Landing page (`App.tsx`) — hero, statistics strip, stakeholder section, pipeline explainer, CTA, footer
+- [x] Sign In page — full UI, navigates to dashboard (no auth logic)
+- [x] Sign Up page — institutional registration form (no submission)
+- [x] Forgot Password page — multi-step OTP flow (no API calls)
+
+**Dashboard pages (complete with mock data):**
+- [x] Dashboard Layout — sidebar nav, top header, card component
+- [x] Main Dashboard — KPI cards, demand trend chart, top skills, sector donut, policy alerts
+- [x] Skills Forecast — filter bar, AI advisory, skill demand index chart, rising/declining tables
+- [x] Employability — radar chart, sector probability bars, skill velocity table
+- [x] Geographic Intelligence — Rwanda tile heatmap, district rankings, urban/rural trends
+- [x] Sector Intelligence — sector growth trends, emerging sub-sectors, transferability grid
+- [x] Reports — report builder UI, template gallery, recent archive
+- [x] Settings — profile, security, notifications, session management
+
+**Shared components (complete):**
+- [x] Navbar, TopBar, Hero, HeroDashboard, Footer
+- [x] Charts library (`charts.tsx`) — 9 chart types (Sparkline, DemandTrend, Radar, Heatmap, etc.)
+- [x] RwandaMap (static image placeholder), SkillDemandChart, TopSkills
+
+**NOT yet built:**
+- [ ] Data Upload page (Module 3)
+- [ ] Skills Taxonomy browser (Module 5)
+- [ ] Education Alignment page (Module 10)
+- [ ] Career Guidance page (Module 11)
+- [ ] Policy & Planning page (Module 12)
+- [ ] User Management page (Module 14)
+- [ ] Auth integration (all pages bypass authentication)
+- [ ] API client setup (no backend connection)
 
 ---
 
@@ -439,17 +477,17 @@ When complete, SkillSense will:
 
 ### 4C: Build Remaining Pages
 
-- [ ] Main Dashboard page (Module 2) — KPIs, charts, alerts
+- [x] Main Dashboard page (Module 2) — KPIs, charts, alerts *(UI shell complete with mock data)*
 - [ ] Data Upload page (Module 3) — CSV upload form, upload history, processing status
 - [ ] Skills Taxonomy page (Module 5) — browse roles, families, groups
-- [ ] Demand Prediction page (Module 6) — forecast charts, trend tables, horizon selector
-- [ ] Employability page (Module 7) — skill profile input, score output
-- [ ] Sector Intelligence page (Module 8) — industry breakdown charts
-- [ ] Geographic Intelligence page (Module 9) — Rwanda map with PostGIS data
+- [x] Demand Prediction page (Module 6) — forecast charts, trend tables, horizon selector *(UI shell complete with mock data)*
+- [x] Employability page (Module 7) — skill profile input, score output *(UI shell complete with mock data)*
+- [x] Sector Intelligence page (Module 8) — industry breakdown charts *(UI shell complete with mock data)*
+- [x] Geographic Intelligence page (Module 9) — Rwanda map with PostGIS data *(UI shell with tile heatmap, mock data — needs real PostGIS map)*
 - [ ] Education Alignment page (Module 10) — gap analysis dashboard
 - [ ] Career Guidance page (Module 11) — personalised recommendations
 - [ ] Policy & Planning page (Module 12) — decision-support dashboard
-- [ ] Reports page (Module 13) — report browser, PDF download
+- [x] Reports page (Module 13) — report browser, PDF download *(UI shell complete with mock data — no real generation)*
 - [ ] User Management page (Module 14) — admin panel for users/roles
 
 ---
@@ -713,14 +751,14 @@ When complete, SkillSense will:
 ```
 Phase 0  [DONE]     Data Foundation
    ↓
-Phase 1  [NEXT]     Data Finalization (aggregate Dataset B → 2026 row)
+Phase 1  [DONE]     Data Finalization (aggregate Dataset B → 2026 row)
    ↓
-Phase 2             ML Model (train → validate → forecast)
+Phase 2  [NEXT]     ML Model (train → validate → forecast)
    ↓
 Phase 3             Django Backend (schema → API → auth → ML integration)
    ↓
-Phase 4             Frontend Integration (wire React → Django)
-   ↓
+Phase 4  [PARTIAL]  Frontend Integration (wire React → Django)
+   ↓                  └── Landing page + 7 dashboard UI shells built (all mock data)
 Phase 5             Core Modules (Dashboard, Upload, Taxonomy, Predictions)
    ↓
 Phase 6             Intelligence Modules (Employability, Sector, Geographic, Education, Career)
@@ -732,7 +770,7 @@ Phase 8             Layer 2: Emerging Skills Radar (global trends, new roles)
 Phase 9             Testing & Deployment (tests, Docker, CI/CD, security)
 ```
 
-**Critical path:** Phase 1 → 2 → 3 → 4 → 5 (everything else branches off after Phase 5)
+**Critical path:** Phase 2 → 3 → 4 → 5 (everything else branches off after Phase 5)
 
 **Can be parallelised:**
 - Phase 6 + Phase 7 (independent modules, can be built simultaneously)
@@ -751,9 +789,9 @@ Phase 9             Testing & Deployment (tests, Docker, CI/CD, security)
 | Current postings (Dataset B) | `skillsense_job_data/data/current_ict/ict_job_postings_v2.csv` |
 | Government microdata (Dataset C) | `skillsense_job_data/Labour_Force_Survey__2017-2024___Microdata/` |
 | Classification pipeline | `skillsense_job_data/scripts/classify_and_group_v2.py` |
-| Frontend source | `frontend/src/` |
-| Frontend components | `frontend/src/components/` |
-| Frontend feature hooks | `frontend/src/features/` |
-| Auth stub (dev only) | `frontend/server/` |
+| Frontend source | `frontend_pages/src/` |
+| Frontend components | `frontend_pages/src/components/` |
+| Frontend pages | `frontend_pages/src/pages/` |
+| Frontend dashboard pages | `frontend_pages/src/pages/dashboard/` |
 | Django backend (to create) | `backend/` |
 | ML models (to create) | `models/` |
