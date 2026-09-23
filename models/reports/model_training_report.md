@@ -13,7 +13,7 @@
 
 | Model | MAE | RMSE | R-squared |
 |-------|-----|------|-----------|
-| XGBoost | 8.42 | 12.63 | 0.7364 |
+| XGBoost | 8.45 | 12.62 | 0.7366 |
 | LightGBM | 8.35 | 12.55 | 0.7395 |
 | Prophet (per-role) | 9.48 | 12.24 | 0.7403 |
 
@@ -21,7 +21,7 @@
 
 ## 2025->2026 Test-Set Performance (Phase 1B correction applied)
 
-XGBoost (R2 0.7364) and LightGBM (R2 0.7395) both meet the Phase 2A acceptance criterion of R2 > 0.7 on the 2025 test fold (predicting the 2026 value).
+XGBoost (R2 0.7366) and LightGBM (R2 0.7395) both meet the Phase 2A acceptance criterion of R2 > 0.7 on the 2025 test fold (predicting the 2026 value).
 
 **Originally this fold failed badly** (XGBoost/LightGBM R2 ~ -0.11, worse than predicting the mean) even though the same model scored R2 > 0.9 on every other year in the rolling-window CV. Root cause: the 2026 row in Dataset A was built by Phase 1 (`phase1_data_finalization.py`) directly from Dataset B's raw posting share (92 scraped postings, ~4.6/role on average) — far noisier than the government-survey-derived shares backing 2005-2025, producing implausible jumps (e.g. Software Developer / Software Engineer 100 -> 53.8, DevOps / Cloud Engineer 8.9 -> 69.2 between 2025 and 2026).
 
@@ -73,16 +73,16 @@ Mean MAE: 3.41, Mean RMSE: 5.68, Mean R2: 0.9182
 
 | feature                   |   importance |
 |:--------------------------|-------------:|
-| demand_index_rolling_3y   |   0.609023   |
-| role_share_within_ict_pct |   0.294986   |
-| role_demand_index_lag1    |   0.0187579  |
-| role_employment_proxy     |   0.01603    |
-| demand_index_change_1y    |   0.0132898  |
-| trend_position            |   0.00997768 |
-| years_since_emergence     |   0.00919532 |
-| role_encoded              |   0.008585   |
-| year                      |   0.00675991 |
-| role_share_change_1y      |   0.00668817 |
+| demand_index_rolling_3y   |   0.635996   |
+| role_share_within_ict_pct |   0.274125   |
+| role_demand_index_lag1    |   0.0170378  |
+| role_employment_proxy     |   0.0152362  |
+| demand_index_change_1y    |   0.0124057  |
+| trend_position            |   0.00952581 |
+| years_since_emergence     |   0.0083494  |
+| role_encoded              |   0.00760649 |
+| year                      |   0.00634666 |
+| role_share_change_1y      |   0.00626955 |
 
 ## Hyperparameters (XGBoost)
 ```
