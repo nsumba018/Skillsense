@@ -1,52 +1,40 @@
 from django.db import models
+from django.conf import settings
 from core.models import TimestampedModel
-from accounts.models import User
-from predictions.models import ForecastRun
 
 
-class Report(TimestampedModel):
-    """
-    A generated PDF/JSON report tied to a forecast run.
-    Nshuti Delphin — Phase 3
-    """
-    REPORT_TYPE_CHOICES = [
-        ('forecast_summary', 'Forecast Summary'),
-        ('validation_report', 'Validation Report'),
-        ('sector_analysis', 'Sector Analysis'),
-        ('geographic_analysis', 'Geographic Analysis'),
-        ('full_dashboard', 'Full Dashboard Export'),
-    ]
+class GeneratedReport(TimestampedModel):
+    """A generated report (PDF or CSV)."""
 
-    STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('generating', 'Generating'),
-        ('ready', 'Ready'),
-        ('failed', 'Failed'),
-    ]
+    class ReportType(models.TextChoices):
+        DEMAND_OUTLOOK = 'demand_outlook', 'ICT Demand Outlook'
+        ROLE_DEEP_DIVE = 'role_deep_dive', 'Role-Specific Deep Dive'
+        EDUCATION_GAP = 'education_gap', 'Education Gap Report'
+        WORKFORCE_PLANNING = 'workforce_planning', 'Workforce Planning Brief'
 
+    class ReportFormat(models.TextChoices):
+        PDF = 'pdf', 'PDF'
+        CSV = 'csv', 'CSV'
+        JSON = 'json', 'JSON'
+
+    report_type = models.CharField(max_length=30, choices=ReportType.choices)
+    format = models.CharField(max_length=10, choices=ReportFormat.choices)
     title = models.CharField(max_length=255)
-    report_type = models.CharField(max_length=50, choices=REPORT_TYPE_CHOICES)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     generated_by = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='reports'
+        related_name='generated_reports',
     )
-    forecast_run = models.ForeignKey(
-        ForecastRun,
-        on_delete=models.SET_NULL,
-        null=True,
+    file = models.FileField(upload_to='reports/%Y/%m/', null=True, blank=True)
+    parameters = models.JSONField(
+        default=dict,
         blank=True,
-        related_name='reports'
+        help_text="Parameters used to generate this report (filters, date range, etc.)"
     )
-    file_path = models.CharField(max_length=500, blank=True)
-    notes = models.TextField(blank=True)
 
     class Meta:
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.title} [{self.get_status_display()}]"
-
-    
+        return f"{self.title} ({self.report_type}, {self.format})"

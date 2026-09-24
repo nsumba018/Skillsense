@@ -1,37 +1,45 @@
 from rest_framework.permissions import BasePermission
 
 
-class IsAdmin(BasePermission):
-    """Full access — platform administrators only."""
+class IsAdminUser(BasePermission):
+    """Full access — admin users only."""
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == 'admin'
-
-
-class IsAnalyst(BasePermission):
-    """Can view forecasts and reports."""
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role in ('admin', 'analyst')
+        return request.user.is_authenticated and request.user.is_admin_user
 
 
 class IsPolicyMaker(BasePermission):
-    """Can view reports and dashboards."""
+    """Access to dashboard, forecasts, policy planning, reports."""
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role in ('admin', 'policy_maker')
+        if not request.user.is_authenticated:
+            return False
+        return request.user.role in ('admin', 'policy_maker') or request.user.is_superuser
 
 
-class IsInstitutionUser(BasePermission):
-    """Institutional staff — read access to relevant data."""
+class IsEducationPlanner(BasePermission):
+    """Access to skills gaps, training alignment, curriculum."""
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role in (
-            'admin', 'analyst', 'policy_maker', 'institution_user'
-        )
+        if not request.user.is_authenticated:
+            return False
+        return request.user.role in ('admin', 'education_planner') or request.user.is_superuser
 
 
-class IsOwnerOrAdmin(BasePermission):
-    """Object-level: owner of the record or admin."""
-    def has_object_permission(self, request, view, obj):
-        if request.user.role == 'admin':
-            return True
-        return getattr(obj, 'generated_by', None) == request.user or obj == request.user
+class IsCareerAdvisor(BasePermission):
+    """Access to career guidance, employability, role outlooks."""
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        return request.user.role in ('admin', 'career_advisor') or request.user.is_superuser
 
-    
+
+class IsResearcher(BasePermission):
+    """Access to full analytics, data exports, historical trends."""
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        return request.user.role in ('admin', 'researcher') or request.user.is_superuser
+
+
+class IsAnyAuthenticated(BasePermission):
+    """Any authenticated user with any role — used for shared read-only endpoints."""
+    def has_permission(self, request, view):
+        return request.user.is_authenticated

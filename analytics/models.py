@@ -4,59 +4,43 @@ from taxonomy.models import NormalizedRole
 
 
 class GeographicDemand(TimestampedModel):
-    """
-    Demand for ICT roles by geographic region.
-    Nshuti Delphin — Phase 3
-    """
+    """ICT demand by geographic location (province/district)."""
+    province = models.CharField(max_length=100, db_index=True)
+    district = models.CharField(max_length=100, db_index=True)
     role = models.ForeignKey(
         NormalizedRole,
         on_delete=models.CASCADE,
-        related_name='geographic_demands'
+        related_name='geographic_demand',
     )
-    region_name = models.CharField(max_length=100)
-    region_code = models.CharField(max_length=20, blank=True)
-    demand_count = models.PositiveIntegerField(default=0)
-    year = models.PositiveSmallIntegerField()
-    quarter = models.PositiveSmallIntegerField(null=True, blank=True)
+    year = models.IntegerField()
+    posting_count = models.IntegerField(default=0)
+    demand_score = models.FloatField(
+        default=0.0,
+        help_text="Normalized demand intensity 0-100"
+    )
 
     class Meta:
-        unique_together = ('role', 'region_code', 'year', 'quarter')
-        ordering = ['-year', 'region_name']
+        ordering = ['province', 'district', '-year']
+        unique_together = ['province', 'district', 'role', 'year']
 
     def __str__(self):
-        return f"{self.region_name} — {self.role.normalized_title} ({self.year})"
+        return f"{self.district}, {self.province} — {self.role.name} ({self.year})"
 
 
 class SectorDemand(TimestampedModel):
-    """
-    Demand for ICT roles by economic sector.
-    Nshuti Delphin — Phase 3
-    """
-    SECTOR_CHOICES = [
-        ('finance', 'Finance & Banking'),
-        ('health', 'Health'),
-        ('government', 'Government & Public Sector'),
-        ('telecom', 'Telecom & ICT'),
-        ('education', 'Education'),
-        ('retail', 'Retail & Commerce'),
-        ('ngo', 'NGO & International Orgs'),
-        ('other', 'Other'),
-    ]
-
+    """ICT demand by industry sector."""
+    industry = models.CharField(max_length=255, db_index=True)
     role = models.ForeignKey(
         NormalizedRole,
         on_delete=models.CASCADE,
-        related_name='sector_demands'
+        related_name='sector_demand',
     )
-    sector = models.CharField(max_length=50, choices=SECTOR_CHOICES)
-    demand_count = models.PositiveIntegerField(default=0)
-    year = models.PositiveSmallIntegerField()
+    year = models.IntegerField()
+    posting_count = models.IntegerField(default=0)
 
     class Meta:
-        unique_together = ('role', 'sector', 'year')
-        ordering = ['-year', 'sector']
+        ordering = ['industry', '-year']
+        unique_together = ['industry', 'role', 'year']
 
     def __str__(self):
-        return f"{self.get_sector_display()} — {self.role.normalized_title} ({self.year})"
-
-    
+        return f"{self.industry} — {self.role.name} ({self.year})"
