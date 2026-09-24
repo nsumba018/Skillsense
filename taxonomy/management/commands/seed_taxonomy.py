@@ -1,8 +1,11 @@
 """
 Load the ICT role taxonomy into the database.
 
-The 20 roles are organized into groups and families based on the
-classification used in our dataset.
+The 22 roles (20 current roles plus 2 that only appear in 2005-2009:
+ICT Applications / E-Government Developer and Telecommunications / Network
+Technician) are organized into groups and families based on the
+classification used in our dataset. emergence_year matches the
+emergence_year column of the historical CSVs the ML model is trained on.
 
 Usage:
     python manage.py seed_taxonomy
@@ -17,22 +20,23 @@ TAXONOMY = {
         "sort_order": 1,
         "families": {
             "Backend Development": [
-                {"name": "Backend Developer", "emergence_year": 2012},
+                {"name": "Backend Developer", "emergence_year": 2016},
             ],
             "Frontend Development": [
-                {"name": "Frontend / Web Developer", "emergence_year": 2010},
+                {"name": "Frontend / Web Developer", "emergence_year": 2014},
             ],
             "Full-Stack Development": [
-                {"name": "Full-Stack Developer", "emergence_year": 2014},
+                {"name": "Full-Stack Developer", "emergence_year": 2018},
             ],
             "Mobile Development": [
-                {"name": "Mobile App Developer", "emergence_year": 2013},
+                {"name": "Mobile App Developer", "emergence_year": 2014},
             ],
             "General Software": [
                 {"name": "Software Developer / Software Engineer", "emergence_year": 2010},
+                {"name": "ICT Applications / E-Government Developer", "emergence_year": 2007},
             ],
             "Quality Assurance": [
-                {"name": "QA / Software Test Engineer", "emergence_year": 2015},
+                {"name": "QA / Software Test Engineer", "emergence_year": 2016},
             ],
         },
     },
@@ -40,10 +44,10 @@ TAXONOMY = {
         "sort_order": 2,
         "families": {
             "Data Analysis": [
-                {"name": "Data Analyst", "emergence_year": 2015},
+                {"name": "Data Analyst", "emergence_year": 2017},
             ],
             "Data Engineering": [
-                {"name": "Data Engineer", "emergence_year": 2017},
+                {"name": "Data Engineer", "emergence_year": 2019},
             ],
             "Data Science": [
                 {"name": "Data Scientist", "emergence_year": 2020},
@@ -61,6 +65,7 @@ TAXONOMY = {
             ],
             "Network Engineering": [
                 {"name": "Network Engineer / Network Administrator", "emergence_year": 2010},
+                {"name": "Telecommunications / Network Technician", "emergence_year": 2005},
             ],
             "IT Support": [
                 {"name": "IT Support / Help Desk Technician", "emergence_year": 2010},
@@ -74,7 +79,7 @@ TAXONOMY = {
         "sort_order": 4,
         "families": {
             "DevOps": [
-                {"name": "DevOps / Cloud Engineer", "emergence_year": 2018},
+                {"name": "DevOps / Cloud Engineer", "emergence_year": 2019},
             ],
         },
     },
@@ -82,10 +87,10 @@ TAXONOMY = {
         "sort_order": 5,
         "families": {
             "Cybersecurity": [
-                {"name": "Cybersecurity Analyst / Security Engineer", "emergence_year": 2016},
+                {"name": "Cybersecurity Analyst / Security Engineer", "emergence_year": 2018},
             ],
             "IT Governance": [
-                {"name": "IT Auditor / IT Governance & Risk", "emergence_year": 2015},
+                {"name": "IT Auditor / IT Governance & Risk", "emergence_year": 2017},
             ],
         },
     },
@@ -96,7 +101,7 @@ TAXONOMY = {
                 {"name": "ICT Manager / IT Manager", "emergence_year": 2010},
             ],
             "Business Analysis": [
-                {"name": "Systems Analyst / IT Business Analyst", "emergence_year": 2012},
+                {"name": "Systems Analyst / IT Business Analyst", "emergence_year": 2010},
             ],
         },
     },
@@ -136,7 +141,7 @@ class Command(BaseCommand):
                     created_families += 1
 
                 for role_data in roles:
-                    role, r_created = NormalizedRole.objects.get_or_create(
+                    role, r_created = NormalizedRole.objects.update_or_create(
                         name=role_data['name'],
                         defaults={
                             'role_family': family,

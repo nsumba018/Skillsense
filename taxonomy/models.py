@@ -86,7 +86,7 @@ class HistoricalDemand(models.Model):
         help_text="Estimated number of people employed in this role"
     )
     data_basis = models.CharField(
-        max_length=100,
+        max_length=255,
         blank=True,
         default='',
         help_text="Source of this data point (e.g., 'LFS_microdata', 'back_extrapolation')"
@@ -118,7 +118,7 @@ class MacroIndicator(models.Model):
     employment_to_population_ratio_pct = models.FloatField()
     tertiary_employment_count = models.BigIntegerField()
     data_source = models.CharField(
-        max_length=100,
+        max_length=255,
         blank=True,
         default='',
         help_text="e.g., 'NISR_LFS_2023', 'extrapolated'"
