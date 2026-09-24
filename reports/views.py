@@ -1,10 +1,13 @@
 import csv
 from django.http import HttpResponse
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 from predictions.models import ForecastRun, RoleForecast
+from core.params import int_param
 from taxonomy.models import HistoricalDemand
 from .models import GeneratedReport
 from .serializers import GeneratedReportSerializer
@@ -17,6 +20,7 @@ class ReportListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
 
+@extend_schema(parameters=[OpenApiParameter('role_id', OpenApiTypes.INT, description='Required for role_deep_dive')], responses=OpenApiTypes.OBJECT)
 class ReportGenerateView(APIView):
     """
     GET /api/reports/:type/ — Generate report data (JSON).
@@ -28,7 +32,7 @@ class ReportGenerateView(APIView):
         if report_type == 'demand_outlook':
             return self._demand_outlook_report()
         elif report_type == 'role_deep_dive':
-            role_id = request.query_params.get('role_id')
+            role_id = int_param(request.query_params, 'role_id')
             return self._role_deep_dive(role_id)
         else:
             return Response(
@@ -73,7 +77,7 @@ class ReportGenerateView(APIView):
         return Response(report_data)
 
     def _role_deep_dive(self, role_id):
-        if not role_id:
+        if role_id is None:
             return Response({"detail": "role_id query param required."}, status=400)
 
         history = HistoricalDemand.objects.filter(
@@ -103,6 +107,7 @@ class ReportGenerateView(APIView):
         })
 
 
+@extend_schema(responses={(200, 'text/csv'): OpenApiTypes.BINARY})
 class ReportCSVView(APIView):
     """
     GET /api/reports/:type/csv/ — Export report as CSV.

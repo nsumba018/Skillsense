@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -6,6 +8,7 @@ from uploads.models import JobPosting
 from .models import ForecastRun, RoleForecast
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 class DashboardKPIView(APIView):
     """
     GET /api/dashboard/kpis/
@@ -43,6 +46,7 @@ class DashboardKPIView(APIView):
         })
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 class DashboardOverviewView(APIView):
     """
     GET /api/dashboard/overview/

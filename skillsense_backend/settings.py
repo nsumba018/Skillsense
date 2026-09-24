@@ -150,8 +150,9 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Africa/Kigali'
 
-ML_MODEL_PATH = BASE_DIR / env('ML_MODEL_PATH', default='models/artifacts/best_model.joblib')
-ML_ROLE_ENCODER_PATH = BASE_DIR / env('ML_ROLE_ENCODER_PATH', default='models/artifacts/role_encoder.joblib')
-ML_FEATURE_LIST_PATH = BASE_DIR / env('ML_FEATURE_LIST_PATH', default='models/artifacts/feature_list.joblib')
+ML_MODEL_PATH = BASE_DIR / env('ML_MODEL_PATH', default='models/skillsense_forecast_model.joblib')
+ML_CORRECTION_FACTORS_PATH = BASE_DIR / env('ML_CORRECTION_FACTORS_PATH', default='models/correction_factors.joblib')
+ML_ROLE_ENCODER_PATH = BASE_DIR / env('ML_ROLE_ENCODER_PATH', default='models/role_encoder.joblib')
+ML_FEATURE_LIST_PATH = BASE_DIR / env('ML_FEATURE_LIST_PATH', default='models/feature_list.joblib')
 
 

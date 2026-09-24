@@ -32,6 +32,13 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'is_active', 'date_joined']
 
 
+class ProfileSerializer(UserSerializer):
+    """Self-service profile update: users cannot change their own role."""
+
+    class Meta(UserSerializer.Meta):
+        read_only_fields = ['id', 'role', 'is_active', 'date_joined']
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
     password_confirm = serializers.CharField(write_only=True)
@@ -49,6 +56,11 @@ class RegisterSerializer(serializers.ModelSerializer):
             'password', 'password_confirm', 'role', 'institution_id',
         ]
 
+    def validate_role(self, value):
+        if value == User.UserRole.ADMIN:
+            raise serializers.ValidationError("Admin accounts cannot be self-registered.")
+        return value
+
     def validate(self, attrs):
         if attrs['password'] != attrs.pop('password_confirm'):
             raise serializers.ValidationError({"password_confirm": "Passwords do not match."})
@@ -60,6 +72,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+
+
+class LogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
 
 
 class ChangePasswordSerializer(serializers.Serializer):

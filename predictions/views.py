@@ -1,9 +1,12 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from accounts.permissions import IsAdminUser
+from core.params import int_param
 from taxonomy.models import HistoricalDemand, MacroIndicator
 from taxonomy.serializers import MacroIndicatorSerializer
 from .models import ForecastRun, RoleForecast
@@ -14,6 +17,7 @@ from .serializers import (
 )
 
 
+@extend_schema(parameters=[OpenApiParameter('horizon', OpenApiTypes.STR, description='6m, 1y or 2y'), OpenApiParameter('role_id', OpenApiTypes.INT, description='Filter to one role')], responses=OpenApiTypes.OBJECT)
 class ForecastListView(APIView):
     """
     GET /api/predictions/forecasts/
@@ -39,8 +43,8 @@ class ForecastListView(APIView):
         if horizon:
             forecasts = forecasts.filter(horizon=horizon)
 
-        role_id = request.query_params.get('role_id')
-        if role_id:
+        role_id = int_param(request.query_params, 'role_id')
+        if role_id is not None:
             forecasts = forecasts.filter(role_id=role_id)
 
         return Response({
@@ -56,6 +60,7 @@ class ForecastByRoleView(APIView):
     """
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(operation_id='predictions_forecast_by_role', responses=OpenApiTypes.OBJECT)
     def get(self, request, role_id):
         latest_run = ForecastRun.objects.first()
         if not latest_run:
@@ -81,6 +86,7 @@ class ForecastByRoleView(APIView):
         })
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 class TrendAnalysisView(APIView):
     """
     GET /api/predictions/trends/
@@ -117,6 +123,7 @@ class TrendAnalysisView(APIView):
         return Response(result)
 
 
+@extend_schema(parameters=[OpenApiParameter('role_id', OpenApiTypes.INT, description=''), OpenApiParameter('year_from', OpenApiTypes.INT, description=''), OpenApiParameter('year_to', OpenApiTypes.INT, description='')], responses=OpenApiTypes.OBJECT)
 class HistoricalDemandView(APIView):
     """
     GET /api/predictions/historical/
@@ -127,17 +134,17 @@ class HistoricalDemandView(APIView):
     def get(self, request):
         queryset = HistoricalDemand.objects.select_related('role').all()
 
-        role_id = request.query_params.get('role_id')
-        if role_id:
+        role_id = int_param(request.query_params, 'role_id')
+        if role_id is not None:
             queryset = queryset.filter(role_id=role_id)
 
-        year_from = request.query_params.get('year_from')
-        if year_from:
-            queryset = queryset.filter(year__gte=int(year_from))
+        year_from = int_param(request.query_params, 'year_from')
+        if year_from is not None:
+            queryset = queryset.filter(year__gte=year_from)
 
-        year_to = request.query_params.get('year_to')
-        if year_to:
-            queryset = queryset.filter(year__lte=int(year_to))
+        year_to = int_param(request.query_params, 'year_to')
+        if year_to is not None:
+            queryset = queryset.filter(year__lte=year_to)
 
         from collections import defaultdict
         by_role = defaultdict(list)
@@ -161,6 +168,7 @@ class MacroIndicatorView(generics.ListAPIView):
     pagination_class = None
 
 
+@extend_schema(request=None, responses={201: ForecastRunSummarySerializer})
 class TriggerForecastRunView(APIView):
     """
     POST /api/predictions/run/ — Trigger a new forecast run (admin only).

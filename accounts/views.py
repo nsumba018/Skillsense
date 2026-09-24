@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
-from .serializers import UserSerializer, RegisterSerializer
+from .serializers import UserSerializer, RegisterSerializer, ProfileSerializer, LogoutSerializer
 
 User = get_user_model()
 
@@ -37,6 +37,7 @@ class RefreshView(TokenRefreshView):
 
 class LogoutView(generics.GenericAPIView):
     """POST /api/auth/logout/ — Blacklist the refresh token."""
+    serializer_class = LogoutSerializer
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -55,7 +56,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
     GET  /api/auth/me/ — Get current user profile.
     PUT  /api/auth/me/ — Update profile.
     """
-    serializer_class = UserSerializer
+    serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
 
     def get_object(self):

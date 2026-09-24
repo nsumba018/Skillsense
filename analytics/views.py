@@ -1,4 +1,6 @@
 from django.db.models import Count
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -10,6 +12,7 @@ from .models import GeographicDemand
 from .serializers import GeographicDemandSerializer, EmployabilityInputSerializer
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 class SectorDemandView(APIView):
     """
     GET /api/analytics/sector/
@@ -43,6 +46,7 @@ class GeographicDemandView(generics.ListAPIView):
     filterset_fields = ['province', 'district', 'year']
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 class EmployabilityOverviewView(APIView):
     """
     GET /api/analytics/employability/
@@ -59,6 +63,7 @@ class EmployabilityOverviewView(APIView):
         })
 
 
+@extend_schema(request=EmployabilityInputSerializer, responses=OpenApiTypes.OBJECT)
 class EmployabilityScoreView(APIView):
     """
     POST /api/analytics/employability/score/
@@ -122,6 +127,7 @@ class EmployabilityScoreView(APIView):
         })
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 class EducationAlignmentView(APIView):
     """
     GET /api/analytics/education/
@@ -137,6 +143,7 @@ class EducationAlignmentView(APIView):
         })
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 class CareerGuidanceView(APIView):
     """
     GET /api/analytics/career/

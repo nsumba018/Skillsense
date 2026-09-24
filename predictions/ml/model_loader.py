@@ -22,12 +22,28 @@ def get_model():
     return _model_cache['model']
 
 
+def get_correction_factors():
+    """Load and cache the Stage 2 market correction factors (role name -> factor)."""
+    if 'correction_factors' not in _model_cache:
+        cf_path = Path(settings.ML_CORRECTION_FACTORS_PATH)
+        if not cf_path.exists():
+            raise FileNotFoundError(
+                f"Correction factors not found at {cf_path}. "
+                "Run 'python models/phase2d_final_model.py' to generate them."
+            )
+        _model_cache['correction_factors'] = joblib.load(cf_path)
+    return _model_cache['correction_factors']
+
+
 def get_role_encoder():
     """Load and cache the role label encoder."""
     if 'role_encoder' not in _model_cache:
         encoder_path = Path(settings.ML_ROLE_ENCODER_PATH)
         if not encoder_path.exists():
-            raise FileNotFoundError(f"Role encoder not found at {encoder_path}")
+            raise FileNotFoundError(
+                f"Role encoder not found at {encoder_path}. "
+                "Run 'python models/phase2d_final_model.py' to generate it."
+            )
         _model_cache['role_encoder'] = joblib.load(encoder_path)
     return _model_cache['role_encoder']
 
@@ -37,7 +53,10 @@ def get_feature_list():
     if 'feature_list' not in _model_cache:
         feature_path = Path(settings.ML_FEATURE_LIST_PATH)
         if not feature_path.exists():
-            raise FileNotFoundError(f"Feature list not found at {feature_path}")
+            raise FileNotFoundError(
+                f"Feature list not found at {feature_path}. "
+                "Run 'python models/phase2d_final_model.py' to generate it."
+            )
         _model_cache['feature_list'] = joblib.load(feature_path)
     return _model_cache['feature_list']
 
