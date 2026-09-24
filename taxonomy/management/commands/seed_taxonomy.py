@@ -1,7 +1,9 @@
 """
 Load the ICT role taxonomy into the database.
 
-The 20 roles are organized into groups and families based on the
+The 22 roles (20 current roles plus 2 that only appear in 2005-2009:
+ICT Applications / E-Government Developer and Telecommunications / Network
+Technician) are organized into groups and families based on the
 classification used in our dataset.
 
 Usage:
@@ -30,6 +32,7 @@ TAXONOMY = {
             ],
             "General Software": [
                 {"name": "Software Developer / Software Engineer", "emergence_year": 2010},
+                {"name": "ICT Applications / E-Government Developer", "emergence_year": 2007},
             ],
             "Quality Assurance": [
                 {"name": "QA / Software Test Engineer", "emergence_year": 2015},
@@ -61,6 +64,7 @@ TAXONOMY = {
             ],
             "Network Engineering": [
                 {"name": "Network Engineer / Network Administrator", "emergence_year": 2010},
+                {"name": "Telecommunications / Network Technician", "emergence_year": 2005},
             ],
             "IT Support": [
                 {"name": "IT Support / Help Desk Technician", "emergence_year": 2010},

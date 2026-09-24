@@ -8,6 +8,7 @@ Usage:
     python manage.py seed_job_postings
 """
 import csv
+from datetime import datetime
 from pathlib import Path
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -22,6 +23,22 @@ DATA_FILE = (
     / 'current_ict'
     / 'ict_job_postings_v2.csv'
 )
+
+DATE_FORMATS = ('%Y-%m-%d', '%m/%d/%Y')
+
+
+def parse_date(value):
+    """Dataset B mixes ISO dates, US-style dates, and free text like
+    'Not specified'. Returns a date object, or None if unparseable."""
+    value = (value or '').strip()
+    if not value:
+        return None
+    for fmt in DATE_FORMATS:
+        try:
+            return datetime.strptime(value, fmt).date()
+        except ValueError:
+            continue
+    return None
 
 
 class Command(BaseCommand):
@@ -55,8 +72,8 @@ class Command(BaseCommand):
                         'education_raw': row.get('education_raw', ''),
                         'experience_raw': row.get('experience_raw', ''),
                         'contract_type_raw': row.get('contract_type_raw', ''),
-                        'posted_date': row.get('posted_date') or None,
-                        'closing_date': row.get('closing_date') or None,
+                        'posted_date': parse_date(row.get('posted_date')),
+                        'closing_date': parse_date(row.get('closing_date')),
                         'is_ict': row.get('is_ict', '').lower() in ('true', '1', 'yes'),
                         'ict_role_confidence': float(row.get('ict_role_confidence', 0) or 0),
                         'normalized_role': role_obj,
