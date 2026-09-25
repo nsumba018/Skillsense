@@ -19,7 +19,7 @@ def _broker_reachable():
 
 
 class UploadCreateView(generics.CreateAPIView):
-    """POST /api/uploads/ — Upload a CSV file (admin only)."""
+    """POST /api/uploads/: Upload a CSV file (admin only)."""
     serializer_class = DataUploadCreateSerializer
     permission_classes = [IsAdminUser]
     parser_classes = [MultiPartParser, FormParser]
@@ -38,21 +38,21 @@ class UploadCreateView(generics.CreateAPIView):
 
 
 class UploadListView(generics.ListAPIView):
-    """GET /api/uploads/list/ — List past uploads."""
+    """GET /api/uploads/list/: List past uploads."""
     queryset = DataUpload.objects.all()
     serializer_class = DataUploadSerializer
     permission_classes = [IsAdminUser]
 
 
 class UploadDetailView(generics.RetrieveAPIView):
-    """GET /api/uploads/:id/ — Upload detail + processing log."""
+    """GET /api/uploads/:id/: Upload detail + processing log."""
     queryset = DataUpload.objects.all()
     serializer_class = DataUploadSerializer
     permission_classes = [IsAdminUser]
 
 
 class UploadPostingsView(generics.ListAPIView):
-    """GET /api/uploads/:id/postings/ — Job postings from this upload."""
+    """GET /api/uploads/:id/postings/: Job postings from this upload."""
     serializer_class = JobPostingSerializer
     permission_classes = [IsAdminUser]
 

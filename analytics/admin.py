@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import GeographicDemand, SectorDemand
+from .models import Curriculum, CurriculumCourse, GeographicDemand, SectorDemand
 
 
 @admin.register(GeographicDemand)
@@ -14,3 +14,16 @@ class SectorDemandAdmin(admin.ModelAdmin):
     list_display = ['industry', 'role', 'year', 'posting_count']
     list_filter = ['year']
     search_fields = ['industry', 'role__name']
+
+
+class CurriculumCourseInline(admin.TabularInline):
+    model = CurriculumCourse
+    extra = 0
+
+
+@admin.register(Curriculum)
+class CurriculumAdmin(admin.ModelAdmin):
+    list_display = ['name', 'level', 'institution', 'uploaded_by', 'created_at']
+    list_filter = ['level', 'institution']
+    search_fields = ['name']
+    inlines = [CurriculumCourseInline]
