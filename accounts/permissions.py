@@ -1,45 +1,40 @@
 from rest_framework.permissions import BasePermission
 
+from .models import User
+
+ROLES = User.UserRole
+
+
+def _has_role(request, *roles):
+    user = request.user
+    return bool(user and user.is_authenticated and (user.role in roles or user.is_superuser))
+
 
 class IsAdminUser(BasePermission):
-    """Full access — admin users only."""
+    """Full access: platform administrators only."""
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.is_admin_user
 
 
-class IsPolicyMaker(BasePermission):
-    """Access to dashboard, forecasts, policy planning, reports."""
+class IsCareerTrainingAdvisor(BasePermission):
+    """Career & Training Advisor (administrators also allowed)."""
     def has_permission(self, request, view):
-        if not request.user.is_authenticated:
-            return False
-        return request.user.role in ('admin', 'policy_maker') or request.user.is_superuser
+        return _has_role(request, ROLES.ADMIN, ROLES.CAREER_TRAINING_ADVISOR)
 
 
 class IsEducationPlanner(BasePermission):
-    """Access to skills gaps, training alignment, curriculum."""
+    """Education / Curriculum Planner: curriculum upload and skills-gap analysis (administrators also allowed)."""
     def has_permission(self, request, view):
-        if not request.user.is_authenticated:
-            return False
-        return request.user.role in ('admin', 'education_planner') or request.user.is_superuser
+        return _has_role(request, ROLES.ADMIN, ROLES.EDUCATION_CURRICULUM_PLANNER)
 
 
-class IsCareerAdvisor(BasePermission):
-    """Access to career guidance, employability, role outlooks."""
+class IsLabourMarketAnalyst(BasePermission):
+    """Labour Market Analyst: deep analytics and reporting (administrators also allowed)."""
     def has_permission(self, request, view):
-        if not request.user.is_authenticated:
-            return False
-        return request.user.role in ('admin', 'career_advisor') or request.user.is_superuser
-
-
-class IsResearcher(BasePermission):
-    """Access to full analytics, data exports, historical trends."""
-    def has_permission(self, request, view):
-        if not request.user.is_authenticated:
-            return False
-        return request.user.role in ('admin', 'researcher') or request.user.is_superuser
+        return _has_role(request, ROLES.ADMIN, ROLES.LABOR_MARKET_ANALYST)
 
 
 class IsAnyAuthenticated(BasePermission):
-    """Any authenticated user with any role — used for shared read-only endpoints."""
+    """Any authenticated user with any role: shared read-only endpoints."""
     def has_permission(self, request, view):
         return request.user.is_authenticated

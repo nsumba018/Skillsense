@@ -22,7 +22,7 @@ class Command(BaseCommand):
 
         email = "admin@skillsense.rw"
         if User.objects.filter(email=email).exists():
-            self.stdout.write(self.style.WARNING("Admin already exists — skipping."))
+            self.stdout.write(self.style.WARNING("Admin already exists: skipping."))
             return
 
         user = User(
