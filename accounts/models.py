@@ -28,17 +28,16 @@ class User(AbstractUser):
     """Custom user model with role-based access and institution scope."""
 
     class UserRole(models.TextChoices):
-        ADMIN = 'admin', 'Admin'
-        POLICY_MAKER = 'policy_maker', 'Policy Maker'
-        EDUCATION_PLANNER = 'education_planner', 'Education Planner'
-        CAREER_ADVISOR = 'career_advisor', 'Career Advisor'
-        RESEARCHER = 'researcher', 'Researcher'
+        ADMIN = 'admin', 'Administrator'
+        CAREER_TRAINING_ADVISOR = 'career_training_advisor', 'Career & Training Advisor'
+        EDUCATION_CURRICULUM_PLANNER = 'education_curriculum_planner', 'Education / Curriculum Planner'
+        LABOR_MARKET_ANALYST = 'labor_market_analyst', 'Labour Market Analyst'
 
     email = models.EmailField(unique=True)
     role = models.CharField(
-        max_length=20,
+        max_length=32,
         choices=UserRole.choices,
-        default=UserRole.RESEARCHER,
+        default=UserRole.LABOR_MARKET_ANALYST,
     )
     institution = models.ForeignKey(
         Institution,
