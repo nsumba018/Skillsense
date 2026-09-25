@@ -1,352 +1,357 @@
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   TrendingUp,
-  FileText,
   BadgeCheck,
-  ArrowLeftRight,
   Zap,
-  BarChart3,
-  Sparkles,
-  AlertTriangle,
-  RefreshCw,
-  ClipboardList,
-  Share2,
-  Mail,
-  ChevronRight,
-  CheckCircle2,
-  Clock,
+  Users,
+  Briefcase,
+  Percent,
+  FileText,
+  UploadCloud,
+  Network,
+  Download,
+  Loader2,
+  ArrowUpRight,
+  ArrowDownRight,
 } from 'lucide-react'
 import DashboardLayout, { Card } from './DashboardLayout'
-import { Sparkline, DemandTrendChart, SectorDonut, sectorShare } from './charts'
+import { Sparkline, EmploymentTrendChart, Donut, DONUT_COLORS } from './charts'
+import { QueryGate } from '../../components/ui/State'
+import { ROLE_LABELS, useAuth } from '../../auth/AuthContext'
+import { ROLE_FOCUS } from '../../auth/access'
+import { useForecasts, useKpis, useMacro, useOverview, useSectors, useTrends } from '../../services/queries'
+import { predictionsApi, reportsApi } from '../../services/api'
+import { employmentChartData, employmentSeries } from '../../lib/derive'
+import { fmtDateTime, fmtInt, fmtNum, fmtPct } from '../../lib/format'
+import { ApiError } from '../../services/http'
 
-const stats = [
-  { label: 'Sectors Monitored', icon: BarChart3, value: '12', delta: '+1', color: '#7DD3C0', spark: [4, 6, 3, 7, 5, 8, 6, 9], iconTone: 'text-primary' },
-  { label: 'Emerging Skills', icon: Sparkles, value: '47', delta: '+8', color: '#7DD3C0', spark: [3, 4, 4, 5, 6, 6, 7, 9], iconTone: 'text-primary' },
-  { label: 'Employability Index', icon: TrendingUp, value: '68.4', delta: '+2.1', color: '#C9B99B', spark: [6, 7, 8, 8, 7, 6, 5, 5], iconTone: 'text-primary' },
-  { label: 'Active Alerts', icon: AlertTriangle, value: '5', delta: '2 new', color: '#EF6B6B', spark: [5, 3, 6, 4, 7, 5, 8, 6], iconTone: 'text-red-500', deltaTone: 'text-red-500' },
-]
+const LINK_ICONS: Record<string, typeof FileText> = {
+  '/dashboard/uploads': UploadCloud,
+  '/dashboard/users': Users,
+  '/dashboard/taxonomy': Network,
+  '/dashboard/reports': FileText,
+  '/dashboard/career': Briefcase,
+  '/dashboard/employability': Briefcase,
+  '/dashboard/forecast': TrendingUp,
+  '/dashboard/education': FileText,
+  '/dashboard/planning': FileText,
+  '/dashboard/geography': FileText,
+  '/dashboard/sectors': FileText,
+}
 
-const topSkills = [
-  { name: 'Data Analysis', pct: 94 },
-  { name: 'Software Dev', pct: 88 },
-  { name: 'Financial Literacy', pct: 76 },
-  { name: 'Digital Marketing', pct: 64 },
-  { name: 'Supply Chain Mgmt', pct: 59 },
-]
-
-const districts = [
-  { rank: '01', name: 'Gasabo', jobs: '12.4k Jobs', pct: 100, badge: 'HIGHEST GROWTH' },
-  { rank: '02', name: 'Nyarugenge', jobs: '9.8k Jobs', pct: 79 },
-  { rank: '03', name: 'Kicukiro', jobs: '8.2k Jobs', pct: 66 },
-  { rank: '04', name: 'Musanze', jobs: '5.4k Jobs', pct: 44 },
-  { rank: '05', name: 'Rubavu', jobs: '4.9k Jobs', pct: 40 },
-  { rank: '06', name: 'Huye', jobs: '4.2k Jobs', pct: 34 },
-]
-
-const alerts = [
-  {
-    title: 'Critical Skills Shortage',
-    time: '2H AGO',
-    body: 'Cybersecurity demand in the financial sector has exceeded local supply by 42%. Immediate training intervention recommended.',
-    accent: 'border-amber-400',
-    bg: 'bg-amber-50/60',
-    title_color: 'text-amber-900',
-  },
-  {
-    title: 'Employability Surge',
-    time: '5H AGO',
-    body: 'Vocational graduates in Musanze District show a 15% higher placement rate this quarter due to tourism industry recovery.',
-    accent: 'border-emerald-500',
-    bg: 'bg-emerald-50/60',
-    title_color: 'text-emerald-900',
-  },
-  {
-    title: 'Data Reporting Lag',
-    time: '1D AGO',
-    body: 'Nyarugenge district labor data reporting has been delayed for the second consecutive period. Potential data integrity risk.',
-    accent: 'border-red-500',
-    bg: 'bg-red-50/60',
-    title_color: 'text-red-900',
-  },
-]
-
-const quickActions = [
-  { icon: RefreshCw, title: 'Trigger Data Sync', desc: 'Manual pull from District Labor Offices' },
-  { icon: ClipboardList, title: 'New Policy Brief', desc: 'Draft recommendation based on current trends' },
-  { icon: Share2, title: 'Publish to Public Portal', desc: 'Export anonymized data to national dashboard' },
-  { icon: Mail, title: 'Contact District Leads', desc: 'Bulk notification to labor market focal points' },
-]
-
-const refreshes = [
-  {
-    entity: 'Rwanda Development Board (RDB)',
-    entitySub: 'Foreign Investment & Job Creation',
-    stream: 'Investment Trends Q3',
-    scheduled: 'Tomorrow, 09:00 AM',
-    priority: 'HIGH',
-    priorityTone: 'bg-red-100 text-red-600',
-    status: 'Validated',
-    statusIcon: CheckCircle2,
-    statusTone: 'text-emerald-600',
-  },
-  {
-    entity: 'TVET Board',
-    entitySub: 'Vocational Training Outcomes',
-    stream: 'Graduation Rates 2024',
-    scheduled: 'Oct 14, 2024',
-    priority: 'MEDIUM',
-    priorityTone: 'bg-gray-100 text-gray-600',
-    status: 'Pending',
-    statusIcon: Clock,
-    statusTone: 'text-gray-400',
-  },
-  {
-    entity: 'National Institute of Statistics',
-    entitySub: 'Demographic Labor Survey',
-    stream: 'Active Workforce Ratio',
-    scheduled: 'Oct 16, 2024',
-    priority: 'LOW',
-    priorityTone: 'bg-gray-100 text-gray-600',
-    status: 'Pending',
-    statusIcon: Clock,
-    statusTone: 'text-gray-400',
-  },
-]
+function Delta({ value, unit = '' }: { value: number | null; unit?: string }) {
+  if (value === null) return null
+  const up = value >= 0
+  const Icon = up ? ArrowUpRight : ArrowDownRight
+  return (
+    <span className={`flex items-center gap-0.5 text-sm font-semibold ${up ? 'text-emerald-600' : 'text-red-500'}`}>
+      <Icon className="h-3.5 w-3.5" />
+      {Math.abs(value).toFixed(1)}
+      {unit}
+    </span>
+  )
+}
 
 export default function Dashboard() {
+  const { user, isAdmin } = useAuth()
+  const queryClient = useQueryClient()
+  const kpis = useKpis()
+  const overview = useOverview()
+  const macro = useMacro()
+  const forecasts = useForecasts()
+  const trends = useTrends()
+  const sectors = useSectors()
+  const [confirmRun, setConfirmRun] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
+
+  const runForecast = useMutation({
+    mutationFn: predictionsApi.run,
+    onSuccess: () => {
+      setConfirmRun(false)
+      queryClient.invalidateQueries()
+    },
+  })
+
+  const series = macro.data ? employmentSeries(macro.data, 2015) : []
+  const latest = series.find((m) => m.year === kpis.data?.latest_year)
+  const prev = latest ? series.find((m) => m.year === latest.year - 1) : undefined
+  const empDelta = latest && prev ? ((latest.ict_employment - prev.ict_employment) / prev.ict_employment) * 100 : null
+  const shareDelta = latest && prev ? latest.ict_employment_share_pct - prev.ict_employment_share_pct : null
+
+  const top = overview.data?.forecast_summary['1y'] ?? []
+  const industryRows = sectors.data ?? []
+  const totalPostings = industryRows.reduce((s, r) => s + r.posting_count, 0)
+  const donutData = [
+    ...industryRows.slice(0, 5).map((r, i) => ({ name: r.industry_raw, value: r.posting_count, color: DONUT_COLORS[i] })),
+    ...(industryRows.length > 5
+      ? [{ name: 'Others', value: industryRows.slice(5).reduce((s, r) => s + r.posting_count, 0), color: DONUT_COLORS[5] }]
+      : []),
+  ]
+
   return (
     <DashboardLayout>
       {/* Welcome header */}
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
-            Welcome, Jean Uwimana
+          <h1 data-testid="welcome" className="text-3xl font-extrabold tracking-tight text-gray-900">
+            Welcome, {user?.first_name || user?.email}
           </h1>
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
             <span className="flex items-center gap-2 font-semibold text-gray-700">
               <BadgeCheck className="h-4 w-4 text-primary" />
-              Policy Maker · MIFOTRA
+              {user ? ROLE_LABELS[user.role] : ''}
             </span>
             <span className="hidden h-4 w-px bg-gray-300 sm:block" />
-            <span className="text-gray-500">National Employment Program Oversight</span>
+            <span className="text-gray-500">
+              Rwanda ICT sector{kpis.data?.latest_year ? ` · data through ${kpis.data.latest_year}` : ''}
+            </span>
           </div>
+          {user && <p data-testid="role-tagline" className="mt-2 max-w-xl text-sm text-gray-500">{ROLE_FOCUS[user.role].tagline}</p>}
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <button className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
-            <ArrowLeftRight className="h-4 w-4" />
-            Compare Districts
-          </button>
-          <button className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
-            <Zap className="h-4 w-4" />
-            Run Forecast
-          </button>
-          <button className="flex items-center gap-2 rounded-lg bg-navy px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-dark-navy">
-            <FileText className="h-4 w-4" />
-            Generate Report
+          <Link to="/dashboard/forecast" className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+            <TrendingUp className="h-4 w-4" />
+            Role forecast
+          </Link>
+          {isAdmin &&
+            (confirmRun ? (
+              <button
+                onClick={() => runForecast.mutate()}
+                disabled={runForecast.isPending}
+                className="flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-amber-600 disabled:opacity-60"
+              >
+                {runForecast.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+                {runForecast.isPending ? 'Running model…' : 'Confirm: create new forecast run'}
+              </button>
+            ) : (
+              <button onClick={() => setConfirmRun(true)} className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+                <Zap className="h-4 w-4" />
+                Run Forecast
+              </button>
+            ))}
+          <button
+            onClick={async () => {
+              setExportError(null)
+              try {
+                await reportsApi.downloadDemandOutlookCsv()
+              } catch {
+                setExportError('Export failed')
+              }
+            }}
+            className="flex items-center gap-2 rounded-lg bg-navy px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-dark-navy"
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
           </button>
         </div>
       </div>
+      {runForecast.isError && (
+        <p role="alert" className="mt-3 text-sm font-medium text-red-600">
+          {runForecast.error instanceof ApiError ? runForecast.error.message : 'Forecast run failed.'}
+        </p>
+      )}
+      {runForecast.isSuccess && <p className="mt-3 text-sm font-medium text-emerald-700">New forecast run stored (#{runForecast.data.id}).</p>}
+      {exportError && <p className="mt-3 text-sm font-medium text-red-600">{exportError}</p>}
 
-      {/* Stat cards */}
-      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map((s) => (
-          <Card key={s.label} className="p-5">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-500">{s.label}</span>
-              <s.icon className={`h-5 w-5 ${s.iconTone}`} />
-            </div>
-            <div className="mt-3 flex items-baseline gap-2">
-              <span className="text-4xl font-extrabold tracking-tight text-gray-900">{s.value}</span>
-              <span className={`text-sm font-semibold ${s.deltaTone ?? 'text-emerald-600'}`}>
-                {s.deltaTone ? s.delta : `↑${s.delta}`}
-              </span>
-            </div>
-            <div className="mt-3">
-              <Sparkline points={s.spark} color={s.color} />
-            </div>
-          </Card>
-        ))}
-      </div>
+      {/* KPI cards */}
+      <QueryGate query={kpis} className="mt-8">
+        {(k) => (
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            <Card className="p-5">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-500">ICT Employment</span>
+                <Users className="h-5 w-5 text-primary" />
+              </div>
+              <div className="mt-3 flex items-baseline gap-2">
+                <span data-testid="kpi-employment" className="text-4xl font-extrabold tracking-tight text-gray-900">{fmtInt(k.total_ict_employment)}</span>
+                <Delta value={empDelta} unit="%" />
+              </div>
+              <div className="mt-3"><Sparkline points={series.map((m) => m.ict_employment)} color="#7DD3C0" /></div>
+            </Card>
+            <Card className="p-5">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-500">ICT Share of Employment</span>
+                <Percent className="h-5 w-5 text-primary" />
+              </div>
+              <div className="mt-3 flex items-baseline gap-2">
+                <span data-testid="kpi-share" className="text-4xl font-extrabold tracking-tight text-gray-900">{fmtPct(k.ict_share_pct)}</span>
+                <Delta value={shareDelta} unit=" pts" />
+              </div>
+              <div className="mt-3"><Sparkline points={series.map((m) => m.ict_employment_share_pct)} color="#C9B99B" /></div>
+            </Card>
+            <Card className="p-5">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-500">ICT Roles Tracked</span>
+                <Network className="h-5 w-5 text-primary" />
+              </div>
+              <div className="mt-3">
+                <span data-testid="kpi-roles" className="text-4xl font-extrabold tracking-tight text-gray-900">{k.total_roles_tracked}</span>
+              </div>
+              <p className="mt-3 text-xs text-gray-500">{new Set(forecasts.data?.forecasts.map((f) => f.role_id)).size || '-'} with active forecasts</p>
+            </Card>
+            <Card className="p-5">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-500">Job Postings Analysed</span>
+                <Briefcase className="h-5 w-5 text-primary" />
+              </div>
+              <div className="mt-3">
+                <span data-testid="kpi-postings" className="text-4xl font-extrabold tracking-tight text-gray-900">{fmtInt(k.total_postings)}</span>
+              </div>
+              <p className="mt-3 text-xs text-gray-500">Current ICT postings used to validate the model</p>
+            </Card>
+          </div>
+        )}
+      </QueryGate>
 
-      {/* Demand trend + Top skills */}
+      {/* Trend + top roles */}
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="p-6 lg:col-span-2">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">National Skills Demand Trend</h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Aggregate demand projection across all sectors
-              </p>
+              <h2 className="text-lg font-bold text-gray-900">ICT Employment Trend & Forecast</h2>
+              <p className="mt-1 text-sm text-gray-500">Rwanda ICT employment, with model-projected totals at 6 months, 1 year and 2 years</p>
             </div>
             <div className="flex items-center gap-4 text-[11px] font-bold uppercase tracking-wide">
-              <span className="flex items-center gap-1.5 text-navy">
-                <span className="h-2.5 w-2.5 rounded-sm bg-navy" /> Historical
-              </span>
-              <span className="flex items-center gap-1.5 text-gray-400">
-                <span className="h-2.5 w-2.5 rounded-sm bg-gray-300" /> Forecast
-              </span>
+              <span className="flex items-center gap-1.5 text-navy"><span className="h-2.5 w-2.5 rounded-sm bg-navy" /> Historical</span>
+              <span className="flex items-center gap-1.5 text-gray-400"><span className="h-2.5 w-2.5 rounded-sm border border-dashed border-navy" /> Forecast</span>
             </div>
           </div>
-          <div className="mt-4">
-            <DemandTrendChart />
-          </div>
+          <QueryGate query={macro} className="mt-4">
+            {(m) => (
+              <div className="mt-4" data-testid="employment-chart">
+                <EmploymentTrendChart data={employmentChartData(m, forecasts.data)} />
+              </div>
+            )}
+          </QueryGate>
           <p className="mt-3 text-xs text-gray-400">
-            Source: MIFOTRA Labor Market Information System (LMIS) 2024 Report. Confidence
-            interval: ±4.2%
+            2017 onward: computed from NISR Labour Force Survey microdata. Earlier years are back-extrapolated estimates.
           </p>
         </Card>
 
         <Card className="p-6">
-          <h2 className="text-lg font-bold text-gray-900">Top 5 In-Demand Skills</h2>
-          <div className="mt-6 space-y-5">
-            {topSkills.map((sk) => (
-              <div key={sk.name}>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-bold text-gray-900">{sk.name}</span>
-                  <span className="font-bold text-navy">{sk.pct}%</span>
-                </div>
-                <div className="mt-2 h-2 w-full rounded-full bg-gray-100">
-                  <div className="h-2 rounded-full bg-navy" style={{ width: `${sk.pct}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      {/* Sector share + Top districts */}
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Card className="p-6">
-          <h2 className="text-lg font-bold text-gray-900">Sector Demand Share</h2>
-          <div className="mt-6 flex flex-col items-center gap-8 sm:flex-row sm:items-center sm:justify-around">
-            <SectorDonut />
-            <ul className="space-y-2.5">
-              {sectorShare.map((s) => (
-                <li key={s.name} className="flex items-center gap-3 text-sm">
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.color }} />
-                  <span className="w-32 text-gray-600">{s.name}</span>
-                  <span className="font-bold text-gray-900">{s.value}%</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <p className="mt-6 text-[11px] text-gray-400">
-            Data Source: Rwanda Sector Skills Council Annual Projection 2024
-          </p>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-lg font-bold text-gray-900">Top Districts by Demand</h2>
-          <div className="mt-5 space-y-4">
-            {districts.map((d) => (
-              <div key={d.name}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-gray-300">{d.rank}</span>
-                    <span className="text-sm font-bold text-gray-900">{d.name}</span>
-                    {d.badge && (
-                      <span className="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700">
-                        {d.badge}
-                      </span>
-                    )}
+          <h2 className="text-lg font-bold text-gray-900">Top 5 In-Demand ICT Roles</h2>
+          <p className="mt-1 text-xs text-gray-500">1-year forecast · demand index (0–100)</p>
+          <QueryGate query={overview} className="mt-6">
+            {() => (
+              <div className="mt-6 space-y-5">
+                {top.map((r, i) => (
+                  <div key={r.role_name}>
+                    <div className="flex items-center justify-between gap-3 text-sm">
+                      <span data-testid={`top-role-${i}`} className="font-bold text-gray-900">{r.role_name}</span>
+                      <span className="font-bold text-navy">{fmtNum(r.demand_index)}</span>
+                    </div>
+                    <div className="mt-2 h-2 w-full rounded-full bg-gray-100">
+                      <div className="h-2 rounded-full bg-navy" style={{ width: `${r.demand_index}%` }} />
+                    </div>
                   </div>
-                  <span className="text-sm font-semibold text-gray-700">{d.jobs}</span>
-                </div>
-                <div className="mt-2 h-2 w-full rounded-full bg-gray-100">
-                  <div className="h-2 rounded-full bg-primary" style={{ width: `${d.pct}%` }} />
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+            )}
+          </QueryGate>
         </Card>
       </div>
 
-      {/* Policy alerts + Quick actions */}
+      {/* Industries + movers */}
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card className="p-6">
-          <h2 className="text-lg font-bold text-gray-900">Recent Policy Alerts</h2>
-          <div className="mt-5 space-y-4">
-            {alerts.map((a) => (
-              <div key={a.title} className={`rounded-r-lg border-l-4 ${a.accent} ${a.bg} p-4`}>
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className={`text-sm font-bold ${a.title_color}`}>{a.title}</h3>
-                  <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
-                    {a.time}
-                  </span>
-                </div>
-                <p className="mt-1.5 text-sm leading-relaxed text-gray-600">{a.body}</p>
+          <h2 className="text-lg font-bold text-gray-900">Industries Hiring ICT Talent</h2>
+          <p className="mt-1 text-xs text-gray-500">Share of {fmtInt(totalPostings)} ICT job postings by industry</p>
+          <QueryGate query={sectors} className="mt-6">
+            {() => (
+              <div className="mt-6 flex flex-col items-center gap-8 sm:flex-row sm:justify-around" data-testid="industry-donut">
+                <Donut data={donutData} centerValue={fmtInt(totalPostings)} centerLabel="Postings" />
+                <ul className="space-y-2.5">
+                  {donutData.map((s) => (
+                    <li key={s.name} className="flex items-center gap-3 text-sm">
+                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.color }} />
+                      <span className="w-40 truncate text-gray-600" title={s.name}>{s.name}</span>
+                      <span className="font-bold text-gray-900">{s.value}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            ))}
-          </div>
+            )}
+          </QueryGate>
         </Card>
 
         <Card className="p-6">
-          <h2 className="text-lg font-bold text-gray-900">Quick Actions</h2>
-          <div className="mt-5 space-y-3">
-            {quickActions.map((q) => (
-              <button
-                key={q.title}
-                className="flex w-full items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 text-left transition-colors hover:border-gray-300 hover:bg-gray-50"
-              >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary-light text-primary">
-                  <q.icon className="h-5 w-5" />
+          <h2 className="text-lg font-bold text-gray-900">Forecast Movers</h2>
+          <p className="mt-1 text-xs text-gray-500">1-year outlook vs. current market share</p>
+          <QueryGate query={trends} className="mt-6">
+            {(t) => (
+              <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">Growing ({t.growing.length})</div>
+                  <ul className="mt-3 space-y-2" data-testid="movers-growing">
+                    {t.growing.slice(0, 4).map((r) => (
+                      <li key={r.role_id} className="flex items-center justify-between gap-2 text-sm">
+                        <span className="truncate font-medium text-gray-800" title={r.role_name}>{r.role_name}</span>
+                        <span className="shrink-0 font-bold text-emerald-600">{fmtNum(r.demand_index, 0)}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <div className="flex-1">
-                  <div className="text-sm font-bold text-gray-900">{q.title}</div>
-                  <div className="text-xs text-gray-500">{q.desc}</div>
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-red-600">Declining ({t.declining.length})</div>
+                  <ul className="mt-3 space-y-2" data-testid="movers-declining">
+                    {t.declining.slice(0, 4).map((r) => (
+                      <li key={r.role_id} className="flex items-center justify-between gap-2 text-sm">
+                        <span className="truncate font-medium text-gray-800" title={r.role_name}>{r.role_name}</span>
+                        <span className="shrink-0 font-bold text-red-500">{fmtNum(r.demand_index, 0)}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ChevronRight className="h-5 w-5 text-gray-300" />
-              </button>
-            ))}
-          </div>
+              </div>
+            )}
+          </QueryGate>
         </Card>
       </div>
 
-      {/* Upcoming data refreshes */}
-      <Card className="mt-6 p-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-gray-900">Upcoming Data Refreshes</h2>
-          <a href="#" className="text-sm font-bold text-primary hover:underline">
-            View Schedule
-          </a>
-        </div>
-        <div className="mt-5 overflow-x-auto">
-          <table className="w-full min-w-[640px] text-left">
-            <thead>
-              <tr className="border-b border-gray-200 text-[11px] font-bold uppercase tracking-wider text-gray-400">
-                <th className="pb-3 pr-4 font-bold">Source Entity</th>
-                <th className="pb-3 pr-4 font-bold">Data Stream</th>
-                <th className="pb-3 pr-4 font-bold">Scheduled For</th>
-                <th className="pb-3 pr-4 font-bold">Priority</th>
-                <th className="pb-3 font-bold">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {refreshes.map((r) => (
-                <tr key={r.entity} className="text-sm">
-                  <td className="py-4 pr-4">
-                    <div className="font-bold text-gray-900">{r.entity}</div>
-                    <div className="text-xs text-gray-500">{r.entitySub}</div>
-                  </td>
-                  <td className="py-4 pr-4 text-gray-600">{r.stream}</td>
-                  <td className="py-4 pr-4 text-gray-600">{r.scheduled}</td>
-                  <td className="py-4 pr-4">
-                    <span className={`rounded px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${r.priorityTone}`}>
-                      {r.priority}
-                    </span>
-                  </td>
-                  <td className="py-4">
-                    <span className={`flex items-center gap-1.5 font-semibold ${r.statusTone}`}>
-                      <r.statusIcon className="h-4 w-4" />
-                      {r.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+      {/* Model + quick links */}
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <Card className="p-6 lg:col-span-2">
+          <h2 className="text-lg font-bold text-gray-900">Forecasting Model</h2>
+          <QueryGate query={forecasts} className="mt-4">
+            {(f) => (
+              <div className="mt-5 grid grid-cols-2 gap-6 sm:grid-cols-4" data-testid="model-card">
+                {[
+                  ['Version', f.forecast_run.model_version],
+                  ['Rank correlation', fmtNum(f.forecast_run.accuracy_spearman, 4)],
+                  ['Pearson correlation', fmtNum(f.forecast_run.accuracy_pearson, 4)],
+                  ['CV R²', fmtNum(f.forecast_run.accuracy_r2, 4)],
+                ].map(([label, value]) => (
+                  <div key={label}>
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-gray-400">{label}</div>
+                    <div className="mt-1.5 text-2xl font-extrabold tracking-tight text-navy">{value}</div>
+                  </div>
+                ))}
+                <div className="col-span-2 text-xs text-gray-500 sm:col-span-4">
+                  Last run {fmtDateTime(f.forecast_run.created_at)} · validated against {fmtInt(kpis.data?.total_postings)} real ICT job postings
+                </div>
+              </div>
+            )}
+          </QueryGate>
+        </Card>
+
+        <Card className="p-6">
+          <h2 className="text-lg font-bold text-gray-900">Quick Links</h2>
+          <div className="mt-4 space-y-3">
+            {(user ? ROLE_FOCUS[user.role].links : []).map((q) => {
+              const Icon = LINK_ICONS[q.to] ?? FileText
+              return (
+                <Link key={q.to} to={q.to} className="flex items-center gap-3 rounded-xl border border-gray-200 p-3.5 text-sm font-semibold text-gray-800 transition-colors hover:border-primary/40 hover:bg-gray-50">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-light text-primary"><Icon className="h-4 w-4" /></span>
+                  {q.label}
+                </Link>
+              )
+            })}
+          </div>
+        </Card>
+      </div>
     </DashboardLayout>
   )
 }

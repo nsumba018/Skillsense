@@ -1,24 +1,55 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { AtSign, Lock, Eye, EyeOff, ArrowRight, Shield, HelpCircle } from 'lucide-react'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { AtSign, Lock, Eye, EyeOff, ArrowRight, Loader2, AlertCircle } from 'lucide-react'
+import { useAuth } from '../auth/AuthContext'
+import { ApiError } from '../services/http'
 
 export default function SignIn() {
+  const { user, loading, login } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const from = (location.state as { from?: string } | null)?.from ?? '/dashboard'
+
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  if (!loading && user) return <Navigate to={from} replace />
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    setSubmitting(true)
+    try {
+      await login(email.trim(), password, remember)
+      navigate(from, { replace: true })
+    } catch (err) {
+      setError(
+        err instanceof ApiError && err.status === 401
+          ? 'Incorrect email or password.'
+          : err instanceof ApiError
+            ? err.message
+            : 'Sign-in failed. Please try again.',
+      )
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
       {/* Left brand panel */}
       <aside className="relative flex flex-col overflow-hidden bg-gradient-to-br from-[#12277B] via-[#0E1F63] to-[#0B1A54] px-10 py-12 text-white lg:w-1/2 lg:px-16 lg:py-14">
-        {/* Globe / dotted world backdrop */}
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.18]"
           style={{
             backgroundImage: 'radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1.4px)',
             backgroundSize: '15px 15px',
-            WebkitMaskImage:
-              'radial-gradient(circle at 70% 42%, black 0%, black 34%, transparent 60%)',
-            maskImage:
-              'radial-gradient(circle at 70% 42%, black 0%, black 34%, transparent 60%)',
+            WebkitMaskImage: 'radial-gradient(circle at 70% 42%, black 0%, black 34%, transparent 60%)',
+            maskImage: 'radial-gradient(circle at 70% 42%, black 0%, black 34%, transparent 60%)',
           }}
         />
         <div className="pointer-events-none absolute right-[-6%] top-[18%] h-[520px] w-[520px] rounded-full border border-white/10 opacity-40" />
@@ -30,50 +61,59 @@ export default function SignIn() {
 
         <div className="relative mt-20 max-w-lg lg:mt-24">
           <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight lg:text-6xl">
-            Predictive Intelligence for the{' '}
-            <span className="text-[#5EEAD4]">Future Workforce.</span>
+            Predictive Intelligence for Rwanda's <span className="text-[#5EEAD4]">ICT Workforce.</span>
           </h1>
           <p className="mt-8 max-w-md text-lg leading-relaxed text-blue-100/75">
-            Access real-time labor market analytics, skills demand forecasting, and regional
-            employment shifts within our institutional ecosystem.
+            Forecast which ICT roles employers will need over the next 6 months, 1 year and 2 years,
+            built on 22 years of labour data and current job postings.
           </p>
 
           <div className="mt-16 flex gap-14">
             <div>
-              <div className="text-4xl font-extrabold text-white">42M+</div>
+              <div className="text-4xl font-extrabold text-white">22</div>
               <div className="mt-2 text-xs font-semibold uppercase tracking-wider text-blue-200/50">
-                Data<br />Points
+                ICT roles
+                <br />
+                tracked
               </div>
             </div>
             <div>
-              <div className="text-4xl font-extrabold text-white">98%</div>
+              <div className="text-4xl font-extrabold text-white">0.99</div>
               <div className="mt-2 text-xs font-semibold uppercase tracking-wider text-blue-200/50">
-                Accur<br />acy Rate
+                Rank correlation
+                <br />
+                on validation
               </div>
             </div>
           </div>
         </div>
 
         <p className="relative mt-auto pt-16 text-sm text-blue-200/40">
-          © 2024 National Labor Intelligence. Advanced Research Division.
+          © 2026 SkillSense: ICT Workforce Intelligence for Rwanda
         </p>
       </aside>
 
       {/* Right form panel */}
       <main className="flex flex-1 items-center justify-center bg-page px-6 py-12 lg:px-16">
         <div className="w-full max-w-md">
-          <h2 className="text-4xl font-extrabold leading-tight tracking-tight text-navy">
-            Secure Stakeholder Access Portal
-          </h2>
-          <p className="mt-4 text-lg text-gray-500">
-            Please enter your institutional credentials to continue.
-          </p>
+          <h2 className="text-4xl font-extrabold leading-tight tracking-tight text-navy">Sign in to SkillSense</h2>
+          <p className="mt-4 text-lg text-gray-500">Enter your account credentials to continue.</p>
 
-          <form className="mt-10 space-y-6" onSubmit={(e) => e.preventDefault()}>
-            {/* Email */}
+          <form className="mt-10 space-y-6" onSubmit={onSubmit} noValidate>
+            {error && (
+              <div
+                role="alert"
+                data-testid="signin-error"
+                className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
+              >
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                {error}
+              </div>
+            )}
+
             <div>
               <label htmlFor="email" className="mb-2 block text-sm font-bold text-gray-900">
-                Institutional Email
+                Email
               </label>
               <div className="flex items-center overflow-hidden rounded-lg border border-gray-300 bg-white transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
                 <span className="flex items-center self-stretch border-r border-gray-200 px-3.5 text-gray-400">
@@ -82,13 +122,16 @@ export default function SignIn() {
                 <input
                   id="email"
                   type="email"
-                  placeholder="name@organization.gov"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@organization.rw"
                   className="w-full bg-transparent px-4 py-3 text-[15px] text-gray-900 placeholder-gray-400 outline-none"
                 />
               </div>
             </div>
 
-            {/* Password */}
             <div>
               <label htmlFor="password" className="mb-2 block text-sm font-bold text-gray-900">
                 Password
@@ -100,6 +143,10 @@ export default function SignIn() {
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
                   className="w-full bg-transparent px-4 py-3 text-[15px] text-gray-900 placeholder-gray-400 outline-none"
                 />
@@ -114,53 +161,42 @@ export default function SignIn() {
               </div>
             </div>
 
-            {/* Remember / Forgot */}
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 text-[15px] text-gray-700">
                 <input
                   type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
                   className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary/30"
                 />
-                Remember Me
+                Remember me
               </label>
               <Link to="/forgot-password" className="text-[15px] font-bold text-primary hover:underline">
                 Forgot Password?
               </Link>
             </div>
 
-            {/* Submit */}
-            <Link
-              to="/dashboard"
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-navy py-4 text-base font-bold text-white shadow-sm transition-colors hover:bg-dark-navy"
+            <button
+              type="submit"
+              disabled={submitting || !email || !password}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-navy py-4 text-base font-bold text-white shadow-sm transition-colors hover:bg-dark-navy disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Sign In
-              <ArrowRight className="h-5 w-5" />
-            </Link>
+              {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
+              {submitting ? 'Signing in…' : 'Sign In'}
+              {!submitting && <ArrowRight className="h-5 w-5" />}
+            </button>
           </form>
 
-          {/* New user */}
           <div className="mt-8 border-t border-gray-200 pt-8">
             <p className="text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
-              New to the Intelligence Network?
+              New to SkillSense?
             </p>
             <Link
               to="/signup"
               className="mt-5 flex w-full items-center justify-center rounded-full border border-gray-300 bg-white py-3.5 text-base font-bold text-navy transition-colors hover:bg-gray-50"
             >
-              Create Institutional Account
+              Create an account
             </Link>
-          </div>
-
-          {/* Bottom links */}
-          <div className="mt-8 flex items-center justify-center gap-8 text-sm text-gray-500">
-            <a href="#" className="flex items-center gap-2 hover:text-gray-900">
-              <Shield className="h-4 w-4" />
-              Privacy Policy
-            </a>
-            <a href="#" className="flex items-center gap-2 hover:text-gray-900">
-              <HelpCircle className="h-4 w-4" />
-              Contact Support
-            </a>
           </div>
         </div>
       </main>

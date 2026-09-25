@@ -1,16 +1,17 @@
 import { lazy, Suspense } from 'react'
-import { ChevronDown, ArrowUp } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import RwandaMap from './RwandaMap'
 import TopSkills from './TopSkills'
 import AiInsightCard from './AiInsightCard'
+import { SNAPSHOT } from '../lib/snapshot'
 
 const SkillDemandChart = lazy(() => import('./SkillDemandChart'))
 
 const stats = [
-  { value: '2.4M+', label: 'Job Records Analyzed', trend: '12.5% vs last month' },
-  { value: '96.4%', label: 'Model Accuracy', trend: '2.3% vs last month' },
-  { value: '12', label: 'Economic Sectors Monitored' },
-  { value: '30', label: 'Districts Covered' },
+  { value: String(SNAPSHOT.roles), label: 'ICT roles tracked' },
+  { value: String(SNAPSHOT.postings), label: 'Real ICT job postings analysed' },
+  { value: SNAPSHOT.rankCorrelation.toFixed(2), label: 'Rank correlation on validation' },
+  { value: '6m · 1y · 2y', label: 'Forecast horizons' },
 ]
 
 const legend = [
@@ -19,14 +20,18 @@ const legend = [
   { label: 'Low', color: '#C7D6F5' },
 ]
 
+/**
+ * Decorative product preview. Numbers in the stat tiles, role list and trend chart are a static
+ * snapshot of real data; the map shading is decorative.
+ */
 export default function HeroDashboard() {
   return (
     <div className="bg-white rounded-[22px] border border-gray-200/80 shadow-xl shadow-gray-200/60 p-3.5">
       <div className="grid grid-cols-12 gap-2.5">
         <div className="col-span-12 lg:col-span-9 bg-white rounded-xl border border-[#E5E7EB] p-3.5">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-2.5">
-            <span className="text-[11px] font-bold text-primary uppercase tracking-wide">
-              National Skills Intelligence Overview
+            <span className="flex items-center gap-2 text-[11px] font-bold text-primary uppercase tracking-wide">
+              ICT Demand Overview
             </span>
             <div className="flex items-center gap-3">
               <button className="hidden sm:flex items-center gap-1 text-[10px] font-medium text-gray-600 border border-gray-200 rounded-lg px-2 py-1 shrink-0">
@@ -53,12 +58,6 @@ export default function HeroDashboard() {
             <div key={s.label} className="bg-white rounded-xl border border-[#E5E7EB] p-2.5 flex-1 flex flex-col justify-center">
               <div className="text-lg font-bold text-gray-900">{s.value}</div>
               <div className="text-[10px] text-gray-500 mt-0.5">{s.label}</div>
-              {s.trend && (
-                <div className="flex items-center gap-1 text-[10px] text-green-600 font-medium mt-1">
-                  <ArrowUp className="w-2.5 h-2.5" />
-                  {s.trend}
-                </div>
-              )}
             </div>
           ))}
         </div>

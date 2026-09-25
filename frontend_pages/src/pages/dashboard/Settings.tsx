@@ -1,297 +1,176 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import {
-  Pencil,
-  Lock,
-  Smartphone,
-  Mail,
-  Bell,
-  AlertTriangle,
-  Laptop,
-  Check,
-} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
+import { Check, Laptop, Loader2, LogOut, Lock } from 'lucide-react'
 import DashboardLayout, { Card } from './DashboardLayout'
+import { EmptyState, QueryGate } from '../../components/ui/State'
+import { ROLE_LABELS, useAuth } from '../../auth/AuthContext'
+import { authApi } from '../../services/api'
+import { ApiError, tokenStore } from '../../services/http'
+import { fmtDateTime, fmtDate } from '../../lib/format'
 
-const profileFields = [
-  { label: 'Full Name', name: 'fullName', type: 'text', defaultValue: 'Jean Uwimana' },
-  { label: 'Email Address', name: 'email', type: 'email', defaultValue: 'j.uwimana@mifotra.gov.rw' },
-  {
-    label: 'Organization',
-    name: 'organization',
-    type: 'text',
-    defaultValue: 'Ministry of Public Service and Labour (MIFOTRA)',
-  },
-]
+const UNAVAILABLE = ['Two-factor authentication', 'Notification preferences']
 
-const notificationOptions = [
-  { id: 'email', label: 'Email Notifications', icon: Mail, tone: 'text-navy', labelTone: 'text-gray-900' },
-  { id: 'dashboard', label: 'Dashboard Updates', icon: Bell, tone: 'text-navy', labelTone: 'text-gray-900' },
-  { id: 'critical', label: 'Critical Alerts', icon: AlertTriangle, tone: 'text-red-500', labelTone: 'text-red-600' },
-] as const
+const inputClass =
+  'mt-2 w-full rounded-lg border border-transparent bg-gray-50 px-4 py-3.5 text-sm text-gray-800 outline-none transition-colors focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20'
 
-const sessions = [
-  { device: 'MacBook Pro 16"', icon: Laptop, location: 'Kigali, Rwanda', lastActive: 'Now', current: true },
-  { device: 'iPhone 15 Pro', icon: Smartphone, location: 'Kigali, Rwanda', lastActive: '2 hours ago', current: false },
-]
-
-function SectionHeading({ title, desc }: { title: string; desc: string }) {
+function Section({ title, desc, children }: { title: string; desc: string; children: React.ReactNode }) {
   return (
-    <div className="lg:pt-2">
-      <h2 className="text-xl font-extrabold tracking-tight text-navy">{title}</h2>
-      <p className="mt-2 text-sm leading-relaxed text-gray-500">{desc}</p>
+    <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-[300px_1fr]">
+      <div className="lg:pt-2">
+        <h2 className="text-xl font-extrabold tracking-tight text-navy">{title}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-gray-500">{desc}</p>
+      </div>
+      {children}
     </div>
   )
 }
 
 export default function Settings() {
-  const [twoFactor, setTwoFactor] = useState(true)
-  const [notifications, setNotifications] = useState<Record<string, boolean>>({
-    email: true,
-    dashboard: true,
-    critical: false,
+  const { user, setUser, logout } = useAuth()
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const [first, setFirst] = useState('')
+  const [last, setLast] = useState('')
+  const [email, setEmail] = useState('')
+  const [oldPw, setOldPw] = useState('')
+  const [newPw, setNewPw] = useState('')
+  const [confirmPw, setConfirmPw] = useState('')
+
+  useEffect(() => {
+    if (user) {
+      setFirst(user.first_name)
+      setLast(user.last_name)
+      setEmail(user.email)
+    }
+  }, [user])
+
+  const save = useMutation({
+    mutationFn: () => authApi.updateMe({ first_name: first.trim(), last_name: last.trim(), email: email.trim(), username: user!.username }),
+    onSuccess: setUser,
   })
+  const changePw = useMutation({
+    mutationFn: () => authApi.changePassword(oldPw, newPw, tokenStore.refresh),
+    onSuccess: () => {
+      setOldPw('')
+      setNewPw('')
+      setConfirmPw('')
+      queryClient.invalidateQueries({ queryKey: ['sessions'] })
+    },
+  })
+  const sessions = useQuery({ queryKey: ['sessions'], queryFn: () => authApi.sessions(tokenStore.refresh) })
+  const revoke = useMutation({
+    mutationFn: (id: number) => authApi.revokeSession(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sessions'] }),
+  })
+
+  if (!user) return null
+  const dirty = first !== user.first_name || last !== user.last_name || email !== user.email
+  const initials = ((user.first_name[0] ?? '') + (user.last_name[0] ?? '')).toUpperCase() || user.email.slice(0, 2).toUpperCase()
+  const pwMismatch = confirmPw.length > 0 && newPw !== confirmPw
 
   return (
     <DashboardLayout>
-      {/* Page header */}
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-navy">Account Settings</h1>
-        <p className="mt-2 text-sm text-gray-500">
-          Manage your administrative profile and institutional security preferences within the
-          SkillSense network.
-        </p>
+        <p className="mt-2 text-sm text-gray-500">Manage your SkillSense profile and security.</p>
       </div>
 
-      {/* ---------- Personal profile ---------- */}
-      <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-[300px_1fr]">
-        <SectionHeading
-          title="Personal Profile"
-          desc="Your professional identity within the national workforce intelligence network."
-        />
-
+      <Section title="Personal Profile" desc="Your identity within the SkillSense platform.">
         <Card className="p-8">
           <div className="flex items-center gap-5 border-b border-gray-100 pb-6">
-            <div className="relative">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-navy text-xl font-bold text-white">
-                JU
-              </div>
-              <button
-                className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition-colors hover:text-navy"
-                aria-label="Change profile photo"
-              >
-                <Pencil className="h-3 w-3" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-navy text-xl font-bold text-white">{initials}</div>
+            <div>
+              <div data-testid="settings-name" className="text-lg font-bold text-gray-900">{`${user.first_name} ${user.last_name}`.trim() || user.email}</div>
+              <div data-testid="settings-role" className="mt-0.5 text-sm text-gray-500">{ROLE_LABELS[user.role]} · member since {fmtDate(user.date_joined)}</div>
+            </div>
+          </div>
+
+          <form className="mt-6 space-y-6" onSubmit={(e) => { e.preventDefault(); save.mutate() }}>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <label className="block"><span className="text-[11px] font-bold uppercase tracking-wider text-navy">First name</span><input value={first} onChange={(e) => setFirst(e.target.value)} className={inputClass} aria-label="First name" /></label>
+              <label className="block"><span className="text-[11px] font-bold uppercase tracking-wider text-navy">Last name</span><input value={last} onChange={(e) => setLast(e.target.value)} className={inputClass} aria-label="Last name" /></label>
+            </div>
+            <label className="block"><span className="text-[11px] font-bold uppercase tracking-wider text-navy">Email address</span><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} aria-label="Email address" /></label>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div><span className="text-[11px] font-bold uppercase tracking-wider text-navy">Role</span><div className="mt-2 rounded-lg bg-gray-100 px-4 py-3.5 text-sm text-gray-600">{ROLE_LABELS[user.role]}</div></div>
+              <div><span className="text-[11px] font-bold uppercase tracking-wider text-navy">Institution</span><div className="mt-2 rounded-lg bg-gray-100 px-4 py-3.5 text-sm text-gray-600">{user.institution?.name ?? 'Not set'}</div></div>
+            </div>
+            <div className="flex flex-wrap items-center justify-end gap-4">
+              {save.isError && <span role="alert" className="text-sm font-medium text-red-600">{save.error instanceof ApiError ? save.error.message : 'Could not save.'}</span>}
+              {save.isSuccess && !dirty && <span data-testid="saved" className="flex items-center gap-1 text-sm font-medium text-emerald-700"><Check className="h-4 w-4" /> Saved</span>}
+              <button type="submit" disabled={!dirty || save.isPending} className="flex items-center gap-2 rounded-lg bg-navy px-8 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-dark-navy disabled:cursor-not-allowed disabled:opacity-50">
+                {save.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Save changes
               </button>
             </div>
-            <div>
-              <div className="text-lg font-bold text-gray-900">Dr. Jean Uwimana</div>
-              <div className="mt-0.5 text-sm text-gray-500">Lead Policy Analyst</div>
-            </div>
-          </div>
+          </form>
+        </Card>
+      </Section>
 
-          <div className="mt-6 space-y-6">
-            {profileFields.map((f) => (
-              <label key={f.name} className="block">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-navy">
-                  {f.label}
-                </span>
-                <input
-                  type={f.type}
-                  name={f.name}
-                  defaultValue={f.defaultValue}
-                  className="mt-2 w-full rounded-lg border border-transparent bg-gray-50 px-4 py-3.5 text-sm text-gray-800 outline-none transition-colors focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20"
-                />
-              </label>
-            ))}
+      <Section title="Password" desc="Changing your password signs out every other device.">
+        <Card className="p-8">
+          <div className="flex items-center gap-2.5"><Lock className="h-5 w-5 text-navy" /><h3 className="text-lg font-bold text-gray-900">Update password</h3></div>
+          <form className="mt-6 space-y-5" onSubmit={(e) => { e.preventDefault(); changePw.mutate() }} noValidate>
+            <label className="block"><span className="text-[11px] font-bold uppercase tracking-wider text-navy">Current password</span><input type="password" autoComplete="current-password" value={oldPw} onChange={(e) => setOldPw(e.target.value)} className={inputClass} aria-label="Current password" /></label>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <label className="block"><span className="text-[11px] font-bold uppercase tracking-wider text-navy">New password</span><input type="password" autoComplete="new-password" value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="At least 8 characters" className={inputClass} aria-label="New password" /></label>
+              <label className="block"><span className="text-[11px] font-bold uppercase tracking-wider text-navy">Confirm new password</span><input type="password" autoComplete="new-password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} className={inputClass} aria-label="Confirm new password" />{pwMismatch && <span className="mt-1 block text-xs font-medium text-red-600">Passwords do not match.</span>}</label>
+            </div>
+            <div className="flex flex-wrap items-center justify-end gap-4">
+              {changePw.isError && <span role="alert" data-testid="pw-error" className="text-sm font-medium text-red-600">{changePw.error instanceof ApiError ? changePw.error.message : 'Could not change the password.'}</span>}
+              {changePw.isSuccess && <span data-testid="pw-changed" className="flex items-center gap-1 text-sm font-medium text-emerald-700"><Check className="h-4 w-4" /> Password updated{changePw.data.other_sessions_signed_out ? ` · ${changePw.data.other_sessions_signed_out} other session(s) signed out` : ''}</span>}
+              <button type="submit" disabled={!oldPw || newPw.length < 8 || newPw !== confirmPw || changePw.isPending} className="flex items-center gap-2 rounded-lg bg-navy px-8 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-dark-navy disabled:cursor-not-allowed disabled:opacity-50">
+                {changePw.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Change password
+              </button>
+            </div>
+          </form>
+        </Card>
+      </Section>
+
+      <Section title="Active Sessions" desc="Devices currently signed in to your account.">
+        <Card className="overflow-x-auto p-2">
+          <QueryGate query={sessions} className="m-6">
+            {(list) =>
+              list.length === 0 ? (
+                <EmptyState title="No active sessions" className="m-4" />
+              ) : (
+                <table className="w-full min-w-[520px] text-left" data-testid="sessions-table">
+                  <thead>
+                    <tr className="text-[11px] font-bold uppercase tracking-wider text-gray-500"><th className="px-4 py-3 font-bold">Session</th><th className="px-4 py-3 font-bold">Signed in</th><th className="px-4 py-3 font-bold">Expires</th><th className="px-4 py-3 text-right font-bold">Action</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {list.map((s) => (
+                      <tr key={s.id} data-current={s.current} className="text-sm">
+                        <td className="px-4 py-4"><span className="flex items-center gap-3 font-medium text-gray-900"><Laptop className="h-5 w-5 text-gray-500" />{s.current ? 'This device' : 'Another device'}</span></td>
+                        <td className="px-4 py-4 text-gray-600">{fmtDateTime(s.created_at)}</td>
+                        <td className="px-4 py-4 text-gray-600">{fmtDate(s.expires_at)}</td>
+                        <td className="px-4 py-4 text-right">
+                          {s.current ? <span className="text-sm font-semibold text-emerald-600">Current</span> : <button onClick={() => revoke.mutate(s.id)} disabled={revoke.isPending} className="text-sm font-bold text-red-500 hover:underline">Sign out</button>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )
+            }
+          </QueryGate>
+        </Card>
+      </Section>
+
+      <Section title="Other Security Options" desc="Options that are planned but not built yet.">
+        <Card className="divide-y divide-gray-100" data-testid="settings-unavailable">
+          {UNAVAILABLE.map((u) => (
+            <div key={u} className="flex items-center justify-between gap-4 px-6 py-5">
+              <span className="text-base font-bold text-gray-400">{u}</span>
+              <span data-mock="true" className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-700">Not available yet</span>
+            </div>
+          ))}
+          <div className="flex items-center justify-between gap-4 px-6 py-5">
+            <span className="text-base font-bold text-gray-900">Sign out on this device</span>
+            <button onClick={async () => { await logout(); navigate('/signin') }} className="flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50"><LogOut className="h-4 w-4" /> Sign out</button>
           </div>
         </Card>
-      </div>
-
-      {/* ---------- Account security ---------- */}
-      <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-[300px_1fr]">
-        <SectionHeading
-          title="Account Security"
-          desc="Maintain the integrity of your institutional data access."
-        />
-
-        <div className="space-y-6">
-          <Card className="p-8">
-            <div className="flex items-center gap-2.5">
-              <Lock className="h-5 w-5 text-navy" />
-              <h3 className="text-lg font-bold text-gray-900">Update Password</h3>
-            </div>
-
-            <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <label className="block">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-navy">
-                  Current Password
-                </span>
-                <input
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  className="mt-2 w-full rounded-lg border border-transparent bg-gray-50 px-4 py-3.5 text-sm text-gray-800 outline-none transition-colors focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20"
-                />
-              </label>
-              <label className="block">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-navy">
-                  New Password
-                </span>
-                <input
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="••••••••"
-                  className="mt-2 w-full rounded-lg border border-transparent bg-gray-50 px-4 py-3.5 text-sm text-gray-800 outline-none transition-colors focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20"
-                />
-              </label>
-            </div>
-
-            <div className="mt-5 text-right">
-              <Link
-                to="/forgot-password"
-                className="text-sm font-bold text-navy hover:underline"
-              >
-                Forgot password?
-              </Link>
-            </div>
-          </Card>
-
-          <Card className="flex items-center justify-between gap-6 border-l-4 border-l-emerald-600 p-6">
-            <div className="flex items-start gap-4">
-              <Smartphone className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">Two-Factor Authentication</h3>
-                <p className="mt-0.5 text-sm text-gray-500">
-                  Add an extra layer of security to your account.
-                </p>
-              </div>
-            </div>
-
-            <button
-              role="switch"
-              aria-checked={twoFactor}
-              aria-label="Two-factor authentication"
-              onClick={() => setTwoFactor((v) => !v)}
-              className={`relative h-7 w-13 shrink-0 rounded-full transition-colors ${
-                twoFactor ? 'bg-emerald-600' : 'bg-gray-300'
-              }`}
-            >
-              <span
-                className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${
-                  twoFactor ? 'left-7' : 'left-1'
-                }`}
-              />
-            </button>
-          </Card>
-        </div>
-      </div>
-
-      {/* ---------- Notification preferences ---------- */}
-      <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-[300px_1fr]">
-        <SectionHeading
-          title="Notification Preferences"
-          desc="Choose how you receive labor market updates and system alerts."
-        />
-
-        <Card className="divide-y divide-gray-100">
-          {notificationOptions.map((o) => {
-            const checked = notifications[o.id]
-            return (
-              <label
-                key={o.id}
-                className="flex cursor-pointer items-center justify-between gap-4 px-6 py-6"
-              >
-                <span className="flex items-center gap-4">
-                  <o.icon className={`h-5 w-5 ${o.tone}`} />
-                  <span className={`text-base font-bold ${o.labelTone}`}>{o.label}</span>
-                </span>
-
-                <span className="relative flex h-5 w-5 items-center justify-center">
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() =>
-                      setNotifications((n) => ({ ...n, [o.id]: !n[o.id] }))
-                    }
-                    className="peer sr-only"
-                  />
-                  <span
-                    className={`flex h-5 w-5 items-center justify-center rounded border-2 transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-primary/40 ${
-                      checked ? 'border-navy bg-navy text-white' : 'border-gray-300 bg-white'
-                    }`}
-                  >
-                    {checked && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
-                  </span>
-                </span>
-              </label>
-            )
-          })}
-        </Card>
-      </div>
-
-      {/* ---------- Session management ---------- */}
-      <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-[300px_1fr]">
-        <SectionHeading
-          title="Session Management"
-          desc="Manage your active sessions and connected devices."
-        />
-
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[600px] text-left">
-            <thead>
-              <tr className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
-                <th className="px-6 pb-4 font-bold">Device</th>
-                <th className="px-6 pb-4 font-bold">Location</th>
-                <th className="px-6 pb-4 font-bold">Last Active</th>
-                <th className="px-6 pb-4 text-right font-bold">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sessions.map((s, i) => (
-                <tr
-                  key={s.device}
-                  className={`bg-white text-sm shadow-sm ${
-                    i === 0 ? '[&>td:first-child]:rounded-tl-2xl [&>td:last-child]:rounded-tr-2xl' : ''
-                  } ${
-                    i === sessions.length - 1
-                      ? '[&>td:first-child]:rounded-bl-2xl [&>td:last-child]:rounded-br-2xl'
-                      : ''
-                  }`}
-                >
-                  <td className="px-6 py-5">
-                    <div className="flex items-center gap-3">
-                      <s.icon className="h-5 w-5 text-gray-500" />
-                      <span className="font-medium text-gray-900">{s.device}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-5 text-gray-600">{s.location}</td>
-                  <td className={`px-6 py-5 font-medium ${s.current ? 'text-emerald-600' : 'text-gray-600'}`}>
-                    {s.lastActive}
-                  </td>
-                  <td className="px-6 py-5 text-right">
-                    {s.current ? (
-                      <span className="text-sm font-semibold text-gray-400">Current</span>
-                    ) : (
-                      <button className="text-sm font-bold text-red-500 hover:underline">
-                        Revoke
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* ---------- Actions ---------- */}
-      <div className="mt-12 flex flex-wrap items-center justify-end gap-4">
-        <button className="rounded-lg px-6 py-3.5 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900">
-          Discard Changes
-        </button>
-        <button className="rounded-lg bg-navy px-8 py-3.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-dark-navy">
-          Save All Changes
-        </button>
-      </div>
+      </Section>
     </DashboardLayout>
   )
 }

@@ -1,12 +1,13 @@
-import { Database, Landmark, ListChecks, TrendingUp, Building2, RefreshCw } from 'lucide-react'
+import { Database, ListChecks, TrendingUp, Building2, Newspaper, CalendarRange } from 'lucide-react'
+import { SNAPSHOT } from '../lib/snapshot'
 
 const stats = [
-  { icon: Building2, value: '5,000+', label: 'Employers Covered' },
-  { icon: Landmark, value: '15+', label: 'Partner Institutions' },
-  { icon: ListChecks, value: '120+', label: 'Skills Tracked' },
-  { icon: Database, value: '6', label: 'National Data Sources' },
-  { icon: TrendingUp, value: '10-Yr', label: 'Forecast Horizon' },
-  { icon: RefreshCw, value: 'Monthly', label: 'Data Refresh' },
+  { icon: ListChecks, value: String(SNAPSHOT.roles), label: 'ICT Roles Tracked' },
+  { icon: Newspaper, value: String(SNAPSHOT.postings), label: 'Real ICT Job Postings' },
+  { icon: Building2, value: String(SNAPSHOT.companies), label: 'Hiring Companies' },
+  { icon: Database, value: String(SNAPSHOT.jobBoards.length), label: 'Job-Board Sources' },
+  { icon: CalendarRange, value: SNAPSHOT.historyYears, label: 'Years of Labour Data' },
+  { icon: TrendingUp, value: '2-Yr', label: 'Forecast Horizon' },
 ]
 
 export default function StatisticsStrip() {
@@ -27,6 +28,7 @@ export default function StatisticsStrip() {
             )
           })}
         </div>
+        <p className="pb-6 text-[11px] text-white/50">Figures from the SkillSense datasets ({SNAPSHOT.asOf}), a static snapshot, not live.</p>
       </div>
     </section>
   )
