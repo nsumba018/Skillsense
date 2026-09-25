@@ -145,10 +145,16 @@ def process_upload_task(upload_id):
 
             except Exception as e:
                 errors += 1
-                log_lines.append(f"Row {row_num}: error — {str(e)}")
+                log_lines.append(f"Row {row_num}: error: {str(e)}")
 
         with transaction.atomic():
             JobPosting.objects.bulk_create(postings_to_create)
+
+        try:
+            from analytics.services import rebuild_geographic_demand
+            rebuild_geographic_demand()
+        except Exception as e:  # geographic refresh must never fail an otherwise good upload
+            log_lines.append(f"Geographic demand refresh skipped: {e}")
 
         log_lines.insert(0, f"Processed {total} rows: {ict_count} ICT, {errors} errors")
         upload.status = 'completed'
