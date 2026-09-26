@@ -9,11 +9,11 @@ export default function EducationLaborMismatch() {
       <div className="container-1200">
         <div className="max-w-2xl mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
-            The Education–Labor Mismatch
+            Why ICT Workforce Intelligence?
           </h2>
           <p className="text-base text-gray-500 leading-relaxed">
-            Despite growing education output, skill misalignment continues to limit
-            employability and economic productivity.
+            Rwanda's ICT sector is expanding quickly. Knowing which roles will be needed, and when, lets training
+            and hiring keep pace.
           </p>
         </div>
 

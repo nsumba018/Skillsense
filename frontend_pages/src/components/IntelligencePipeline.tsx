@@ -4,27 +4,27 @@ const steps = [
   {
     icon: ClipboardList,
     title: 'Ingest',
-    details: ['Job postings', 'Census data', 'Education outputs', 'Surveys'],
+    details: ['Job-posting CSVs', 'NISR labour survey', 'Role taxonomy'],
   },
   {
     icon: Settings2,
     title: 'Process',
-    details: ['Clean', 'Standardize', 'NLP'],
+    details: ['Classify ICT / non-ICT', 'Normalize job titles', 'Map to 22 roles'],
   },
   {
     icon: MapPin,
     title: 'Predict',
-    details: ['Skill demand', 'Employment', 'Sector growth'],
+    details: ['Role demand', 'ICT employment', 'Trend direction'],
   },
   {
     icon: Zap,
     title: 'Analyze',
-    details: ['Insights', 'Regional comparison', 'Risk alerts'],
+    details: ['Employability scores', 'Sector mix', 'Skill gaps'],
   },
   {
     icon: LayoutGrid,
     title: 'Deliver',
-    details: ['Dashboards', 'Reports', 'API Access', 'Institutional Portals'],
+    details: ['Dashboards', 'Reports & CSV', 'REST API'],
   },
 ]
 
@@ -36,7 +36,7 @@ export default function IntelligencePipeline() {
           The Intelligence Pipeline
         </h2>
         <p className="text-base text-gray-500 text-center mt-3 mb-14">
-          From raw data to actionable workforce intelligence.
+          From raw ICT job data to actionable workforce forecasts.
         </p>
 
         <div className="flex flex-col lg:flex-row items-start gap-0 relative">

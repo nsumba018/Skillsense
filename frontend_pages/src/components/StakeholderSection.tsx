@@ -1,38 +1,31 @@
-import { Users, MapPin, UserCheck, UserSearch, Share2 } from 'lucide-react'
+import { Compass, GraduationCap, LineChart, ShieldCheck } from 'lucide-react'
 
 const stakeholders = [
   {
-    icon: Users,
-    title: 'Policy Makers',
-    description: 'Strategic labor planning and resource allocation.',
-    bg: '#E2E7FB',
-    color: '#2F4CDD',
-  },
-  {
-    icon: MapPin,
-    title: 'Education Planners',
-    description: 'Curriculum alignment with market needs.',
-    bg: '#E2E7FB',
-    color: '#2F4CDD',
-  },
-  {
-    icon: UserCheck,
-    title: 'Career Advisors',
-    description: 'Data-driven guidance for youth and job seekers.',
+    icon: Compass,
+    title: 'Career & Training Advisors',
+    description: 'Guide learners toward ICT roles with growing demand, and score skill profiles against the forecast.',
     bg: '#DCF3ED',
     color: '#0F9D6E',
   },
   {
-    icon: UserSearch,
-    title: 'Researchers',
-    description: 'Granular datasets for labor economy studies.',
+    icon: GraduationCap,
+    title: 'Education & Curriculum Planners',
+    description: 'Upload a programme and see which in-demand ICT skills it teaches, and which it misses.',
     bg: '#E2E7FB',
     color: '#2F4CDD',
   },
   {
-    icon: Share2,
+    icon: LineChart,
+    title: 'Labour Market Analysts',
+    description: 'Role, industry and regional demand, forecasts, and planning briefs for workforce investment.',
+    bg: '#E2E7FB',
+    color: '#2F4CDD',
+  },
+  {
+    icon: ShieldCheck,
     title: 'Administrators',
-    description: 'Monitoring performance of training initiatives.',
+    description: 'Upload job-posting data, manage users and keep the forecasts current.',
     bg: '#F1EFEC',
     color: '#44403C',
   },
@@ -43,9 +36,9 @@ export default function StakeholderSection() {
     <section id="stakeholders" className="py-20 scroll-mt-24">
       <div className="container-1200">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12 tracking-tight">
-          Built for Rwanda's Decision-Makers
+          Built for Rwanda's ICT Decision-Makers
         </h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {stakeholders.map((s) => {
             const Icon = s.icon
             return (

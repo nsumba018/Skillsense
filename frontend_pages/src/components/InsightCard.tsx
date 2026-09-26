@@ -1,35 +1,35 @@
-import { TrendingUp, GraduationCap, Globe2, MapPin } from 'lucide-react'
+import { TrendingUp, GraduationCap, Globe2, Briefcase } from 'lucide-react'
 
 const insights = [
   {
     icon: TrendingUp,
-    title: 'Supply-Demand Disparity',
+    title: 'A fast-growing ICT workforce',
     description:
-      'Addressing the widening gap between available talent and industry demand with precision data.',
+      'ICT employment has grown from 1.45% to 4.80% of all jobs in Rwanda in under a decade. Demand is moving faster than planning cycles.',
     bg: '#E2E7FB',
     color: '#2F4CDD',
   },
   {
     icon: GraduationCap,
-    title: 'Emerging Skills Gap',
+    title: 'Training must follow demand',
     description:
-      'Identifying and forecasting critical shortages in the digital economy and fintech requirements.',
+      'Forecasts show which ICT roles will grow or shrink, so programmes can be aligned before skills gaps open.',
     bg: '#EDEBFB',
     color: '#6D4FE0',
   },
   {
     icon: Globe2,
-    title: 'Data-Driven Alignment',
+    title: 'Built on evidence',
     description:
-      'Real-time signals from 5,000+ employers analyzed monthly to ensure curriculum relevance.',
+      'Trained on NISR Labour Force Survey data, then validated against 92 real ICT job postings from four Rwandan job boards.',
     bg: '#DCF3ED',
     color: '#0F9D6E',
   },
   {
-    icon: MapPin,
-    title: 'Regional Imbalance',
+    icon: Briefcase,
+    title: 'Roles, not just titles',
     description:
-      'Counteracting the high concentration of specialized technical skills within urban hubs.',
+      'Every posting is mapped to a controlled taxonomy of 22 ICT roles, so demand for Backend, DevOps or Data roles is comparable over time.',
     bg: '#E2E7FB',
     color: '#2F4CDD',
   },
@@ -41,21 +41,14 @@ export default function InsightCard() {
       {insights.map((insight) => {
         const Icon = insight.icon
         return (
-          <div
-            key={insight.title}
-            className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-4 hover:shadow-md transition-shadow"
-          >
+          <div key={insight.title} className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-4 hover:shadow-md transition-shadow">
             <div className="flex items-start gap-3">
               <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: insight.bg }}>
                 <Icon className="w-4 h-4" style={{ color: insight.color }} />
               </div>
               <div>
-                <h4 className="text-sm font-semibold text-gray-900 mb-0.5">
-                  {insight.title}
-                </h4>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  {insight.description}
-                </p>
+                <h4 className="text-sm font-semibold text-gray-900 mb-0.5">{insight.title}</h4>
+                <p className="text-xs text-gray-500 leading-relaxed">{insight.description}</p>
               </div>
             </div>
           </div>
