@@ -95,5 +95,8 @@ data/raw/**/*.json
 # ---------- Session / dev logs ----------
 SESSION_LOG.md
 
+# ---------- Stray output files ----------
+demand_outlook.csv
+
 # ---------- Prompt files (dev notes, not source code) ----------
 SkillSense_Job_Scraping_and_Role_Grouping_ETL_Prompt.md
