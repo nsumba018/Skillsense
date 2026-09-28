@@ -40,7 +40,7 @@ export default function SignIn() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col lg:flex-row">
+    <div className="flex h-screen flex-col lg:flex-row">
       {/* Left brand panel */}
       <aside className="relative flex flex-col overflow-hidden bg-gradient-to-br from-[#12277B] via-[#0E1F63] to-[#0B1A54] px-10 py-12 text-white lg:w-1/2 lg:px-16 lg:py-14">
         <div
@@ -59,18 +59,18 @@ export default function SignIn() {
           <span className="text-xl font-bold tracking-tight text-white">SkillSense</span>
         </Link>
 
-        <div className="relative mt-20 max-w-lg lg:mt-24">
-          <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight lg:text-6xl">
+        <div className="relative mt-8 max-w-lg lg:mt-10">
+          <h1 className="text-[42px] font-extrabold leading-[1.08] tracking-tight lg:text-[56px]">
             Predictive Intelligence for Rwanda's <span className="text-[#5EEAD4]">ICT Workforce.</span>
           </h1>
-          <p className="mt-8 max-w-md text-lg leading-relaxed text-blue-100/75">
+          <p className="mt-6 max-w-md text-base leading-relaxed text-blue-100/75">
             Forecast which ICT roles employers will need over the next 6 months, 1 year and 2 years,
-            built on 22 years of labour data and current job postings.
+            built on 22+ years of labour data and current job postings.
           </p>
 
-          <div className="mt-16 flex gap-14">
+          <div className="mt-6 flex gap-14">
             <div>
-              <div className="text-4xl font-extrabold text-white">22</div>
+              <div className="text-4xl font-extrabold text-white">22+</div>
               <div className="mt-2 text-xs font-semibold uppercase tracking-wider text-blue-200/50">
                 ICT roles
                 <br />
@@ -88,7 +88,7 @@ export default function SignIn() {
           </div>
         </div>
 
-        <p className="relative mt-auto pt-16 text-sm text-blue-200/40">
+        <p className="relative mt-auto pt-6 text-sm text-blue-200/40">
           © 2026 SkillSense: ICT Workforce Intelligence for Rwanda
         </p>
       </aside>

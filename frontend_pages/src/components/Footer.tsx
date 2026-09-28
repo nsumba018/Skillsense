@@ -7,6 +7,7 @@ export default function Footer() {
       <div className="container-1200 pt-20 pb-16">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
           <div className="sm:col-span-2 lg:col-span-1">
+            <div className="mb-5" />
             <Link to="/" className="flex items-center gap-2 mb-3 w-fit">
               <img src="/logo_icon.webp" alt="SkillSense logo" className="h-7 w-auto" />
               <span className="text-lg font-extrabold text-white tracking-tight">SkillSense</span>
@@ -18,6 +19,7 @@ export default function Footer() {
           </div>
 
           <div>
+            <div className="mb-5" />
             <h4 className="text-sm font-semibold mb-4">Explore</h4>
             <ul className="space-y-2.5">
               <li><Link to="/signin" className="text-xs text-gray-400 hover:text-white transition-colors">Sign in</Link></li>
@@ -28,6 +30,7 @@ export default function Footer() {
           </div>
 
           <div>
+            <div className="mb-5" />
             <h4 className="text-sm font-semibold mb-4">Data Sources</h4>
             <ul className="space-y-2.5 text-xs text-gray-400">
               <li>NISR Labour Force Survey</li>
@@ -37,6 +40,7 @@ export default function Footer() {
           </div>
 
           <div>
+            <div className="mb-5" />
             <h4 className="text-sm font-semibold mb-4">Based in</h4>
             <ul className="space-y-2.5">
               <li className="flex items-center gap-2 text-xs text-gray-400">

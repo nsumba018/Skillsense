@@ -90,7 +90,7 @@ frontend/server/data/
 
 # ---------- Scraping artifacts ----------
 # Raw JSON archives are large — keep CSVs, ignore JSON duplicates
-skillsense_job_data/raw/**/*.json
+data/raw/**/*.json
 
 # ---------- Session / dev logs ----------
 SESSION_LOG.md

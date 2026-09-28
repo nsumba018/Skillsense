@@ -4,7 +4,7 @@
 
 Rwanda-focused. First sector: ICT / Computer Science / Digital Technology.
 
-Last updated: Sep 21, 2026 (Phase 2D completed)
+Last updated: Sep 28, 2026 (Phase 3 done, Phase 4 in progress)
 
 ---
 
@@ -60,10 +60,9 @@ When complete, SkillSense will:
 - [x] PROJECT_SPEC.md updated with two-layer architecture
 
 **Key files:**
-- `skillsense_job_data/data/historical/*.csv` — training data
-- `skillsense_job_data/data/current_ict/ict_job_postings_v2.csv` — validation data
-- `skillsense_job_data/Labour_Force_Survey__2017-2024___Microdata/` — government microdata
-- `skillsense_job_data/scripts/classify_and_group_v2.py` — classification pipeline
+- `data/historical/*.csv` — training data
+- `data/current_ict/ict_job_postings_v2.csv` — validation data
+- `data/scripts/classify_and_group_v2.py` — classification pipeline
 
 ---
 
@@ -86,7 +85,7 @@ When complete, SkillSense will:
 
 **Output:** `data/historical/skillsense_ict_labour_history_2019_2026.csv` — 160 rows (2019-2026, 20 roles/year). Combined with 2005-2009 (100 rows) and 2010-2018 (180 rows) = 440 total rows.
 
-**Key file:** `skillsense_job_data/scripts/phase1_data_finalization.py` — the script that produced this output.
+**Key file:** `data/scripts/phase1_data_finalization.py` — the script that produced this output.
 
 ---
 
@@ -115,15 +114,7 @@ When complete, SkillSense will:
 - [x] Charts library (`charts.tsx`) — 9 chart types (Sparkline, DemandTrend, Radar, Heatmap, etc.)
 - [x] RwandaMap (static image placeholder), SkillDemandChart, TopSkills
 
-**NOT yet built:**
-- [ ] Data Upload page (Module 3)
-- [ ] Skills Taxonomy browser (Module 5)
-- [ ] Education Alignment page (Module 10)
-- [ ] Career Guidance page (Module 11)
-- [ ] Policy & Planning page (Module 12)
-- [ ] User Management page (Module 14)
-- [ ] Auth integration (all pages bypass authentication)
-- [ ] API client setup (no backend connection)
+**All pages now built** (see Phase 4C for current status). Auth integration, API client, and role-based routing completed in Phase 4A.
 
 ---
 
@@ -139,7 +130,7 @@ When complete, SkillSense will:
 - [x] Validated: shares sum to 100%, max index = 100, zero nulls
 - [x] Updated both `skillsense_ict_labour_history_2019_2025.csv` and `_2019_2026.csv`
 
-**Key file:** `skillsense_job_data/scripts/phase1b_shrinkage_correction.py`
+**Key file:** `data/scripts/phase1b_shrinkage_correction.py`
 
 ---
 
@@ -198,7 +189,7 @@ When complete, SkillSense will:
   - 1-year outlook (2027)
   - 2-year outlook (2028)
 - [x] Output per role: forecasted_demand_index, forecasted_share_pct, forecasted_employment_proxy, confidence intervals, trend direction
-- [x] Model artifacts saved (`.joblib` — gitignored, regenerate with `python models/train_model.py`)
+- [x] Model artifacts saved (`.joblib` — gitignored, regenerate with `python ml/train_model.py`)
 - [x] Forecast results saved as CSV (60 rows: 20 roles x 3 horizons)
 - [x] Performance report written
 
@@ -216,23 +207,23 @@ When complete, SkillSense will:
 **Declining roles:** DevOps/Cloud, ICT Manager, IT Officer, Software Engineer, Systems Admin
 
 **Output files (committed):**
-- `models/forecast_results_2027_2028.csv` — 60 forecast rows
-- `models/model_performance_report.md` — full metrics and validation
-- `models/reports/model_training_report.md` — training metrics and comparison
-- `models/reports/validation_comparison.csv` — predicted vs actual rankings
-- `models/reports/feature_importance.png` — feature importance chart
-- `models/artifacts/engineered_dataset.csv` — 440 rows with all features
-- `models/artifacts/model_ready_dataset.csv` — 418 training-ready rows
+- `ml/forecast_results_2027_2028.csv` — 60 forecast rows
+- `ml/model_performance_report.md` — full metrics and validation
+- `ml/reports/model_training_report.md` — training metrics and comparison
+- `ml/reports/validation_comparison.csv` — predicted vs actual rankings
+- `ml/reports/feature_importance.png` — feature importance chart
+- `ml/artifacts/engineered_dataset.csv` — 440 rows with all features
+- `ml/artifacts/model_ready_dataset.csv` — 418 training-ready rows
 
 **Output files (gitignored, regenerate locally):**
-- `models/skillsense_forecast_model.joblib` — run `python models/phase2d_final_model.py`
-- `models/role_encoder.joblib` — run `python models/phase2d_final_model.py`
-- `models/feature_list.joblib` — run `python models/phase2d_final_model.py`
-- `models/correction_factors.joblib` — run `python models/phase2d_final_model.py`
-- `models/artifacts/best_model.joblib` — run `python models/train_model.py` (v1, superseded)
-- `models/artifacts/role_encoder.joblib` (v1, superseded)
-- `models/artifacts/feature_list.joblib` (v1, superseded)
-- `models/artifacts/prophet_results.joblib` (v1, superseded)
+- `ml/skillsense_forecast_model.joblib` — run `python ml/phase2d_final_model.py`
+- `ml/role_encoder.joblib` — run `python ml/phase2d_final_model.py`
+- `ml/feature_list.joblib` — run `python ml/phase2d_final_model.py`
+- `ml/correction_factors.joblib` — run `python ml/phase2d_final_model.py`
+- `ml/artifacts/best_model.joblib` — run `python ml/train_model.py` (v1, superseded)
+- `ml/artifacts/role_encoder.joblib` (v1, superseded)
+- `ml/artifacts/feature_list.joblib` (v1, superseded)
+- `ml/artifacts/prophet_results.joblib` (v1, superseded)
 
 ---
 
@@ -280,294 +271,119 @@ When complete, SkillSense will:
 | QA / Software Test Engineer | 43.22 | 6.74% | growing |
 
 **Key files:**
-- `models/phase2d_final_model.py` — production Two-Stage script (run to regenerate all artifacts)
-- `models/phase2d_model_iteration.py` — v1 experiment sweep (18 experiments, all failed)
-- `models/phase2d_iteration_v2.py` — v2 experiment sweep (found Two-Stage winner)
-- `models/forecast_results_2027_2028.csv` — 60 forecast rows (regenerated)
-- `models/model_performance_report.md` — full validation report
-- `models/skillsense_forecast_model.joblib` — production model (gitignored, regenerate with `python models/phase2d_final_model.py`)
+- `ml/phase2d_final_model.py` — production Two-Stage script (run to regenerate all artifacts)
+- `ml/phase2d_model_iteration.py` — v1 experiment sweep (18 experiments, all failed)
+- `ml/phase2d_iteration_v2.py` — v2 experiment sweep (found Two-Stage winner)
+- `ml/forecast_results_2027_2028.csv` — 60 forecast rows (regenerated)
+- `ml/model_performance_report.md` — full validation report
+- `ml/skillsense_forecast_model.joblib` — production model (gitignored, regenerate with `python ml/phase2d_final_model.py`)
 
 ---
 
-## Phase 3: Django Backend
+## Phase 3: Django Backend [DONE]
 
-*Set up the production backend with database, API, and authentication.*
+*Production backend with database, API, authentication, and ML integration.*
 
-**Depends on:** Phase 2 (model artifact needed for prediction endpoints)
+**Done by:** Nshuti Delphin (3A: Project Setup) + Gasana Leslie (3B-3F: API & Integration) + IRAKOZE Nsumba Herve (code review, fixes, restructure)
 
-### 3A: Project Setup
+### 3A: Project Setup [DONE]
 
-- [ ] Create Django project: `skillsense_backend/`
-- [ ] Create Django apps:
-  - `core` — shared models, utilities, middleware
-  - `accounts` — user management, JWT auth, RBAC
-  - `taxonomy` — ICT role taxonomy (roles, families, groups)
-  - `predictions` — ML model loading, forecast API
-  - `uploads` — CSV upload, classification pipeline
-  - `analytics` — sector, geographic, employability analytics
-  - `reports` — report generation, PDF export
-- [ ] Install and configure packages:
-  - `djangorestframework` + `djangorestframework-simplejwt`
-  - `django-cors-headers`
-  - `django-filter`
-  - `psycopg2-binary` (PostgreSQL)
-  - `django.contrib.gis` (PostGIS)
-  - `celery` + `redis` (async tasks)
-  - `drf-spectacular` (API docs / OpenAPI schema)
-- [ ] Configure settings:
-  - Database (PostgreSQL + PostGIS)
-  - CORS (allow React frontend origin)
-  - JWT token lifetimes
-  - Media/static files
-  - Celery broker (Redis)
-- [ ] Create `.env` file for secrets (database password, secret key, etc.)
+- [x] Created Django project: `backend/skillsense_backend/`
+- [x] Created 7 Django apps: `core`, `accounts`, `taxonomy`, `predictions`, `uploads`, `analytics`, `reports`
+- [x] Installed and configured: DRF, simplejwt, cors-headers, django-filter, psycopg2-binary, drf-spectacular
+- [x] Configured settings: PostgreSQL, CORS, JWT lifetimes, media/static, `.env` secrets
+- [x] Project restructured: `backend/`, `ml/`, `data/`, `frontend_pages/`, `docs/`
 
-### 3B: Database Schema & Models
+### 3B: Database Schema & Models [DONE]
 
-- [ ] **accounts app:**
-  ```
-  User (extends AbstractUser)
-    - email, first_name, last_name
-    - role: enum (policy_maker, education_planner, career_advisor, researcher, admin)
-    - institution: FK → Institution
-    - is_active, date_joined
+- [x] `accounts`: User (AbstractUser + role enum + institution FK), Institution
+- [x] `taxonomy`: RoleGroup, RoleFamily, NormalizedRole, HistoricalDemand, MacroIndicator
+- [x] `predictions`: ForecastRun, RoleForecast
+- [x] `uploads`: DataUpload, JobPosting
+- [x] `analytics`: GeographicDemand, SectorDemand
+- [x] Migrations run, all tables created
+- [x] Seed data loaded: 20 roles, 440 historical demand rows, 22 macro years, 92 job postings, 60 forecasts
+- [x] 4 seed users created (admin, career advisor, curriculum planner, market analyst)
 
-  Institution
-    - name, type (government, university, ngo, private, other)
-    - created_at
-  ```
+### 3C: REST API Endpoints [DONE]
 
-- [ ] **taxonomy app:**
-  ```
-  RoleGroup
-    - name, description, sort_order
+- [x] Auth: register, login, refresh, logout, me (GET/PUT)
+- [x] Taxonomy: roles, groups, families, emerging roles
+- [x] Predictions: forecasts (all + per-role), trends, historical, macro, run forecast (admin)
+- [x] Dashboard: KPIs, overview
+- [x] Uploads: CSV upload (admin), list, detail, postings
+- [x] Analytics: sector, geographic, employability score, education, career
+- [x] Reports: list, generate JSON/PDF/CSV
+- [x] API docs at `/api/docs/` (drf-spectacular)
+- [x] Pagination, filtering, search, permission classes
 
-  RoleFamily
-    - name, role_group: FK → RoleGroup
+### 3D: Authentication & RBAC [DONE]
 
-  NormalizedRole
-    - name, role_family: FK → RoleFamily
-    - emergence_year, is_emerging (bool)
-    - global_trend_signal (float, 0-100, nullable — for Layer 2)
+- [x] JWT configured: 30min access, 7-day refresh, blacklisting enabled
+- [x] 4 roles: admin, career_training_advisor, education_curriculum_planner, labor_market_analyst
+- [x] Custom permission classes per endpoint
+- [x] Password validation (Django validators) on registration
+- [x] Seed users for all 4 roles (management command)
 
-  HistoricalDemand
-    - year, role: FK → NormalizedRole
-    - role_demand_index, role_share_within_ict_pct, role_employment_proxy
-    - data_basis, synthetic_flag
+### 3E: ML Model Integration [DONE]
 
-  MacroIndicator
-    - year
-    - total_employment, ict_employment, ict_employment_share_pct
-    - labour_force_participation_rate_pct, unemployment_rate_pct
-    - employment_to_population_ratio_pct, tertiary_employment_count
-    - data_source (str)
-  ```
+- [x] `predictions/ml/model_loader.py` — loads Two-Stage model artifacts
+- [x] `predictions/ml/forecaster.py` — runs predictions with computed accuracy metrics
+- [x] `run_forecast` management command
+- [x] Forecast results stored in ForecastRun + RoleForecast tables
 
-- [ ] **predictions app:**
-  ```
-  ForecastRun
-    - created_at, model_version, training_data_hash
-    - accuracy_mae, accuracy_rmse, accuracy_r2
+### 3F: CSV Upload Pipeline [DONE]
 
-  RoleForecast
-    - forecast_run: FK → ForecastRun
-    - role: FK → NormalizedRole
-    - horizon: enum (6m, 1y, 2y)
-    - demand_index, share_pct, employment_proxy
-    - confidence_lower, confidence_upper
-    - trend_direction: enum (growing, stable, declining)
-  ```
-
-- [ ] **uploads app:**
-  ```
-  DataUpload
-    - uploaded_by: FK → User
-    - file, original_filename, uploaded_at
-    - status: enum (pending, processing, completed, failed)
-    - total_records, ict_records, error_count
-    - processing_log (text)
-
-  JobPosting
-    - upload: FK → DataUpload (nullable for seed data)
-    - source, source_job_id, source_url
-    - title, company, location_raw, country
-    - industry_raw, education_raw, experience_raw
-    - contract_type_raw, closing_date, posted_date
-    - description, raw_text
-    - is_ict (bool), ict_role_confidence (float)
-    - normalized_role: FK → NormalizedRole (nullable)
-    - role_level, role_normalization_confidence
-    - needs_manual_review (bool)
-    - scraped_at, created_at
-  ```
-
-- [ ] **analytics app:**
-  ```
-  GeographicDemand (PostGIS)
-    - province, district
-    - role: FK → NormalizedRole
-    - year, posting_count, demand_score
-    - geom: PointField or MultiPolygonField
-
-  SectorDemand
-    - industry, role: FK → NormalizedRole
-    - year, posting_count
-  ```
-
-- [ ] Run `makemigrations` and `migrate`
-- [ ] Create seed data management command: load historical CSVs + taxonomy into database
-- [ ] Load Dataset A (440 rows) into `HistoricalDemand` + `MacroIndicator`
-- [ ] Load Dataset B (92 postings) into `JobPosting`
-- [ ] Load taxonomy (22 roles, 14 families, 12 groups) into `RoleGroup` / `RoleFamily` / `NormalizedRole`
-
-### 3C: REST API Endpoints
-
-- [ ] **Auth endpoints** (`/api/auth/`)
-  ```
-  POST   /api/auth/register/          — Create account
-  POST   /api/auth/login/             — Get JWT tokens
-  POST   /api/auth/refresh/           — Refresh access token
-  POST   /api/auth/logout/            — Blacklist refresh token
-  GET    /api/auth/me/                — Current user profile
-  PUT    /api/auth/me/                — Update profile
-  ```
-
-- [ ] **Taxonomy endpoints** (`/api/taxonomy/`)
-  ```
-  GET    /api/taxonomy/roles/          — List all normalized roles
-  GET    /api/taxonomy/roles/:id/      — Role detail + history + forecasts
-  GET    /api/taxonomy/groups/         — List role groups
-  GET    /api/taxonomy/families/       — List role families
-  GET    /api/taxonomy/emerging/       — List emerging roles (Layer 2)
-  ```
-
-- [ ] **Predictions endpoints** (`/api/predictions/`)
-  ```
-  GET    /api/predictions/forecasts/               — Latest forecasts (all roles, all horizons)
-  GET    /api/predictions/forecasts/:role_id/       — Forecasts for specific role
-  GET    /api/predictions/trends/                   — Trend analysis (growing/stable/declining)
-  GET    /api/predictions/historical/               — Historical demand data
-  GET    /api/predictions/macro/                    — Macro indicator time series
-  POST   /api/predictions/run/                      — Trigger new forecast run (admin only)
-  ```
-
-- [ ] **Dashboard endpoints** (`/api/dashboard/`)
-  ```
-  GET    /api/dashboard/kpis/          — Top-level KPIs (ICT employment, top roles, alerts)
-  GET    /api/dashboard/overview/      — Summary for main dashboard
-  ```
-
-- [ ] **Upload endpoints** (`/api/uploads/`)
-  ```
-  POST   /api/uploads/                 — Upload CSV file (admin only)
-  GET    /api/uploads/                 — List past uploads
-  GET    /api/uploads/:id/             — Upload detail + processing log
-  GET    /api/uploads/:id/postings/    — Job postings from this upload
-  ```
-
-- [ ] **Analytics endpoints** (`/api/analytics/`)
-  ```
-  GET    /api/analytics/sector/        — Sector demand breakdown
-  GET    /api/analytics/geographic/    — Geographic demand (PostGIS)
-  GET    /api/analytics/employability/ — Employability score calculator
-  POST   /api/analytics/employability/score/  — Score a skill profile
-  GET    /api/analytics/education/     — Education/training gap analysis
-  GET    /api/analytics/career/        — Career guidance recommendations
-  ```
-
-- [ ] **Reports endpoints** (`/api/reports/`)
-  ```
-  GET    /api/reports/                 — List available reports
-  GET    /api/reports/:type/           — Generate report (JSON)
-  GET    /api/reports/:type/pdf/       — Generate PDF report
-  GET    /api/reports/:type/csv/       — Export as CSV
-  ```
-
-- [ ] Configure API documentation (drf-spectacular / Swagger UI at `/api/docs/`)
-- [ ] Add pagination, filtering, and search across all list endpoints
-- [ ] Add permission classes (role-based access per endpoint)
-
-### 3D: Authentication & RBAC
-
-- [ ] Configure `djangorestframework-simplejwt`:
-  - Access token lifetime: 30 minutes
-  - Refresh token lifetime: 7 days
-  - Token blacklisting enabled
-- [ ] Create custom permission classes:
-  - `IsAdmin` — full access
-  - `IsPolicyMaker` — dashboard, forecasts, policy planning, reports
-  - `IsEducationPlanner` — skills gaps, training alignment, curriculum
-  - `IsCareerAdvisor` — career guidance, employability, role outlooks
-  - `IsResearcher` — full analytics, data exports, historical trends
-- [ ] Institution-scoped data access (users see data relevant to their institution)
-- [ ] Admin user seeding (management command)
-
-### 3E: ML Model Integration
-
-- [ ] Create `predictions/ml/` module:
-  - `model_loader.py` — load model artifact from disk
-  - `forecaster.py` — run predictions using loaded model
-  - `feature_engineering.py` — prepare input features from database
-- [ ] Management command: `python manage.py run_forecast` — retrain and produce new forecasts
-- [ ] Store forecast results in `ForecastRun` + `RoleForecast` tables
-- [ ] API endpoint loads latest `ForecastRun` results from database (not real-time inference)
-
-### 3F: CSV Upload Pipeline
-
-- [ ] Upload endpoint accepts CSV, saves to `DataUpload`
-- [ ] Celery task processes upload asynchronously:
-  1. Parse CSV
-  2. Run through `classify_and_group_v2.py` logic (ported to Django)
-  3. Create `JobPosting` records
-  4. Update processing log and status
-- [ ] Admin can review uploaded postings, approve/reject classifications
-- [ ] After approval, new data can trigger a forecast rerun
+- [x] Upload endpoint accepts CSV, creates DataUpload record
+- [x] Async processing: parse CSV, classify, create JobPosting records
+- [x] Date parsing for posted_date/closing_date fields
+- [x] Processing log and status tracking
 
 ---
 
-## Phase 4: Frontend Integration
+## Phase 4: Frontend Integration [IN PROGRESS]
 
-*Replace mock data with real Django API calls.*
+*Connect React frontend to Django backend. Replace mock data with real API calls.*
 
-**Depends on:** Phase 3 (API endpoints must exist)
+**Depends on:** Phase 3 (done)
 
-### 4A: API Client Setup
+### 4A: API Client & Auth [DONE]
 
-- [ ] Configure base API client in `frontend/src/services/http/`
-  - Base URL pointing to Django backend
-  - JWT token interceptor (attach access token to requests)
-  - Token refresh interceptor (auto-refresh on 401)
-  - Error handling
-- [ ] Create typed API service functions for each endpoint group:
-  - `authService.ts` — login, register, refresh, logout, getProfile
-  - `taxonomyService.ts` — getRoles, getGroups, getFamilies
-  - `predictionService.ts` — getForecasts, getTrends, getHistorical
-  - `dashboardService.ts` — getKPIs, getOverview
-  - `uploadService.ts` — uploadCSV, getUploads
-  - `analyticsService.ts` — getSector, getGeographic, scoreEmployability
-  - `reportService.ts` — getReports, downloadPDF
+- [x] Base API client in `frontend_pages/src/services/http/` with JWT interceptor
+- [x] Token refresh on 401 (silent refresh)
+- [x] Typed API service functions: auth, taxonomy, predictions, dashboard, uploads, analytics, reports
+- [x] Authentication flow: login → JWT → protected routes → role-based access
+- [x] AuthContext with useAuth() hook
+- [x] Role-based route guards (`access.ts` — single source of truth for all 22 routes)
 
-### 4B: Replace Mock Data
+### 4B: Landing Page & Auth Pages [DONE]
 
-- [ ] Update React Query hooks in `frontend/src/features/` to call real API services
-- [ ] Replace mock data in all dashboard components with live data
-- [ ] Wire up authentication flow (login page → JWT → protected routes)
-- [ ] Test all data flows end-to-end (frontend → API → database → response)
+- [x] Landing page polished: hero section, statistics strip, stakeholder section, pipeline explainer, CTA, footer
+- [x] "Built for" marquee with institution logos (MINICT, RDB, RISA, AUCA, MIFOTRA, NISR)
+- [x] Sign In page (no-scroll, split layout, connected to JWT auth)
+- [x] Sign Up page (institutional registration, connected to API)
+- [x] Forgot Password page (multi-step OTP flow)
 
-### 4C: Build Remaining Pages
+### 4C: Dashboard Pages [PARTIAL — UI built, role-based content needs cleanup]
 
-- [x] Main Dashboard page (Module 2) — KPIs, charts, alerts *(UI shell complete with mock data)*
-- [ ] Data Upload page (Module 3) — CSV upload form, upload history, processing status
-- [ ] Skills Taxonomy page (Module 5) — browse roles, families, groups
-- [x] Demand Prediction page (Module 6) — forecast charts, trend tables, horizon selector *(UI shell complete with mock data)*
-- [x] Employability page (Module 7) — skill profile input, score output *(UI shell complete with mock data)*
-- [x] Sector Intelligence page (Module 8) — industry breakdown charts *(UI shell complete with mock data)*
-- [x] Geographic Intelligence page (Module 9) — Rwanda map with PostGIS data *(UI shell with tile heatmap, mock data — needs real PostGIS map)*
-- [ ] Education Alignment page (Module 10) — gap analysis dashboard
-- [ ] Career Guidance page (Module 11) — personalised recommendations
-- [ ] Policy & Planning page (Module 12) — decision-support dashboard
-- [x] Reports page (Module 13) — report browser, PDF download *(UI shell complete with mock data — no real generation)*
-- [ ] User Management page (Module 14) — admin panel for users/roles
+All 13 dashboard pages exist with UI shells. Auth + routing + role-based sidebar filtering all work. **Next step: ensure each role sees the correct data/charts for their pages.**
+
+- [x] Dashboard Layout — sidebar nav filtered by role, top header
+- [x] Main Dashboard — KPI cards, demand trend chart, top skills, role-specific quick links
+- [x] Skills Forecast — filter bar, AI advisory, demand index chart, rising/declining tables
+- [x] Employability — radar chart, sector probability bars, skill velocity table
+- [x] Career Guidance — personalised recommendations (career_training_advisor + admin)
+- [x] Education — curriculum analysis (education_curriculum_planner + admin)
+- [x] Sector Intelligence — industry breakdown charts (labor_market_analyst + admin)
+- [x] Geographic Intelligence — Rwanda map, district rankings (labor_market_analyst + admin)
+- [x] Policy & Planning — decision-support dashboard (labor_market_analyst + admin)
+- [x] Taxonomy — ICT role browser (all roles)
+- [x] Reports — report builder, template gallery (all roles)
+- [x] Settings — profile, security, notifications (all roles)
+- [x] Data Upload — CSV upload (admin only)
+- [x] User Management — admin panel (admin only)
+
+**Known issue:** Dashboard pages still use mock/hardcoded data in many places. Role-based content filtering (what each user type sees) needs cleanup before moving to Phase 5.
 
 ---
 
@@ -842,11 +658,15 @@ Phase 2D [DONE]     Model Iteration — Two-Stage model (Spearman 0.99)
    ↓                  └── Stage 1: LightGBM trend (2010-2026, recency-weighted)
    ↓                  └── Stage 2: Market correction factors from Dataset B
    ↓
-Phase 3  [NEXT]     Django Backend (schema → API → auth → ML integration)
+Phase 3  [DONE]     Django Backend (schema → API → auth → ML integration)
+   ↓                  └── 7 apps, JWT auth, 4 seed users, all endpoints live
    ↓
-Phase 4  [PARTIAL]  Frontend Integration (wire React → Django)
-   ↓                  └── Landing page + 7 dashboard UI shells built (all mock data)
-Phase 5             Core Modules (Dashboard, Upload, Taxonomy, Predictions)
+Phase 4  [IN PROGRESS]  Frontend Integration (wire React → Django)
+   ↓                  └── Auth flow + API client done
+   ↓                  └── All 13 dashboard pages built with role-based routing
+   ↓                  └── TODO: role-based content cleanup per dashboard page
+   ↓
+Phase 5             Core Modules — replace mock data with live API data
    ↓
 Phase 6             Intelligence Modules (Employability, Sector, Geographic, Education, Career)
    ↓
@@ -857,12 +677,12 @@ Phase 8             Layer 2: Emerging Skills Radar (global trends, new roles)
 Phase 9             Testing & Deployment (tests, Docker, CI/CD, security)
 ```
 
-**Critical path:** Phase 3 → 4 → 5 (everything else branches off after Phase 5)
+**Critical path:** Phase 4 (content cleanup) → Phase 5 (live data) → everything else branches off
 **Gate:** Phase 2D Spearman > 0.85 — **PASSED** (0.9898)
 
 **Can be parallelised:**
 - Phase 6 + Phase 7 (independent modules, can be built simultaneously)
-- Phase 8 data collection can start during Phase 3-5 (research doesn't block development)
+- Phase 8 data collection can start now (research doesn't block development)
 
 ---
 
@@ -872,21 +692,33 @@ Phase 9             Testing & Deployment (tests, Docker, CI/CD, security)
 |------|-------|
 | Project spec | `PROJECT_SPEC.md` |
 | This checklist | `DEVELOPMENT_CHECKLIST.md` |
-| Session log | `skillsense_job_data/SESSION_LOG.md` |
-| Historical data (Dataset A) | `skillsense_job_data/data/historical/*.csv` |
-| Current postings (Dataset B) | `skillsense_job_data/data/current_ict/ict_job_postings_v2.csv` |
-| Government microdata (Dataset C) | `skillsense_job_data/Labour_Force_Survey__2017-2024___Microdata/` |
-| Classification pipeline | `skillsense_job_data/scripts/classify_and_group_v2.py` |
+| Historical data (Dataset A) | `data/historical/*.csv` |
+| Current postings (Dataset B) | `data/current_ict/ict_job_postings_v2.csv` |
+| Data scripts | `data/scripts/` |
+| Shrinkage correction | `data/scripts/phase1b_shrinkage_correction.py` |
 | Frontend source | `frontend_pages/src/` |
 | Frontend components | `frontend_pages/src/components/` |
 | Frontend pages | `frontend_pages/src/pages/` |
 | Frontend dashboard pages | `frontend_pages/src/pages/dashboard/` |
-| Django backend (to create) | `backend/` |
-| ML training script (v1, superseded) | `models/train_model.py` |
-| ML validation + forecast (v1, superseded) | `models/validate_and_forecast.py` |
-| **Production model (Two-Stage)** | `models/phase2d_final_model.py` |
-| Forecast output | `models/forecast_results_2027_2028.csv` |
-| Model performance report | `models/model_performance_report.md` |
-| Model artifacts (gitignored) | `models/*.joblib` |
-| Model reports (v1) | `models/reports/` |
-| Shrinkage correction | `skillsense_job_data/scripts/phase1b_shrinkage_correction.py` |
+| Frontend auth & access control | `frontend_pages/src/auth/` |
+| Frontend API services | `frontend_pages/src/services/` |
+| Django backend | `backend/` |
+| Django settings | `backend/skillsense_backend/settings.py` |
+| Django apps | `backend/{core,accounts,taxonomy,predictions,uploads,analytics,reports}/` |
+| ML model integration | `backend/predictions/ml/` |
+| **Production model (Two-Stage)** | `ml/phase2d_final_model.py` |
+| ML training script (v1, superseded) | `ml/train_model.py` |
+| Forecast output | `ml/forecast_results_2027_2028.csv` |
+| Model performance report | `ml/model_performance_report.md` |
+| Model artifacts (gitignored) | `ml/*.joblib` |
+| Model reports | `ml/reports/` |
+| Environment variables | `.env` (gitignored), `.env.example` |
+
+### Seed User Credentials
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@skillsense.rw` | `Admin@1234` |
+| Career & Training Advisor | `advisor@skillsense.rw` | `Advisor@1234` |
+| Education / Curriculum Planner | `planner@skillsense.rw` | `Planner@1234` |
+| Labour Market Analyst | `analyst@skillsense.rw` | `Analyst@1234` |

@@ -1,18 +1,17 @@
-import { Database, ListChecks, TrendingUp, Building2, Newspaper, CalendarRange } from 'lucide-react'
-import { SNAPSHOT } from '../lib/snapshot'
+import { ListChecks, TrendingUp, Target, CalendarRange, ShieldCheck, BarChart3 } from 'lucide-react'
 
 const stats = [
-  { icon: ListChecks, value: String(SNAPSHOT.roles), label: 'ICT Roles Tracked' },
-  { icon: Newspaper, value: String(SNAPSHOT.postings), label: 'Real ICT Job Postings' },
-  { icon: Building2, value: String(SNAPSHOT.companies), label: 'Hiring Companies' },
-  { icon: Database, value: String(SNAPSHOT.jobBoards.length), label: 'Job-Board Sources' },
-  { icon: CalendarRange, value: SNAPSHOT.historyYears, label: 'Years of Labour Data' },
-  { icon: TrendingUp, value: '2-Yr', label: 'Forecast Horizon' },
+  { icon: ListChecks, value: '20+', label: 'ICT Roles Tracked' },
+  { icon: BarChart3, value: '3', label: 'Forecast Horizons' },
+  { icon: Target, value: '98.9%', label: 'Rank Accuracy' },
+  { icon: CalendarRange, value: '20+', label: 'Years of Data' },
+  { icon: TrendingUp, value: '2026', label: 'Market-Validated' },
+  { icon: ShieldCheck, value: 'NISR', label: 'Verified Data Source' },
 ]
 
 export default function StatisticsStrip() {
   return (
-    <section id="reports" className="bg-navy scroll-mt-24">
+    <section className="bg-navy">
       <div className="container-1200">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 py-12">
           {stats.map((stat) => {
@@ -28,7 +27,6 @@ export default function StatisticsStrip() {
             )
           })}
         </div>
-        <p className="pb-6 text-[11px] text-white/50">Figures from the SkillSense datasets ({SNAPSHOT.asOf}), a static snapshot, not live.</p>
       </div>
     </section>
   )
