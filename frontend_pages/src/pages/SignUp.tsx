@@ -71,10 +71,19 @@ export default function SignUp() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-page">
+    <div className="flex min-h-screen bg-page">
       <div className="flex flex-1 flex-col lg:flex-row">
-        <aside className="relative flex flex-col overflow-hidden bg-gradient-to-br from-navy to-dark-navy px-10 py-12 text-white lg:w-[42%] lg:px-16 lg:py-16">
-          <div className="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-primary/30 blur-3xl" />
+        <aside className="relative flex flex-col overflow-hidden bg-gradient-to-br from-[#12277B] via-[#0E1F63] to-[#0B1A54] px-10 py-12 text-white lg:w-[42%] lg:px-16 lg:py-16">
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.18]"
+            style={{
+              backgroundImage: 'radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1.4px)',
+              backgroundSize: '15px 15px',
+              WebkitMaskImage: 'radial-gradient(circle at 70% 42%, black 0%, black 34%, transparent 60%)',
+              maskImage: 'radial-gradient(circle at 70% 42%, black 0%, black 34%, transparent 60%)',
+            }}
+          />
+          <div className="pointer-events-none absolute right-[-6%] top-[18%] h-[520px] w-[520px] rounded-full border border-white/10 opacity-40" />
 
           <Link to="/" className="relative flex w-fit items-center gap-3">
             <img src="/logo_icon.webp" alt="SkillSense logo" className="h-9 w-auto" />
@@ -82,10 +91,10 @@ export default function SignUp() {
           </Link>
 
           <div className="relative mt-16 max-w-md lg:mt-20">
-            <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight lg:text-5xl">
-              ICT workforce intelligence for Rwanda.
+            <h1 className="text-5xl font-extrabold leading-[1.08] tracking-tight lg:text-[64px]">
+              ICT Workforce Intelligence for <span className="text-[#5EEAD4]">Rwanda.</span>
             </h1>
-            <p className="mt-6 text-base leading-relaxed text-blue-100/80">
+            <p className="mt-6 text-lg leading-relaxed text-blue-100/75">
               See which ICT roles will be in demand, where skills gaps are opening, and how to prepare, powered by
               a forecasting model validated against real job postings.
             </p>
@@ -97,13 +106,16 @@ export default function SignUp() {
                 <BadgeCheck className="h-6 w-6 text-accent" strokeWidth={2} />
               </div>
               <div>
-                <h4 className="text-base font-bold text-white">Role-based access</h4>
+                <h4 className="text-base font-bold text-white">Role-based dashboards</h4>
                 <p className="mt-1 text-sm leading-relaxed text-blue-100/70">
-                  Choose the role that matches how you'll use the platform. Administrator accounts are created by
-                  the SkillSense team.
+                  Your role determines which forecasts, analytics, and tools you see — so you get insights
+                  relevant to your work, not everything at once.
                 </p>
               </div>
             </div>
+            <p className="mt-6 text-sm text-blue-200/40">
+              © 2026 SkillSense: ICT Workforce Intelligence for Rwanda
+            </p>
           </div>
         </aside>
 
@@ -211,10 +223,6 @@ export default function SignUp() {
           </div>
         </main>
       </div>
-
-      <footer className="border-t border-gray-200 bg-page px-6 py-5 lg:px-10">
-        <p className="text-center text-sm text-gray-500">© 2026 SkillSense: ICT Workforce Intelligence for Rwanda</p>
-      </footer>
     </div>
   )
 }
