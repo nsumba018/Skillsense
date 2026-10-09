@@ -4,7 +4,7 @@
 
 Rwanda-focused. First sector: ICT / Computer Science / Digital Technology.
 
-Last updated: Sep 28, 2026 (Phase 3 done, Phase 4 in progress)
+Last updated: Oct 9, 2026 (Phase 3 done, Phase 4 in progress, Prototype Review 1 feedback logged)
 
 ---
 
@@ -683,6 +683,57 @@ Phase 9             Testing & Deployment (tests, Docker, CI/CD, security)
 **Can be parallelised:**
 - Phase 6 + Phase 7 (independent modules, can be built simultaneously)
 - Phase 8 data collection can start now (research doesn't block development)
+
+---
+
+## Prototype Review 1 — Facilitator Feedback (Oct 9, 2026)
+
+*Feedback from prototype review session with project facilitators. Each item needs a decision before implementation.*
+
+### PR1-1: Admin User Invitations
+**Feedback:** Admin should be able to invite users by email with a pre-assigned role. Invited users create their own account using that email.
+**Current state:** Users self-register and pick their own role. No invite flow exists.
+**Status:** [ ] Decision pending — [ ] Implemented
+
+### PR1-2: Labour Market Demand Focus (Cross-Sector)
+**Feedback:** Main focus should be on labour market demand, not just trends. Should collect insights from different sectors. Should also track changes and trends over time.
+**Current state:** System tracks ICT sector only (20 roles). Demand forecasts and trend tracking are working. No cross-sector data.
+**Status:** [ ] Decision pending — [ ] Implemented
+
+### PR1-3: Data Generalization vs Detail
+**Feedback:** Group similar data where necessary, but keep detailed data where it provides better insights. Use generalization for some areas, detail for others.
+**Current state:** Taxonomy has 20 roles → 14 families → 12 groups. Shrinkage correction balances noise vs signal in small samples.
+**Status:** [ ] Decision pending — [ ] Implemented
+
+### PR1-4: Career Advice — Keep or Remove?
+**Feedback:** Need to decide whether career advice should be in the system. If kept, define what information and methods will drive the advice. Review and remove unnecessary career pages.
+**Current state:** CareerGuidance page exists (UI shell, mock data). Accessible to career_training_advisor and admin roles.
+**Status:** [ ] Decision pending — [ ] Implemented
+
+### PR1-5: Education Alignment
+**Feedback:** System should clearly show the relationship between education and labour market demand — which qualifications, courses, skills, and training programs are demanded by employers.
+**Current state:** Education page exists (UI shell, mock data). No real curriculum-to-demand mapping data.
+**Status:** [ ] Decision pending — [ ] Implemented
+
+### PR1-6: Institution & University Graduate Tracking
+**Feedback:** Track the number of students graduating from each institution and entering the labour market. Understand how many graduates each institution produces and how they perform.
+**Current state:** Not implemented. Institution model exists (name, type) but no graduate count or outcome tracking.
+**Status:** [ ] Decision pending — [ ] Implemented
+
+### PR1-7: Training Centre Data
+**Feedback:** Collect information about training centres: types of training provided, number of trained people entering the labour market, and impact measurement.
+**Current state:** Not implemented. No training centre model or data collection.
+**Status:** [ ] Decision pending — [ ] Implemented
+
+### PR1-8: Page Audit — Remove Unnecessary Pages
+**Feedback:** Review current prototype, remove pages without clear purpose. Final system should be simple, organized, and focused on main objectives.
+**Current state:** 13 dashboard pages exist. Some may overlap or lack clear purpose for their target role.
+**Status:** [ ] Decision pending — [ ] Implemented
+
+### PR1-9: System Redesign & Research
+**Feedback:** The group should sit down together and redesign/review the system before continuing. Clearly define: purpose, goals, users, data sources, how to measure demand, how to track employability, how to connect education and labour market, which features are necessary vs removable.
+**Current state:** System architecture exists but was built incrementally. Facilitators want a deliberate design review.
+**Status:** [ ] Decision pending — [ ] Implemented
 
 ---
 

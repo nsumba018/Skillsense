@@ -1,0 +1,202 @@
+original_job_title,company,normalized_role,role_family,role_group,is_ict,ict_role_confidence,role_normalization_confidence,role_group_confidence,classification_reason,normalization_reason,needs_manual_review,manual_review_reason,min_confidence
+Human Resources Officer,FAWE Rwanda Chapter,,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+"Analyst, Office of the CFO (Fixed-term)",One Acre Fund,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Biobank Head,University of Global Health Equity (UGHE),,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Sales Representative,"AMPLEO POWER TECHNOLOGY CO., LTD",,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Umukozi Ushinzwe Ubuzima Bw’abana N’iterambere Ry’umuryango,EAR Paroisse Gashongora,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Assistant Teacher Trainer - Inclusive Education,The Moyo Center,,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+Branch Operation Officer,RATWA SACCO HUYE,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Finance Lead,Wicloud,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Rwanda Seed Quality Control Coordinator,One Acre Fund,,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+Rwanda Contracts Coordinator,One Acre Fund,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Safeguarding Officer,FAWE Rwanda Chapter,,,,False,0.0,,,Weak ICT function evidence (1 keyword clusters); Some non-ICT signals detected (1 matches),,False,,0.0
+HR & Administration Manager,Inkunga Finance Plc,,,,False,0.0,,,Multiple non-ICT signals detected (2 matches),,False,,0.0
+Maintenance Intern,Africa Improved Foods Rwanda,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Biobank Technician I,University of Global Health Equity (UGHE),,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Procurement Officer,FAWE Rwanda Chapter,,,,False,0.0,,,Weak ICT function evidence (1 keyword clusters); Multiple non-ICT signals detected (2 matches),,False,,0.0
+Tea Shop Manager,HR Management Services Ltd (HRMS Ltd),,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Rwanda Construction Quality Assurance and Quality Check Engineer (Fixed-term),One Acre Fund,,,,False,0.0,,,Weak ICT function evidence (1 keyword clusters); Some non-ICT signals detected (1 matches),,False,,0.0
+Legal and Company Secretary,Vision Fund Rwanda,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Procurement Officer,Rwanda Ultimate Golf Course,,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+Communications Intern,VIA Foundation,,,,False,0.0,,,Multiple non-ICT signals detected (3 matches),,False,,0.0
+Fish Harvest Foreman,Kivu Choice Ltd,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Fish Handling Foreman,Kivu Choice Ltd,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Programs Coordinator,FAWE Rwanda Chapter,,,,False,0.0,,,Multiple non-ICT signals detected (5 matches),,False,,0.0
+"Monitoring, Evaluation and Learning (MEL) Specialist",FAWE Rwanda Chapter,,,,False,0.0,,,Weak ICT function evidence (1 keyword clusters); Multiple non-ICT signals detected (3 matches),,False,,0.0
+"Safeguarding, Safety and Security Officer",Save the Children,,,,False,0.0,,,Multiple non-ICT signals detected (3 matches),,False,,0.0
+Engineering Technician,American Embassy Kigali Mission Rwanda,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Senior Maintenance Technician,LFL Rwanda LTD,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+"Executive Coordinator, ACE-AJ Secretariat",Legal Aid Forum (LAF),,,,False,0.0,,,Multiple non-ICT signals detected (4 matches),,False,,0.0
+Project Assistant,Raising The Village,,,,False,0.0,,,Weak ICT function evidence (1 keyword clusters); Multiple non-ICT signals detected (2 matches),,False,,0.0
+Logistics Officer,Ngali Holdings Ltd,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Tour Guide Driver,Sambora Kinigi Lodge,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Biobank Coordinator (Administrative & Research Operations),University of Global Health Equity (UGHE),,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Supply Chain Management Specialist,MUNYAX ECO LTD,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Teacher Trainer – Inclusive Education,The Moyo Center,,,,False,0.0,,,Multiple non-ICT signals detected (2 matches),,False,,0.0
+Executive Director,ARCT-RUHUKA (Rwandese Association of Trauma Counsellors),,,,False,0.0,,,Multiple non-ICT signals detected (6 matches),,False,,0.0
+Warehouse Manager,Huming International Factory Co.Ltd,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+SHEC Officer,LuNa Smelter Ltd,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Senior Resource Development Manager,World Vision International Rwanda,,,,False,0.0,,,Weak ICT function evidence (1 keyword clusters); Multiple non-ICT signals detected (5 matches),,False,,0.0
+Sourcing Manager,Souk Farms,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Accountant,RULI HIGHER INSTITUTE OF HEALTH,,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+Communications and Advocacy Officer,FAWE Rwanda Chapter,,,,False,0.0,,,Weak ICT function evidence (1 keyword clusters); Multiple non-ICT signals detected (2 matches),,False,,0.0
+General Secretary Assistant in Charge of Academic,RULI HIGHER INSTITUTE OF HEALTH,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Accountant,RATWA SACCO HUYE,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Plant Operator,Kivu Choice Ltd,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Accounting Intern,Visions Africa Ltd,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Loan Officer,RATWA SACCO HUYE,,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+Customer Care,RATWA SACCO HUYE,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Sales Executive,DP World Logistics Rwanda,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Marketing Manager,Urwego Finance CBC,,,,False,0.0,,,Multiple non-ICT signals detected (3 matches),,False,,0.0
+Rwanda Quantity Surveyor Lead (Fixed-term),One Acre Fund,,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+Head of Operations,RATWA SACCO HUYE,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Human Resource Officer,RULI HIGHER INSTITUTE OF HEALTH,,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+Product Operations Lead (Fixed-Term),One Acre Fund,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Telemarketing & Client Follow-up Officer,Buy Sell or Rent Ltd,,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+Clinical Field Supervisor (Re-advertised),King Faisal Hospital Rwanda Foundation (KFHRF),,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+Hospitality Manager,Hope Haven Christian School,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Physical and Mental Wellbeing Specialist,FH Association Rwanda (Food for the Hungry ),,,,False,0.0,,,Weak ICT function evidence (1 keyword clusters); Multiple non-ICT signals detected (4 matches),,False,,0.0
+Rwanda Driver (Fixed-Term),One Acre Fund,,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+Sous Chef and Butler,Job in Rwanda,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Rwanda Data Audit Supervisor (Fixed-Term),One Acre Fund,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Enseignant(E) De Garde Après Les Cours,Youth for Christ (YFC) Rwanda,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+CLO Administrative Assistant,American Embassy Kigali Mission Rwanda,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Rwanda Outgrower Production Senior Coordinator (Fixed-term),One Acre Fund,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Carbon Finance Manager (Fixed-Term),One Acre Fund,,,,False,0.0,,,Multiple non-ICT signals detected (2 matches),,False,,0.0
+Community Engagement Officer,DATA- ORBIT LABS,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Fleet Management Assistant,"LOVEWAY RWANDA CO,. LTD",,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Recruitment Consultant,NEIL CORPORATION LTD,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Accounts Receivable Manager,NEIL CORPORATION LTD,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Coffee Quality Assurance and Regulation Specialist (Re-Advertised),The National Agricultural Export Development Board (NAEB),,,,False,0.0,,,Multiple non-ICT signals detected (2 matches),,False,,0.0
+Young Economist Program,GIZ Rwanda,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Rwanda Partnerships Lead,The Wellspring Foundation for Education (Wellspring),,,,False,0.0,,,Multiple non-ICT signals detected (3 matches),,False,,0.0
+Senior Internal Auditor (Re-advertised),AKAGERA SACCO KAYONZA,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Project Manager,Raising The Village,,,,False,0.0,,,Weak ICT function evidence (1 keyword clusters); Multiple non-ICT signals detected (4 matches),,False,,0.0
+Rwanda Seed Sample Reception and Data Entry,One Acre Fund,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Chinese Translator,Regal Shoes LTD,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Pediatric Surgery Faculty,University of Global Health Equity (UGHE),,,,False,0.0,,,Multiple non-ICT signals detected (4 matches),,False,,0.0
+Strategic Partnerships Manager / Senior Associate,One Acre Fund,,,,False,0.0,,,Multiple non-ICT signals detected (3 matches),,False,,0.0
+Public Relations & Marketing Officer,Capitalist Supply & Logistics Ltd,,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+Finance Assistant,Raising The Village,,,,False,0.0,,,Weak ICT function evidence (1 keyword clusters); Some non-ICT signals detected (1 matches),,False,,0.0
+Biobank Technician II – Data Management and Cold Chain,University of Global Health Equity (UGHE),,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+National Sales Manager,NEIL CORPORATION LTD,,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+Solar Installation Technician,"AMPLEO POWER TECHNOLOGY CO., LTD",,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Payments & Reconciliation Transformation Lead,One Acre Fund,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+"Rwanda Senior Agronomist, Conservation Agriculture",One Acre Fund,,,,False,0.0,,,Multiple non-ICT signals detected (2 matches),,False,,0.0
+Senior Cost Accountant,DATA- ORBIT LABS,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Territory Sales Manager,DATA- ORBIT LABS,,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+Recruitment Marketing Manager,NEIL CORPORATION LTD,,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+Territory Account Manager,NEIL CORPORATION LTD,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Finance Manager,NEIL CORPORATION LTD,,,,False,0.0,,,Some non-ICT signals detected (1 matches),,False,,0.0
+Project Manager,NEIL CORPORATION LTD,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Operations Manager,NEIL CORPORATION LTD,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Gestionnaire de Performance et Reporting KPI,I C S TELECOM RWANDA LIMITED,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Accounts Payable Manager,NEIL CORPORATION LTD,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Job - Management Information Systems Specialist,POST A JOB,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Job - Rwanda Data Audit Supervisor (Fixed-Term),POST A JOB,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Job - Digital Innovation & Analytics Officer,POST A JOB,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Tiktok Live Streamer (Female Only) at Streamrise Africa LTD,Streamrise Africa LTD,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Social Media Manager at The Jonathan Foundation,The Jonathan Foundation,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Job - E-Commerce Specialist,POST A JOB,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Job - IECMS IT Support Staff & Call Center Operator,POST A JOB,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Job - Applications Specialist,POST A JOB,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Digital Content Creator – Malaria Molecular Surveillance (MMS) Project (1) at Society for Family Health(SFH),Society for Family Health(SFH),,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Job - Digital Readiness Senior Technologist,POST A JOB,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Head Of Technology at Access to Finance Rwanda (AFR),Access to Finance Rwanda (AFR),,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Social Media & Content Strategist at D&D Karuse Foundation,D&D Karuse Foundation,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Job - Windows Forum Freelancer JD,POST A JOB,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Job - IT Lead,POST A JOB,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Job - Senior Manager ICT and Programs Digitalisation,POST A JOB,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Job - Rwanda Master Data and Integration Specialist (Fixed-Term),POST A JOB,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+ICT Teacher at Direct Aid,Teacher,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Digital Growth & Lead Generation Specialist at ECHOWA Ltd,ECHOWA Ltd,,,,False,0.0,,,No significant ICT evidence found,,False,,0.0
+Head of Information Technology (Head of IT) at Vision Fund Rwanda,Vision Fund Rwanda,,,,False,0.05,,,Moderate ICT function evidence (3 keyword clusters); Some non-ICT signals detected (1 matches),,False,,0.05
+Market & Sales Coordinator,Ramba Real Estate Ltd,,,,False,0.1,,,Weak ICT function evidence (1 keyword clusters),,False,,0.1
+Information Technology (IT) Officer,FAWE Rwanda Chapter,,,,False,0.1,,,"Industry includes 'Computer and IT': Computer and IT, Other; Strong ICT function evidence (5 keyword clusters); Multiple non-ICT signals detected (3 matches)",,False,,0.1
+Research Coordinator (Re-advertised),King Faisal Hospital Rwanda Foundation (KFHRF),,,,False,0.1,,,Weak ICT function evidence (1 keyword clusters),,False,,0.1
+Real Estate Marketing Planner,Ramba Real Estate Ltd,,,,False,0.1,,,Weak ICT function evidence (1 keyword clusters),,False,,0.1
+ICT Program Specialist at Korea International Cooperation Agency (KOICA),Korea International Cooperation Agency (KOICA),,,,False,0.1,,,Weak ICT function evidence (2 keyword clusters),,False,,0.1
+Admission and Registration Officer,RULI HIGHER INSTITUTE OF HEALTH,,,,False,0.1,,,Weak ICT function evidence (2 keyword clusters),,False,,0.1
+Impact Division Chief of Staff,One Acre Fund,,,,False,0.1,,,Weak ICT function evidence (1 keyword clusters),,False,,0.1
+Real Estate Sales Consultant,Ramba Real Estate Ltd,,,,False,0.1,,,Weak ICT function evidence (1 keyword clusters),,False,,0.1
+Job - Technical Support Engineer,POST A JOB,,,,False,0.1,,,Weak ICT function evidence (1 keyword clusters),,False,,0.1
+Teller,RATWA SACCO HUYE,,,,False,0.15,,,"Industry includes 'Computer and IT': Computer and IT, Other",,False,,0.15
+Rwanda Master Data and Integration Specialist (Fixed-Term),One Acre Fund,,,,False,0.15,,,"Industry includes 'Computer and IT': Administration, Computer and IT, Other",,False,,0.15
+Head of IT Department at COPEDU PLC,COPEDU PLC,,,,False,0.2,,,Moderate ICT function evidence (4 keyword clusters),,False,,0.2
+Customer Service Agent,AC Mobility,,,,False,0.2,,,Moderate ICT function evidence (3 keyword clusters),,False,,0.2
+"IT Support, Intern – Aims Research and Innovation Centre at African Institute for Mathematical Sciences (AIMS)",African Institute for Mathematical Sciences (AIMS),,,,False,0.2,,,Moderate ICT function evidence (3 keyword clusters),,False,,0.2
+Technical Support Engineers,Wicloud,,,,False,0.25,,,"Industry includes 'Computer and IT': Computer and IT, Other; Weak ICT function evidence (2 keyword clusters)",,False,,0.25
+Windows Forum Freelancer,Wicloud,,,,False,0.25,,,"Industry includes 'Computer and IT': Communications, Computer and IT, Other; Weak ICT function evidence (1 keyword clusters)",,False,,0.25
+Network & Security Analyst at VisionFund International,VisionFund International,,,,False,0.35,,,Strong ICT function evidence (5 keyword clusters),,False,,0.35
+Software Quality Assurance Engineer at Umwalimu SACCO,Umwalimu SACCO,,,,False,0.35,,,Strong ICT function evidence (6 keyword clusters),,False,,0.35
+IT Lead,Wicloud,,,,False,0.35,,,"Industry includes 'Computer and IT': Computer and IT, Other; Moderate ICT function evidence (3 keyword clusters)",,False,,0.35
+Job - IT Internal Auditor,POST A JOB,IT Auditor / IT Governance & Risk,IT Governance & Audit,IT Governance & Audit,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'Job - IT Internal Auditor',Title indicates IT audit/governance role,True,Low ICT classification confidence (0.5),0.5
+Job - Senior Software Developer,POST A JOB,Software Developer / Software Engineer,Software Development,Software Development,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'Job - Senior Software Developer',Title indicates software development,True,Low ICT classification confidence (0.5),0.5
+IT Officer at Irembo Sacco Nyagatare,Irembo Sacco Nyagatare,IT Officer / ICT Administrator,IT Operations & Support,Systems & Infrastructure,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'IT Officer at Irembo Sacco Nyagatare',Title indicates IT operations/admin role,True,Low ICT classification confidence (0.5),0.5
+Job - IT Officer,POST A JOB,IT Officer / ICT Administrator,IT Operations & Support,Systems & Infrastructure,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'Job - IT Officer',Title indicates IT operations/admin role,True,Low ICT classification confidence (0.5),0.5
+"Job - Specialist, Data Analyst",POST A JOB,Data Analyst,Data & Analytics,Data & Analytics,True,0.5,0.9,0.95,"Title strongly indicates ICT role: 'Job - Specialist, Data Analyst'",Title indicates data analysis role,True,Low ICT classification confidence (0.5),0.5
+Job - IT Officer,POST A JOB,IT Officer / ICT Administrator,IT Operations & Support,Systems & Infrastructure,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'Job - IT Officer',Title indicates IT operations/admin role,True,Low ICT classification confidence (0.5),0.5
+PHP Developer (M/F),AFRICASHORE,Backend Developer,Software Development,Software Development,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'PHP Developer (M/F)',Technology-specific developer title maps to Backend Developer,True,Low ICT classification confidence (0.5),0.5
+NODE.JS Developer (M/F),AFRICASHORE,Backend Developer,Software Development,Software Development,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'NODE.JS Developer (M/F)',Technology-specific developer title maps to Backend Developer,True,Low ICT classification confidence (0.5),0.5
+KOTLIN Developer (M/F),AFRICASHORE,Mobile App Developer,Software Development,Software Development,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'KOTLIN Developer (M/F)',Mobile platform/language developer title,True,Low ICT classification confidence (0.5),0.5
+JAVA JEE Developer (M/F),AFRICASHORE,Backend Developer,Software Development,Software Development,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'JAVA JEE Developer (M/F)',Technology-specific developer title maps to Backend Developer,True,Low ICT classification confidence (0.5),0.5
+JAVA Developer (M/F),AFRICASHORE,Backend Developer,Software Development,Software Development,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'JAVA Developer (M/F)',Technology-specific developer title maps to Backend Developer,True,Low ICT classification confidence (0.5),0.5
+REACT Developer (M/F),AFRICASHORE,Frontend / Web Developer,Software Development,Software Development,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'REACT Developer (M/F)',Frontend framework/language developer title,True,Low ICT classification confidence (0.5),0.5
+SWIFT Developer (M/F),AFRICASHORE,Mobile App Developer,Software Development,Software Development,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'SWIFT Developer (M/F)',Mobile platform/language developer title,True,Low ICT classification confidence (0.5),0.5
+DOTNET Developer (M/F),AFRICASHORE,Backend Developer,Software Development,Software Development,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'DOTNET Developer (M/F)',Technology-specific developer title maps to Backend Developer,True,Low ICT classification confidence (0.5),0.5
+ANGULAR Developer (M/F),AFRICASHORE,Frontend / Web Developer,Software Development,Software Development,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'ANGULAR Developer (M/F)',Frontend framework/language developer title,True,Low ICT classification confidence (0.5),0.5
+Software Developer,AMAZETHU,Software Developer / Software Engineer,Software Development,Software Development,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'Software Developer',Title indicates software development,True,Low ICT classification confidence (0.5),0.5
+RUBY ON RAILS Developer (M/F),AFRICASHORE,Backend Developer,Software Development,Software Development,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'RUBY ON RAILS Developer (M/F)',Technology-specific developer title maps to Backend Developer,True,Low ICT classification confidence (0.5),0.5
+IOS Developer (M/F),AFRICASHORE,Mobile App Developer,Software Development,Software Development,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'IOS Developer (M/F)',Mobile platform/language developer title,True,Low ICT classification confidence (0.5),0.5
+QA Tester (M/F),AFRICASHORE,QA / Software Test Engineer,Software Quality,Software Quality,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'QA Tester (M/F)',Title indicates QA/testing role,True,Low ICT classification confidence (0.5),0.5
+Senior SAP Consultant (M/F),AFRICASHORE,Systems Analyst / IT Business Analyst,Systems Analysis,Systems Analysis,True,0.5,0.8,0.85,Title strongly indicates ICT role: 'Senior SAP Consultant (M/F)',SAP consultant/developer maps to Systems Analyst,True,Low ICT classification confidence (0.5),0.5
+Job - Digital Project Manager,POST A JOB,ICT Manager / IT Manager,ICT Management,ICT Management,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'Job - Digital Project Manager',Title indicates ICT management role,True,Low ICT classification confidence (0.5),0.5
+Job - IT Officer Software,POST A JOB,IT Officer / ICT Administrator,IT Operations & Support,Systems & Infrastructure,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'Job - IT Officer Software',Title indicates IT operations/admin role,True,Low ICT classification confidence (0.5),0.5
+Z/OS System Engineer Senior Storage(M/F),AFRICASHORE,Systems Administrator,Systems & Infrastructure,Systems & Infrastructure,True,0.5,0.8,0.85,Title strongly indicates ICT role: 'Z/OS System Engineer Senior Storage(M/F)',Mainframe/middleware system engineer maps to Systems Administrator,True,Low ICT classification confidence (0.5),0.5
+DBA IMS/DB2 Z/OS(M/F),AFRICASHORE,Database Administrator,Data & Database,Data & Database,True,0.5,0.95,1.0,Title strongly indicates ICT role: 'DBA IMS/DB2 Z/OS(M/F)',Title indicates database administration,True,Low ICT classification confidence (0.5),0.5
+Middleware System Engineer Z/OS (M/F),AFRICASHORE,Systems Administrator,Systems & Infrastructure,Systems & Infrastructure,True,0.5,0.8,0.85,Title strongly indicates ICT role: 'Middleware System Engineer Z/OS (M/F)',Mainframe/middleware system engineer maps to Systems Administrator,True,Low ICT classification confidence (0.5),0.5
+SAP MM/SD/EWM/PP/QM/CAR Consultant (M/F),AFRICASHORE,Systems Analyst / IT Business Analyst,Systems Analysis,Systems Analysis,True,0.5,0.8,0.85,Title strongly indicates ICT role: 'SAP MM/SD/EWM/PP/QM/CAR Consultant (M/F)',SAP consultant/developer maps to Systems Analyst,True,Low ICT classification confidence (0.5),0.5
+Test and Validation Engineer (M/F),AFRICASHORE,QA / Software Test Engineer,Software Quality,Software Quality,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'Test and Validation Engineer (M/F)',Title indicates QA/testing role,True,Low ICT classification confidence (0.5),0.5
+UX / UI Designer (M/F),AFRICASHORE,Frontend / Web Developer,Software Development,Software Development,True,0.5,0.8,0.85,Title strongly indicates ICT role: 'UX / UI Designer (M/F)',UX/UI Designer maps to Frontend / Web Developer,True,Low ICT classification confidence (0.5),0.5
+Test Automation Engineer (M/F),AFRICASHORE,QA / Software Test Engineer,Software Quality,Software Quality,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'Test Automation Engineer (M/F)',Title indicates QA/testing role,True,Low ICT classification confidence (0.5),0.5
+Cloud Architect (M/F),AFRICASHORE,DevOps / Cloud Engineer,Cloud & DevOps,Cloud & DevOps,True,0.5,0.85,0.9,Title strongly indicates ICT role: 'Cloud Architect (M/F)',Cloud architecture/specialist title maps to DevOps / Cloud Engineer,True,Low ICT classification confidence (0.5),0.5
+GENESYS Architect (M/F),AFRICASHORE,Data Engineer,Data & Analytics,Data & Analytics,True,0.5,0.75,0.8,Title strongly indicates ICT role: 'GENESYS Architect (M/F)',Data platform architect maps to Data Engineer,True,Low ICT classification confidence (0.5),0.5
+AWS Cloud Architect (M/F),AFRICASHORE,DevOps / Cloud Engineer,Cloud & DevOps,Cloud & DevOps,True,0.5,0.85,0.9,Title strongly indicates ICT role: 'AWS Cloud Architect (M/F)',Cloud architecture/specialist title maps to DevOps / Cloud Engineer,True,Low ICT classification confidence (0.5),0.5
+SAP ABAP Consultant (M/F),AFRICASHORE,Systems Analyst / IT Business Analyst,Systems Analysis,Systems Analysis,True,0.5,0.8,0.85,Title strongly indicates ICT role: 'SAP ABAP Consultant (M/F)',SAP consultant/developer maps to Systems Analyst,True,Low ICT classification confidence (0.5),0.5
+SAP FI-CO/PS Consultant (M/F),AFRICASHORE,Systems Analyst / IT Business Analyst,Systems Analysis,Systems Analysis,True,0.5,0.8,0.85,Title strongly indicates ICT role: 'SAP FI-CO/PS Consultant (M/F)',SAP consultant/developer maps to Systems Analyst,True,Low ICT classification confidence (0.5),0.5
+SAP EHS Consultant (M/F),AFRICASHORE,Systems Analyst / IT Business Analyst,Systems Analysis,Systems Analysis,True,0.5,0.8,0.85,Title strongly indicates ICT role: 'SAP EHS Consultant (M/F)',SAP consultant/developer maps to Systems Analyst,True,Low ICT classification confidence (0.5),0.5
+DATASTAGE Architect (M/F),AFRICASHORE,Data Engineer,Data & Analytics,Data & Analytics,True,0.5,0.75,0.8,Title strongly indicates ICT role: 'DATASTAGE Architect (M/F)',Data platform architect maps to Data Engineer,True,Low ICT classification confidence (0.5),0.5
+Cloud System Integrator (M/F),AFRICASHORE,Systems Administrator,Systems & Infrastructure,Systems & Infrastructure,True,0.5,0.85,0.9,Title strongly indicates ICT role: 'Cloud System Integrator (M/F)',Cloud system admin maps to Systems Administrator,True,Low ICT classification confidence (0.5),0.5
+Lead Java JEE Developer (M/F),AFRICASHORE,Backend Developer,Software Development,Software Development,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'Lead Java JEE Developer (M/F)',Technology-specific developer title maps to Backend Developer,True,Low ICT classification confidence (0.5),0.5
+Job - IT Officer Hardware,POST A JOB,IT Officer / ICT Administrator,IT Operations & Support,Systems & Infrastructure,True,0.5,0.9,0.95,Title strongly indicates ICT role: 'Job - IT Officer Hardware',Title indicates IT operations/admin role,True,Low ICT classification confidence (0.5),0.5
+"Associate, Data Scientist",Clinton Health Access Initiative- Rwanda (CHAI),Data Scientist,Data & Analytics,Data & Analytics,True,0.55,0.95,1.0,"Title strongly indicates ICT role: 'Associate, Data Scientist'; Moderate ICT function evidence (3 keyword clusters); Some non-ICT signals detected (1 matches)",Title indicates data science/ML,True,Low ICT classification confidence (0.55),0.55
+PYTHON Developer (M/F),AFRICASHORE,Backend Developer,Software Development,Software Development,True,0.6,0.9,0.95,Title strongly indicates ICT role: 'PYTHON Developer (M/F)'; Weak ICT function evidence (1 keyword clusters),Technology-specific developer title maps to Backend Developer,False,,0.6
+DevOps Engineer (M/F),AFRICASHORE,DevOps / Cloud Engineer,Cloud & DevOps,Cloud & DevOps,True,0.6,0.95,1.0,Title strongly indicates ICT role: 'DevOps Engineer (M/F)'; Weak ICT function evidence (1 keyword clusters),Title indicates DevOps engineering,False,,0.6
+PHP Larval Debug Code,KORSTRADA ENTERPRISES LIMITED,Software Developer / Software Engineer,Software Development,Software Development,True,0.6,0.8,0.85,Title strongly indicates ICT role: 'PHP Larval Debug Code'; Weak ICT function evidence (1 keyword clusters),Programming language + action word in title indicates software development,False,,0.6
+FullStack Developer,MALFOUR LIMITED,Full-Stack Developer,Software Development,Software Development,True,0.6,0.95,1.0,Title strongly indicates ICT role: 'FullStack Developer'; Weak ICT function evidence (1 keyword clusters),Title contains 'full stack',False,,0.6
+LARAVEL Developer (M/F),AFRICASHORE,Backend Developer,Software Development,Software Development,True,0.6,0.9,0.95,Title strongly indicates ICT role: 'LARAVEL Developer (M/F)'; Weak ICT function evidence (1 keyword clusters),Technology-specific developer title maps to Backend Developer,False,,0.6
+Assistant IT Officer at Mantis Kivu Marina Bay Hotel,Mantis Kivu Marina Bay Hotel,IT Officer / ICT Administrator,IT Operations & Support,Systems & Infrastructure,True,0.6,0.9,0.95,Title strongly indicates ICT role: 'Assistant IT Officer at Mantis Kivu Marina Bay Hotel'; Weak ICT function evidence (1 keyword clusters),Title indicates IT operations/admin role,False,,0.6
+OBJECTIVE-C Developer (M/F),AFRICASHORE,Mobile App Developer,Software Development,Software Development,True,0.6,0.9,0.95,Title strongly indicates ICT role: 'OBJECTIVE-C Developer (M/F)'; Weak ICT function evidence (1 keyword clusters),Mobile platform/language developer title,False,,0.6
+JAVASCRIPT Developer (M/F),AFRICASHORE,Frontend / Web Developer,Software Development,Software Development,True,0.6,0.9,0.95,Title strongly indicates ICT role: 'JAVASCRIPT Developer (M/F)'; Weak ICT function evidence (2 keyword clusters),Frontend framework/language developer title,False,,0.6
+AWS Solutions Architect (M/F),AFRICASHORE,DevOps / Cloud Engineer,Cloud & DevOps,Cloud & DevOps,True,0.6,0.85,0.9,Title strongly indicates ICT role: 'AWS Solutions Architect (M/F)'; Weak ICT function evidence (1 keyword clusters),Cloud architecture/specialist title maps to DevOps / Cloud Engineer,False,,0.6
+Cloud Computing and Virtualization Engineer (M/F),AFRICASHORE,DevOps / Cloud Engineer,Cloud & DevOps,Cloud & DevOps,True,0.6,0.85,0.9,Title strongly indicates ICT role: 'Cloud Computing and Virtualization Engineer (M/F)'; Weak ICT function evidence (1 keyword clusters),Cloud architecture/specialist title maps to DevOps / Cloud Engineer,False,,0.6
+AZURE Solutions Architect (M/F),AFRICASHORE,DevOps / Cloud Engineer,Cloud & DevOps,Cloud & DevOps,True,0.6,0.85,0.9,Title strongly indicates ICT role: 'AZURE Solutions Architect (M/F)'; Weak ICT function evidence (1 keyword clusters),Cloud architecture/specialist title maps to DevOps / Cloud Engineer,False,,0.6
+Data Analyst at Umwalimu SACCO,Umwalimu SACCO,Data Analyst,Data & Analytics,Data & Analytics,True,0.6,0.9,0.95,Title strongly indicates ICT role: 'Data Analyst at Umwalimu SACCO'; Weak ICT function evidence (2 keyword clusters),Title indicates data analysis role,False,,0.6
+IT Officer (Hardware & Software) at Ubudasa Sacco Bugesera,Ubudasa Sacco Bugesera,IT Officer / ICT Administrator,IT Operations & Support,Systems & Infrastructure,True,0.6,0.9,0.95,Title strongly indicates ICT role: 'IT Officer (Hardware & Software) at Ubudasa Sacco Bugesera'; Weak ICT function evidence (2 keyword clusters),Title indicates IT operations/admin role,False,,0.6
+Assistant IT Officer at Mantis Kivu Marina Bay Hotel,Mantis Kivu Marina Bay Hotel,IT Officer / ICT Administrator,IT Operations & Support,Systems & Infrastructure,True,0.6,0.9,0.95,Title strongly indicates ICT role: 'Assistant IT Officer at Mantis Kivu Marina Bay Hotel'; Weak ICT function evidence (1 keyword clusters),Title indicates IT operations/admin role,False,,0.6
+IT Officer at The National Council of Nurses and Midwives (NCNM),The National Council of Nurses and Midwives (NCNM),IT Officer / ICT Administrator,IT Operations & Support,Systems & Infrastructure,True,0.6,0.9,0.95,Title strongly indicates ICT role: 'IT Officer at The National Council of Nurses and Midwives (NCNM)'; Weak ICT function evidence (2 keyword clusters),Title indicates IT operations/admin role,False,,0.6
+IT Officer (Hardware & Software) at Icyerekezo SACCO Nyarugenge (ISN),Icyerekezo SACCO Nyarugenge (ISN),IT Officer / ICT Administrator,IT Operations & Support,Systems & Infrastructure,True,0.6,0.9,0.95,Title strongly indicates ICT role: 'IT Officer (Hardware & Software) at Icyerekezo SACCO Nyarugenge (ISN)'; Weak ICT function evidence (2 keyword clusters),Title indicates IT operations/admin role,False,,0.6
+Cloud Engineer (M/F),AFRICASHORE,DevOps / Cloud Engineer,Cloud & DevOps,Cloud & DevOps,True,0.6,0.9,0.95,Title strongly indicates ICT role: 'Cloud Engineer (M/F)'; Weak ICT function evidence (1 keyword clusters),Title indicates cloud engineering,False,,0.6
+Cloud System Administrator (M/F),AFRICASHORE,Systems Administrator,Systems & Infrastructure,Systems & Infrastructure,True,0.6,0.95,1.0,Title strongly indicates ICT role: 'Cloud System Administrator (M/F)'; Weak ICT function evidence (2 keyword clusters),Title indicates systems administration,False,,0.6
+Cloud Microservices Architect (M/F),AFRICASHORE,DevOps / Cloud Engineer,Cloud & DevOps,Cloud & DevOps,True,0.6,0.85,0.9,Title strongly indicates ICT role: 'Cloud Microservices Architect (M/F)'; Weak ICT function evidence (1 keyword clusters),Cloud architecture/specialist title maps to DevOps / Cloud Engineer,False,,0.6
+Cyber Security Engineer (M/F),AFRICASHORE,Cybersecurity Analyst / Security Engineer,Cybersecurity,Cybersecurity,True,0.6,0.9,0.95,Title strongly indicates ICT role: 'Cyber Security Engineer (M/F)'; Weak ICT function evidence (1 keyword clusters),Title indicates cybersecurity role,False,,0.6
+Network Architect (M/F),AFRICASHORE,Network Engineer / Network Administrator,Networks,Networks,True,0.6,0.85,0.9,Title strongly indicates ICT role: 'Network Architect (M/F)'; Weak ICT function evidence (1 keyword clusters),Network Architect maps to Network Engineer,False,,0.6
+Assistant IT Officer at Mantis Kivu Marina Bay Hotel,Mantis Kivu Marina Bay Hotel,IT Officer / ICT Administrator,IT Operations & Support,Systems & Infrastructure,True,0.6,0.9,0.95,Title strongly indicates ICT role: 'Assistant IT Officer at Mantis Kivu Marina Bay Hotel'; Weak ICT function evidence (1 keyword clusters),Title indicates IT operations/admin role,False,,0.6
+Generalist Backend Developer at Echowa Ltd,Echowa Ltd,Backend Developer,Software Development,Software Development,True,0.7,0.95,1.0,Title strongly indicates ICT role: 'Generalist Backend Developer at Echowa Ltd'; Moderate ICT function evidence (3 keyword clusters),Title indicates backend development,False,,0.7
+ICT Officer at Rwanda Institute for Conservation Agriculture (RICA),Rwanda Institute for Conservation Agriculture (RICA),IT Officer / ICT Administrator,IT Operations & Support,Systems & Infrastructure,True,0.7,0.9,0.95,Title strongly indicates ICT role: 'ICT Officer at Rwanda Institute for Conservation Agriculture (RICA)'; Moderate ICT function evidence (3 keyword clusters),Title indicates IT operations/admin role,False,,0.7
+UI/UX Designer,QT Global Software Ltd,Frontend / Web Developer,Software Development,Software Development,True,0.85,0.8,0.85,"Title strongly indicates ICT role: 'UI/UX Designer'; Industry includes 'Computer and IT': Computer and IT, Other; Moderate ICT function evidence (4 keyword clusters)",UX/UI Designer maps to Frontend / Web Developer,False,,0.85
+Associate Software Engineer at SMART Africa,SMART Africa,Full-Stack Developer,Software Development,Software Development,True,0.85,0.85,0.9,Title strongly indicates ICT role: 'Associate Software Engineer at SMART Africa'; Strong ICT function evidence (9 keyword clusters),Software Engineer with full-stack context,False,,0.85
+Backend Developer specializing in API First & Bus Driven at Echowa Ltd,Echowa Ltd,Backend Developer,Software Development,Software Development,True,0.85,0.95,1.0,Title strongly indicates ICT role: 'Backend Developer specializing in API First & Bus Driven at Echowa Ltd'; Strong ICT function evidence (5 keyword clusters),Title indicates backend development,False,,0.85
+Front-End Developer at Echowa Ltd,Echowa Ltd,Frontend / Web Developer,Software Development,Software Development,True,0.85,0.95,1.0,Title strongly indicates ICT role: 'Front-End Developer at Echowa Ltd'; Strong ICT function evidence (5 keyword clusters),Title indicates frontend/web development,False,,0.85
+Information & Cybersecurity Officer at Urwego Finance CBC,Urwego Finance CBC,IT Auditor / IT Governance & Risk,IT Governance & Audit,IT Governance & Audit,True,0.85,0.5,0.55,Title strongly indicates ICT role: 'Information & Cybersecurity Officer at Urwego Finance CBC'; Strong ICT function evidence (5 keyword clusters),Weak inference from context (2 signals for IT Auditor / IT Governance & Risk),True,Low role normalization confidence (0.5),0.85
+"Associate Software Engineer, Ctlt at University of Global Health Equity (UGHE)",University of Global Health Equity (UGHE),Full-Stack Developer,Software Development,Software Development,True,0.85,0.85,0.9,"Title strongly indicates ICT role: 'Associate Software Engineer, Ctlt at University of Global Health Equity (UGHE)'; Strong ICT function evidence (6 keyword clusters)",Software Engineer with full-stack context,False,,0.85

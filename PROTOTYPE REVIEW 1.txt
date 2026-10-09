@@ -1,0 +1,88 @@
+# PROTOTYPE REVIEW
+
+### 1. User Authentication and Invitations
+
+* The admin should be able to invite users based on their assigned roles.
+* Each invited user should create their own account and authentication using their email.
+* Users should be able to remember and manage their own login credentials securely.
+
+### 3. Labour Market Demand
+
+* We should apply the requirements we have identified across all relevant sectors.
+* Our main focus should be on **labour market demand**, not only on general trends or evolution.
+* However, we should also track changes and trends in the labour market over time.
+* We need to collect insights from different sectors to understand what skills and qualifications are currently demanded.
+
+### 4. Data Generalization and Classification
+
+* We should group similar types of data where necessary.
+* However, more detailed data can provide better and more useful insights.
+* Therefore, we can use generalization for some sectors while keeping more detailed information where it is important.
+
+### 5. Demand and Prediction
+
+* The system should mainly focus on identifying labour market demand.
+* We should also consider developing a prediction model that can help predict future demand for skills, jobs, and qualifications.
+
+
+### 7. Career Advice
+
+* We need to decide whether the system should provide career advice.
+* If career advice is included, we should determine what information and methods will be used to provide relevant advice to students.
+* We should also review the existing career advice pages and remove or improve any unnecessary ones.
+
+### 8. Labour Analyst Role
+
+* The Labour Analyst user role should have the necessary functions to analyze labour market information.
+* The system should provide useful insights that help Labour Analysts understand demand, skills gaps, employment trends, and other relevant information.
+
+### 9. Education Alignment
+
+* The system should clearly show the relationship between education and labour market demand.
+* For example, it should show which qualifications, courses, skills, or training programs are currently demanded by employers and sectors.
+
+### 11. Institution and University Data
+
+* We should track the number of students graduating from each institution or university and entering the labour market.
+* This can help us understand how many graduates each institution is producing and how they are performing in the labour market.
+
+### 12. Training Centres
+
+* The system should collect information about training centres.
+* We should identify:
+
+  * The types of training they provide.
+  * The number of trained people who enter the labour market.
+  * Other relevant information that can help measure the impact of the training.
+
+### 13. Prototype Pages
+
+* We should review the current prototype and remove pages that are not necessary.
+* We should also review the career advice section and other pages to make sure every page has a clear purpose.
+* The final system should be simple, organized, and focused on the main objectives.
+
+---
+
+# IMPORTANT: SYSTEM DESIGN AND RESEARCH
+
+The most important thing we should do now is to **sit down as a group and redesign/review the system properly before continuing with the prototype.**
+
+We need to clearly understand:
+
+* **What is the main purpose of the system?**
+* **What is the final goal or expected outcome?**
+* **Who are the users of the system?**
+* **What does each user need to achieve their goals?**
+* **What information do we need to collect?**
+* **Where will the information come from?**
+* **How will the system use this information?**
+* **How will we measure labour market demand?**
+* **How will we track employability?**
+* **How will we connect education and labour market demand?**
+* **How will we handle data validation and security?**
+* **How will we solve the blockers and challenges we have already identified?**
+* **Which features are actually necessary, and which ones should be removed?**
+
+As group members, we should **review and redesign the system together** so that we have a clear understanding of the complete system before developing it further.
+
+We should also conduct proper **research on the labour market, education, training centres, employability, career guidance, and existing systems** to make sure our solution is based on real needs and reliable information.

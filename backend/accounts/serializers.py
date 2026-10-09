@@ -1,7 +1,9 @@
+from django.utils import timezone
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from .models import Institution
+from django.core.exceptions import ValidationError as DjangoValidationError
+from .models import Institution, Invitation
 
 User = get_user_model()
 
@@ -117,47 +119,82 @@ class SessionSerializer(serializers.Serializer):
 
 
 class AdminUserSerializer(serializers.ModelSerializer):
-    """User management by administrators (all four roles assignable)."""
+    """User management by administrators — invite-only (no password on create)."""
     institution = InstitutionSerializer(read_only=True)
     institution_id = serializers.PrimaryKeyRelatedField(
         queryset=Institution.objects.all(), source='institution',
         write_only=True, required=False, allow_null=True,
     )
-    password = serializers.CharField(write_only=True, required=False, min_length=8)
+    invitation_status = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = [
             'id', 'email', 'username', 'first_name', 'last_name', 'role',
-            'institution', 'institution_id', 'is_active', 'date_joined', 'last_login', 'password',
+            'institution', 'institution_id', 'is_active', 'date_joined', 'last_login',
+            'invitation_status',
         ]
-        read_only_fields = ['id', 'date_joined', 'last_login']
+        read_only_fields = ['id', 'date_joined', 'last_login', 'invitation_status']
         extra_kwargs = {'username': {'required': False}}
 
-    def validate_password(self, value):
-        validate_password(value)
-        return value
+    def get_invitation_status(self, obj):
+        inv = getattr(obj, 'invitation', None)
+        if inv is None:
+            try:
+                inv = obj.invitation
+            except Invitation.DoesNotExist:
+                return None
+        if inv.is_expired:
+            return 'expired'
+        return inv.status
 
     def create(self, validated_data):
-        password = validated_data.pop('password', None)
-        if not password:
-            raise serializers.ValidationError({'password': 'A password is required.'})
         validated_data.setdefault('username', validated_data['email'])
         user = User(**validated_data)
-        user.set_password(password)
+        user.set_unusable_password()
         user.save()
         return user
 
     def update(self, instance, validated_data):
-        password = validated_data.pop('password', None)
         request = self.context.get('request')
         if request and instance.pk == request.user.pk:
             if validated_data.get('role', instance.role) != instance.role and instance.role == User.UserRole.ADMIN:
                 raise serializers.ValidationError({'role': "You can't remove your own administrator role."})
             if validated_data.get('is_active', True) is False:
                 raise serializers.ValidationError({'is_active': "You can't deactivate your own account."})
-        instance = super().update(instance, validated_data)
-        if password:
-            instance.set_password(password)
-            instance.save(update_fields=['password'])
-        return instance
+        return super().update(instance, validated_data)
+
+
+class InviteDetailSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Invitation
+        fields = ['user', 'status', 'expires_at']
+        read_only_fields = fields
+
+
+class AcceptInviteSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    password = serializers.CharField(write_only=True, min_length=8)
+    password_confirm = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs.pop('password_confirm'):
+            raise serializers.ValidationError({'password_confirm': 'Passwords do not match.'})
+        try:
+            invitation = Invitation.objects.select_related('user').get(
+                token=attrs['token'], status=Invitation.Status.PENDING,
+            )
+        except Invitation.DoesNotExist:
+            raise serializers.ValidationError({'token': 'This invitation link is invalid or has already been used.'})
+        if invitation.expires_at < timezone.now():
+            invitation.status = Invitation.Status.EXPIRED
+            invitation.save(update_fields=['status'])
+            raise serializers.ValidationError({'token': 'This invitation link has expired. Ask your administrator to resend it.'})
+        try:
+            validate_password(attrs['password'], invitation.user)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError({'password': list(e.messages)})
+        attrs['invitation'] = invitation
+        return attrs

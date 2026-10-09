@@ -1,0 +1,19 @@
+normalized_role,posting_count,unique_employers,demand_share_pct,rank
+Backend Developer,9,2,19.1,1
+DevOps / Cloud Engineer,8,1,17.0,2
+Systems Analyst / IT Business Analyst,5,1,10.6,3
+Frontend / Web Developer,5,3,10.6,4
+Systems Administrator,4,1,8.5,5
+Mobile App Developer,4,1,8.5,6
+QA / Software Test Engineer,3,1,6.4,7
+Data Engineer,2,1,4.3,8
+Software Developer / Software Engineer,2,3,4.3,9
+Cybersecurity Analyst / Security Engineer,1,1,2.1,10
+Data Scientist,1,1,2.1,11
+Network Engineer / Network Administrator,1,1,2.1,12
+Database Administrator,1,1,2.1,13
+Full-Stack Developer,1,3,2.1,14
+ICT Manager / IT Manager,0,1,0.0,15
+Data Analyst,0,2,0.0,16
+IT Auditor / IT Governance & Risk,0,2,0.0,17
+IT Officer / ICT Administrator,0,7,0.0,18

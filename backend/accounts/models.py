@@ -61,5 +61,24 @@ class User(AbstractUser):
         return self.role == self.UserRole.ADMIN or self.is_superuser
 
 
+class Invitation(TimestampedModel):
+    class Status(models.TextChoices):
+        PENDING = 'pending', 'Pending'
+        ACCEPTED = 'accepted', 'Accepted'
+        EXPIRED = 'expired', 'Expired'
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='invitation')
+    token = models.CharField(max_length=128, unique=True, db_index=True)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    expires_at = models.DateTimeField()
+    invited_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='invitations_sent')
+
+    def __str__(self):
+        return f"Invitation for {self.user.email} ({self.status})"
+
+    @property
+    def is_expired(self):
+        from django.utils import timezone
+        return self.status == self.Status.PENDING and self.expires_at < timezone.now()
 
     

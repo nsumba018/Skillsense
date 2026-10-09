@@ -1,42 +1,42 @@
 # SkillSense — Data Quality Report (v2)
 
-Generated: 2026-09-11 09:12:12
+Generated: 2026-10-09 16:24:15
 
 ## Dataset Summary
 
 - **Source:** JobInRwanda.com
-- **Total records:** 141
-- **ICT records:** 49 (34.8%)
-- **Non-ICT records:** 92
+- **Total records:** 201
+- **ICT records:** 70 (34.8%)
+- **Non-ICT records:** 131
 
 ## Classification Quality
 
-- **Avg ICT confidence (ICT records):** 0.56
+- **Avg ICT confidence (ICT records):** 0.57
 - **Min ICT confidence (ICT records):** 0.50
 - **Avg role normalization confidence:** 0.87
-- **Records needing manual review:** 30
+- **Records needing manual review:** 41
 
 ## Normalized Roles Created
 
-- **Distinct normalized roles:** 15
+- **Distinct normalized roles:** 18
 - **Distinct role groups:** 11
 
 ## Role Level Distribution
 
-- Not Specified: 42
-- Senior: 3
+- Not Specified: 62
+- Senior: 4
 - Mid-Level: 2
-- Manager: 1
 - Lead: 1
+- Manager: 1
 
 ## Data Completeness
 
-- Records with title: 141/141
-- Records with company: 141/141
-- Records with industry: 82/141
-- Records with description/raw_text: 141/141
-- Records with education: 82/141
-- Records with experience: 82/141
+- Records with title: 201/201
+- Records with company: 201/201
+- Records with industry: 173/201
+- Records with description/raw_text: 181/201
+- Records with education: 114/201
+- Records with experience: 117/201
 
 ## Taxonomy Recommendations
 

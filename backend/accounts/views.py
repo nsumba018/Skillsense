@@ -17,12 +17,15 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .models import Institution
+from .invitations import create_invitation, resend_invitation
+from .models import Institution, Invitation
 from .permissions import IsAdminUser
 from .serializers import (
+    AcceptInviteSerializer,
     AdminUserSerializer,
     ChangePasswordSerializer,
     InstitutionSerializer,
+    InviteDetailSerializer,
     LogoutSerializer,
     PasswordResetConfirmSerializer,
     PasswordResetRequestSerializer,
@@ -36,19 +39,14 @@ from .tokens import active_tokens, refresh_jti, revoke_tokens
 User = get_user_model()
 
 
-class RegisterView(generics.CreateAPIView):
-    """POST /api/auth/register/: Create a new account."""
-    queryset = User.objects.all()
-    serializer_class = RegisterSerializer
+class RegisterView(APIView):
+    """POST /api/auth/register/: Disabled — invite-only system."""
     permission_classes = [AllowAny]
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+    def post(self, request):
         return Response(
-            UserSerializer(user).data,
-            status=status.HTTP_201_CREATED,
+            {'detail': 'Self-registration is disabled. Please contact an administrator.'},
+            status=status.HTTP_403_FORBIDDEN,
         )
 
 
@@ -197,7 +195,7 @@ class SessionRevokeView(APIView):
 
 
 class AdminUserListView(generics.ListCreateAPIView):
-    """GET/POST /api/auth/users/: List or create users (administrators only)."""
+    """GET/POST /api/auth/users/: List or invite users (administrators only)."""
     queryset = User.objects.select_related('institution').all()
     serializer_class = AdminUserSerializer
     permission_classes = [IsAdminUser]
@@ -205,9 +203,75 @@ class AdminUserListView(generics.ListCreateAPIView):
     search_fields = ['email', 'first_name', 'last_name']
     ordering_fields = ['date_joined', 'last_login', 'email']
 
+    def perform_create(self, serializer):
+        user = serializer.save()
+        create_invitation(user, self.request.user)
+
 
 class AdminUserDetailView(generics.RetrieveUpdateAPIView):
     """GET/PATCH /api/auth/users/:id/: Change a user's role, institution or active status (administrators only)."""
     queryset = User.objects.select_related('institution').all()
     serializer_class = AdminUserSerializer
     permission_classes = [IsAdminUser]
+
+
+class InviteDetailView(APIView):
+    """GET /api/auth/invite/?token=xxx: Fetch invite info so the frontend can show the welcome page."""
+    permission_classes = [AllowAny]
+
+    @extend_schema(responses=InviteDetailSerializer)
+    def get(self, request):
+        token = request.query_params.get('token')
+        if not token:
+            raise ValidationError({'token': 'Token is required.'})
+        try:
+            invitation = Invitation.objects.select_related('user', 'user__institution').get(token=token)
+        except Invitation.DoesNotExist:
+            raise NotFound('Invalid invitation link.')
+        if invitation.is_expired:
+            invitation.status = Invitation.Status.EXPIRED
+            invitation.save(update_fields=['status'])
+        if invitation.status == Invitation.Status.ACCEPTED:
+            raise NotFound('This invitation has already been accepted.')
+        return Response(InviteDetailSerializer(invitation).data)
+
+
+class AcceptInviteView(generics.GenericAPIView):
+    """POST /api/auth/invite/accept/: Set password and activate the invited account."""
+    serializer_class = AcceptInviteSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        invitation = serializer.validated_data['invitation']
+        user = invitation.user
+        user.set_password(serializer.validated_data['password'])
+        user.is_active = True
+        user.save(update_fields=['password', 'is_active'])
+        invitation.status = Invitation.Status.ACCEPTED
+        invitation.save(update_fields=['status'])
+        tokens = RefreshToken.for_user(user)
+        return Response({
+            'access': str(tokens.access_token),
+            'refresh': str(tokens),
+            'user': UserSerializer(user).data,
+        })
+
+
+class ResendInviteView(APIView):
+    """POST /api/auth/invite/resend/: Regenerate token and re-send the invitation email."""
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        user_id = request.data.get('user_id')
+        if not user_id:
+            raise ValidationError({'user_id': 'user_id is required.'})
+        try:
+            invitation = Invitation.objects.select_related('user').get(user_id=user_id)
+        except Invitation.DoesNotExist:
+            raise NotFound('No invitation found for this user.')
+        if invitation.status == Invitation.Status.ACCEPTED:
+            raise ValidationError({'detail': 'This invitation has already been accepted.'})
+        resend_invitation(invitation)
+        return Response({'detail': f'Invitation re-sent to {invitation.user.email}.'})
