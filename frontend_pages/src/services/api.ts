@@ -7,6 +7,7 @@ import type {
   DataUpload,
   GeographicSummary,
   Institution,
+  InviteInfo,
   Session,
   DemandOutlookReport,
   RoleDeepDiveReport,
@@ -67,9 +68,16 @@ export const authApi = {
     first_name: string
     last_name: string
     role: string
-    password: string
     institution_id?: number | null
   }) => request<AdminUser>('/api/auth/users/', { method: 'POST', body: data }),
+  inviteDetail: (token: string) =>
+    request<InviteInfo>('/api/auth/invite/', { params: { token }, auth: false }),
+  acceptInvite: (token: string, password: string, password_confirm: string) =>
+    request<{ access: string; refresh: string; user: import('../types/api').User }>('/api/auth/invite/accept/', {
+      method: 'POST', body: { token, password, password_confirm }, auth: false,
+    }),
+  resendInvite: (userId: number) =>
+    request<{ detail: string }>('/api/auth/invite/resend/', { method: 'POST', body: { user_id: userId } }),
   updateMe: (data: Pick<User, 'email' | 'username' | 'first_name' | 'last_name'>) =>
     request<User>('/api/auth/me/', { method: 'PUT', body: data }),
 }

@@ -34,17 +34,26 @@ export default function UserManagement() {
   })
 
   const [showCreate, setShowCreate] = useState(false)
-  const [form, setForm] = useState({ first_name: '', last_name: '', email: '', role: 'career_training_advisor', password: '', institution: '' })
+  const [inviteSent, setInviteSent] = useState<string | null>(null)
+  const [form, setForm] = useState({ first_name: '', last_name: '', email: '', role: 'career_training_advisor', institution: '' })
   const create = useMutation({
     mutationFn: () => authApi.createUser({
       first_name: form.first_name.trim(), last_name: form.last_name.trim(), email: form.email.trim().toLowerCase(),
-      role: form.role, password: form.password, institution_id: form.institution ? Number(form.institution) : null,
+      role: form.role, institution_id: form.institution ? Number(form.institution) : null,
     }),
     onSuccess: () => {
-      setForm({ first_name: '', last_name: '', email: '', role: 'career_training_advisor', password: '', institution: '' })
+      const email = form.email.trim().toLowerCase()
+      setForm({ first_name: '', last_name: '', email: '', role: 'career_training_advisor', institution: '' })
       setShowCreate(false)
+      setInviteSent(email)
       queryClient.invalidateQueries({ queryKey: ['users'] })
+      setTimeout(() => setInviteSent(null), 6000)
     },
+  })
+  const resend = useMutation({
+    mutationFn: (userId: number) => authApi.resendInvite(userId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
+    onError: (e) => setRowError(e instanceof ApiError ? e.message : 'Could not resend invitation.'),
   })
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm({ ...form, [k]: e.target.value })
 
@@ -56,7 +65,7 @@ export default function UserManagement() {
           <p className="mt-2 text-sm text-gray-500">Manage who can use SkillSense and what they can access.</p>
         </div>
         <button onClick={() => setShowCreate((v) => !v)} className="flex items-center gap-2 rounded-lg bg-navy px-5 py-3 text-sm font-bold text-white shadow-sm hover:bg-dark-navy">
-          <UserPlus className="h-4 w-4" /> {showCreate ? 'Cancel' : 'Add user'}
+          <UserPlus className="h-4 w-4" /> {showCreate ? 'Cancel' : 'Invite user'}
         </button>
       </div>
 
@@ -70,15 +79,20 @@ export default function UserManagement() {
               <select value={form.role} onChange={set('role')} className={inputClass} aria-label="Role">{ALL_ROLES.map((r) => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}</select></label>
             <label className="block"><span className="text-[11px] font-bold uppercase tracking-wider text-navy">Institution</span>
               <select value={form.institution} onChange={set('institution')} className={inputClass} aria-label="Institution"><option value="">None</option>{(institutions.data ?? []).map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}</select></label>
-            <label className="block"><span className="text-[11px] font-bold uppercase tracking-wider text-navy">Temporary password</span><input type="password" autoComplete="new-password" value={form.password} onChange={set('password')} placeholder="At least 8 characters" className={inputClass} aria-label="Temporary password" /></label>
             <div className="md:col-span-3 flex flex-wrap items-center justify-end gap-4">
-              {create.isError && <span role="alert" data-testid="create-error" className="text-sm font-medium text-red-600">{create.error instanceof ApiError ? create.error.message : 'Could not create the user.'}</span>}
-              <button type="submit" disabled={!form.first_name || !form.email || form.password.length < 8 || create.isPending} className="flex items-center gap-2 rounded-lg bg-navy px-6 py-3 text-sm font-bold text-white hover:bg-dark-navy disabled:opacity-50">
-                {create.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Create user
+              {create.isError && <span role="alert" data-testid="create-error" className="text-sm font-medium text-red-600">{create.error instanceof ApiError ? create.error.message : 'Could not send invitation.'}</span>}
+              <button type="submit" disabled={!form.first_name || !form.email || create.isPending} className="flex items-center gap-2 rounded-lg bg-navy px-6 py-3 text-sm font-bold text-white hover:bg-dark-navy disabled:opacity-50">
+                {create.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Send invite
               </button>
             </div>
           </form>
         </Card>
+      )}
+
+      {inviteSent && (
+        <div className="mt-4 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+          Invitation sent to {inviteSent}
+        </div>
       )}
 
       <div className="mt-6 flex flex-wrap items-center gap-4">
@@ -103,7 +117,7 @@ export default function UserManagement() {
                 <table className="w-full min-w-[820px] text-left" data-testid="users-table">
                   <thead>
                     <tr className="border-b border-gray-200 bg-gray-50/60 text-[11px] font-bold uppercase tracking-wider text-gray-500">
-                      <th className="px-6 py-4 font-bold">User</th><th className="px-6 py-4 font-bold">Role</th><th className="px-6 py-4 font-bold">Institution</th><th className="px-6 py-4 font-bold">Joined</th><th className="px-6 py-4 font-bold">Last sign-in</th><th className="px-6 py-4 font-bold">Status</th>
+                      <th className="px-6 py-4 font-bold">User</th><th className="px-6 py-4 font-bold">Role</th><th className="px-6 py-4 font-bold">Institution</th><th className="px-6 py-4 font-bold">Invite</th><th className="px-6 py-4 font-bold">Joined</th><th className="px-6 py-4 font-bold">Last sign-in</th><th className="px-6 py-4 font-bold">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -118,6 +132,23 @@ export default function UserManagement() {
                             </select>
                           </td>
                           <td className="px-6 py-4 text-gray-600">{row.institution?.name ?? '-'}</td>
+                          <td className="px-6 py-4">
+                            {row.invitation_status === 'accepted' ? (
+                              <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold uppercase text-emerald-700">Accepted</span>
+                            ) : row.invitation_status === 'pending' ? (
+                              <span className="inline-flex items-center gap-1.5">
+                                <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold uppercase text-amber-700">Pending</span>
+                                <button onClick={() => resend.mutate(row.id)} disabled={resend.isPending} className="text-[11px] font-bold text-primary hover:underline disabled:opacity-50">Resend</button>
+                              </span>
+                            ) : row.invitation_status === 'expired' ? (
+                              <span className="inline-flex items-center gap-1.5">
+                                <span className="rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-bold uppercase text-red-600">Expired</span>
+                                <button onClick={() => resend.mutate(row.id)} disabled={resend.isPending} className="text-[11px] font-bold text-primary hover:underline disabled:opacity-50">Resend</button>
+                              </span>
+                            ) : (
+                              <span className="text-xs text-gray-400">-</span>
+                            )}
+                          </td>
                           <td className="px-6 py-4 text-gray-600">{fmtDate(row.date_joined)}</td>
                           <td className="px-6 py-4 text-gray-600">{fmtDate(row.last_login)}</td>
                           <td className="px-6 py-4">

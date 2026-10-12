@@ -13,11 +13,11 @@ export default function CallToAction() {
             Ready to see where Rwanda's ICT demand is heading?
           </h2>
           <p className="text-base text-white/80 mb-8 max-w-2xl mx-auto">
-            Create an account to explore the role-by-role ICT forecasts, score a skill
+            Sign in to explore the role-by-role ICT forecasts, score a skill
             profile, and export reports.
           </p>
-          <Link to="/signup" className="inline-flex items-center gap-2 bg-white text-primary font-semibold px-8 py-3.5 rounded-xl hover:bg-gray-50 transition-colors shadow-sm text-sm">
-            Create an account
+          <Link to="/signin" className="inline-flex items-center gap-2 bg-white text-primary font-semibold px-8 py-3.5 rounded-xl hover:bg-gray-50 transition-colors shadow-sm text-sm">
+            Sign in
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

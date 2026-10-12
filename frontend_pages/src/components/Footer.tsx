@@ -23,7 +23,6 @@ export default function Footer() {
             <h4 className="text-sm font-semibold mb-4">Explore</h4>
             <ul className="space-y-2.5">
               <li><Link to="/signin" className="text-xs text-gray-400 hover:text-white transition-colors">Sign in</Link></li>
-              <li><Link to="/signup" className="text-xs text-gray-400 hover:text-white transition-colors">Create an account</Link></li>
               <li><a href="#how-it-works" className="text-xs text-gray-400 hover:text-white transition-colors">How it works</a></li>
               <li><a href="#stakeholders" className="text-xs text-gray-400 hover:text-white transition-colors">Who it's for</a></li>
             </ul>

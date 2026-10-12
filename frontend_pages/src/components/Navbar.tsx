@@ -38,11 +38,8 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-4">
-          <Link to="/signin" className="text-sm font-medium text-gray-700 hover:text-gray-900 px-4 py-2">
-            Login
-          </Link>
-          <Link to="/signup" className="text-sm font-medium text-white bg-navy hover:bg-primary-dark px-5 py-2.5 rounded-lg transition-colors shadow-sm">
-            Request Access
+          <Link to="/signin" className="text-sm font-medium text-white bg-navy hover:bg-primary-dark px-5 py-2.5 rounded-lg transition-colors shadow-sm">
+            Sign In
           </Link>
         </div>
 
@@ -70,11 +67,8 @@ export default function Navbar() {
             </a>
           ))}
           <div className="pt-2 space-y-3">
-            <Link to="/signin" className="block w-full text-center text-sm font-medium text-gray-700 border border-gray-300 rounded-lg px-4 py-2.5">
-              Login
-            </Link>
-            <Link to="/signup" className="block w-full text-center text-sm font-medium text-white bg-navy rounded-lg px-4 py-2.5">
-              Request Access
+            <Link to="/signin" className="block w-full text-center text-sm font-medium text-white bg-navy rounded-lg px-4 py-2.5">
+              Sign In
             </Link>
           </div>
         </div>

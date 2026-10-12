@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { useQueryClient } from '@tanstack/react-query'
 import { authApi } from '../services/api'
 import { LOGOUT_EVENT, tokenStore } from '../services/http'
-import type { RegisterPayload, User, UserRole } from '../types/api'
+import type { User, UserRole } from '../types/api'
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   admin: 'Administrator',
@@ -16,7 +16,6 @@ interface AuthState {
   loading: boolean
   isAdmin: boolean
   login: (email: string, password: string, remember: boolean) => Promise<void>
-  register: (payload: RegisterPayload) => Promise<void>
   logout: () => Promise<void>
   setUser: (u: User) => void
 }
@@ -56,14 +55,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(await authApi.me())
   }, [])
 
-  const register = useCallback(
-    async (payload: RegisterPayload) => {
-      await authApi.register(payload)
-      await login(payload.email, payload.password, false)
-    },
-    [login],
-  )
-
   const logout = useCallback(async () => {
     const refresh = tokenStore.refresh
     try {
@@ -77,8 +68,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [queryClient])
 
   const value = useMemo<AuthState>(
-    () => ({ user, loading, isAdmin: user?.role === 'admin', login, register, logout, setUser }),
-    [user, loading, login, register, logout],
+    () => ({ user, loading, isAdmin: user?.role === 'admin', login, logout, setUser }),
+    [user, loading, login, logout],
   )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

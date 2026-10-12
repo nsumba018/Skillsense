@@ -187,17 +187,9 @@ export default function SignIn() {
             </button>
           </form>
 
-          <div className="mt-8 border-t border-gray-200 pt-8">
-            <p className="text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
-              New to SkillSense?
-            </p>
-            <Link
-              to="/signup"
-              className="mt-5 flex w-full items-center justify-center rounded-full border border-gray-300 bg-white py-3.5 text-base font-bold text-navy transition-colors hover:bg-gray-50"
-            >
-              Create an account
-            </Link>
-          </div>
+          <p className="mt-8 text-center text-sm text-gray-400">
+            Access is by invitation only. Contact your administrator if you need an account.
+          </p>
         </div>
       </main>
     </div>

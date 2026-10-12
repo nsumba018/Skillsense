@@ -6,8 +6,8 @@ import './index.css'
 import App from './App'
 import { AuthProvider } from './auth/AuthContext'
 import ProtectedRoute from './auth/ProtectedRoute'
-import SignUp from './pages/SignUp'
 import SignIn from './pages/SignIn'
+import AcceptInvite from './pages/AcceptInvite'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import Dashboard from './pages/dashboard/Dashboard'
@@ -38,8 +38,9 @@ createRoot(document.getElementById('root')!).render(
         <AuthProvider>
           <Routes>
             <Route path="/" element={<App />} />
-            <Route path="/signup" element={<SignUp />} />
+            <Route path="/signup" element={<Navigate to="/signin" replace />} />
             <Route path="/signin" element={<SignIn />} />
+            <Route path="/invite/accept" element={<AcceptInvite />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
 

@@ -43,7 +43,7 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-wrap items-center justify-start gap-4 mb-8">
-              <Link to={user ? '/dashboard' : '/signup'} className="inline-flex items-center gap-2 bg-navy hover:bg-primary-dark text-white font-medium px-6 py-3 rounded-xl transition-colors shadow-sm text-sm">
+              <Link to={user ? '/dashboard' : '/signin'} className="inline-flex items-center gap-2 bg-navy hover:bg-primary-dark text-white font-medium px-6 py-3 rounded-xl transition-colors shadow-sm text-sm">
                 {user ? 'Open Dashboard' : 'Explore the Forecasts'}
                 <ArrowRight className="w-4 h-4" />
               </Link>

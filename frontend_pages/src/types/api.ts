@@ -56,6 +56,13 @@ export interface Session {
 
 export interface AdminUser extends User {
   last_login: string | null
+  invitation_status?: 'pending' | 'accepted' | 'expired' | null
+}
+
+export interface InviteInfo {
+  user: { email: string; first_name: string; last_name: string; role: UserRole; institution: Institution | null }
+  expires_at: string
+  status: 'pending' | 'accepted' | 'expired'
 }
 
 /* ---------- taxonomy ---------- */
