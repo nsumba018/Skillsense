@@ -2,9 +2,37 @@ from django.db import models
 from core.models import TimestampedModel
 
 
-class RoleGroup(TimestampedModel):
-    """Top-level grouping of ICT roles (e.g., 'Software Development', 'Data & Analytics')."""
+class Sector(TimestampedModel):
+    """A labour-market sector (e.g. 'ICT & Technology', 'Finance & Business').
+
+    Sits above RoleGroup. Every role group belongs to exactly one sector.
+    """
     name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.TextField(blank=True, default='')
+    sort_order = models.IntegerField(default=0)
+    color = models.CharField(
+        max_length=7, blank=True, default='',
+        help_text="Hex color for charts, e.g. '#2563EB'"
+    )
+
+    class Meta:
+        ordering = ['sort_order', 'name']
+
+    def __str__(self):
+        return self.name
+
+
+class RoleGroup(TimestampedModel):
+    """Grouping of roles within a sector (e.g. 'Software Development' under ICT)."""
+    name = models.CharField(max_length=100, unique=True)
+    sector = models.ForeignKey(
+        Sector,
+        on_delete=models.CASCADE,
+        related_name='role_groups',
+        null=True,
+        blank=True,
+    )
     description = models.TextField(blank=True, default='')
     sort_order = models.IntegerField(default=0)
 
@@ -34,10 +62,7 @@ class RoleFamily(TimestampedModel):
 
 
 class NormalizedRole(TimestampedModel):
-    """A specific ICT role (e.g., 'Backend Developer', 'DevOps / Cloud Engineer').
-
-    These are the 20 roles tracked in our historical dataset.
-    """
+    """A specific role within a sector (e.g. 'Backend Developer', 'Financial Analyst')."""
     name = models.CharField(max_length=100, unique=True)
     role_family = models.ForeignKey(
         RoleFamily,
@@ -45,7 +70,7 @@ class NormalizedRole(TimestampedModel):
         related_name='roles',
     )
     emergence_year = models.IntegerField(
-        help_text="Year this role first appeared in Rwanda's ICT market"
+        help_text="Year this role first appeared in Rwanda's labour market"
     )
     is_emerging = models.BooleanField(
         default=False,
@@ -66,10 +91,7 @@ class NormalizedRole(TimestampedModel):
 
 
 class HistoricalDemand(models.Model):
-    """One row per role per year — the historical demand dataset (Dataset A).
-
-    440 rows total: 20 roles x 22 years (2005-2026).
-    """
+    """One row per role per year — the historical demand dataset."""
     year = models.IntegerField(db_index=True)
     role = models.ForeignKey(
         NormalizedRole,
@@ -80,7 +102,7 @@ class HistoricalDemand(models.Model):
         help_text="Demand index 0-100, max within each year = 100"
     )
     role_share_within_ict_pct = models.FloatField(
-        help_text="Role's share of ICT employment in percent"
+        help_text="Role's share of sector employment in percent"
     )
     role_employment_proxy = models.FloatField(
         help_text="Estimated number of people employed in this role"
@@ -129,3 +151,46 @@ class MacroIndicator(models.Model):
 
     def __str__(self):
         return f"Macro {self.year} (ICT: {self.ict_employment_share_pct:.1f}%)"
+
+
+class SectorEmployment(models.Model):
+    """Per-sector employment indicators per year.
+
+    Tracks how each sector's employment has grown over time.
+    Used for sector-level forecasting and cross-sector comparison.
+    """
+    sector = models.ForeignKey(
+        Sector,
+        on_delete=models.CASCADE,
+        related_name='employment_data',
+    )
+    year = models.IntegerField(db_index=True)
+    employment_count = models.BigIntegerField(
+        help_text="Estimated employment in this sector"
+    )
+    employment_share_pct = models.FloatField(
+        help_text="Sector's share of total national employment"
+    )
+    gdp_contribution_pct = models.FloatField(
+        null=True, blank=True,
+        help_text="Sector's contribution to GDP in percent"
+    )
+    posting_count = models.IntegerField(
+        default=0,
+        help_text="Job postings observed for this sector in this year"
+    )
+    data_source = models.CharField(
+        max_length=255, blank=True, default='',
+        help_text="e.g., 'NISR_GDP_2023', 'simulated_from_gdp'"
+    )
+    synthetic_flag = models.BooleanField(
+        default=False,
+        help_text="True if this data point is simulated"
+    )
+
+    class Meta:
+        ordering = ['sector', 'year']
+        unique_together = ['sector', 'year']
+
+    def __str__(self):
+        return f"{self.sector.name} {self.year}: {self.employment_share_pct:.1f}%"

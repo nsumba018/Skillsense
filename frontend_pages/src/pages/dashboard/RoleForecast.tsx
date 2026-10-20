@@ -72,7 +72,7 @@ export default function RoleForecast() {
     <DashboardLayout>
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="max-w-2xl">
-          <h1 className="text-3xl font-extrabold tracking-tight text-navy">ICT Role Demand Forecast</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight text-navy">Role Demand Forecast</h1>
           <p className="mt-3 text-base leading-relaxed text-gray-600">
             Two-stage forecasting model (gradient-boosted trend model corrected against current job postings) projecting
             demand for each ICT role at 6 months, 1 year and 2 years.

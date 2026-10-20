@@ -40,7 +40,7 @@ const navItems: NavItem[] = [
   { label: 'Employability', icon: Briefcase, to: '/dashboard/employability' },
   { label: 'Career Guidance', icon: Compass, to: '/dashboard/career' },
   { label: 'Education Alignment', icon: GraduationCap, to: '/dashboard/education' },
-  { label: 'ICT Sector', icon: Layers, to: '/dashboard/sectors' },
+  { label: 'Sector Overview', icon: Layers, to: '/dashboard/sectors' },
   { label: 'Geography', icon: MapPin, to: '/dashboard/geography' },
   { label: 'Policy & Planning', icon: Landmark, to: '/dashboard/planning' },
   { label: 'Role Taxonomy', icon: Network, to: '/dashboard/taxonomy' },
@@ -100,7 +100,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <div className="leading-tight">
                 <div className="text-lg font-extrabold tracking-tight text-navy">SkillSense</div>
                 <div className="flex items-center gap-1 text-[11px] text-gray-400">
-                  <Code2 className="h-3 w-3" /> ICT Intelligence
+                  <Code2 className="h-3 w-3" /> Workforce Intelligence
                 </div>
               </div>
             </Link>
@@ -148,8 +148,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search ICT roles…"
-                  aria-label="Search ICT roles"
+                  placeholder="Search roles…"
+                  aria-label="Search roles"
                   className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
               </form>
@@ -204,9 +204,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {children}
 
             <footer className="mt-10 flex flex-col gap-2 border-t border-gray-200 pt-6 text-sm md:flex-row md:items-center md:justify-between">
-              <div className="font-bold text-navy">SkillSense: ICT Workforce Intelligence for Rwanda</div>
+              <div className="font-bold text-navy">SkillSense: Workforce Intelligence for Rwanda</div>
               <p className="text-xs text-gray-500">
-                Forecasts for 20 ICT roles · trained on NISR Labour Force Survey data and current ICT job postings
+                9 sectors tracked · 20 ICT roles · trained on NISR data and current job postings
               </p>
             </footer>
           </main>

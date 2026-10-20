@@ -55,11 +55,11 @@ export const ROLE_FOCUS: Record<UserRole, { tagline: string; links: { to: string
     ],
   },
   labor_market_analyst: {
-    tagline: 'Analyse ICT demand by role, industry and region, and plan workforce investment.',
+    tagline: 'Analyse workforce demand across all sectors, track trends, and plan investment.',
     links: [
+      { to: '/dashboard/sectors', label: 'Sector overview' },
       { to: '/dashboard/planning', label: 'Policy & planning brief' },
       { to: '/dashboard/geography', label: 'Regional demand' },
-      { to: '/dashboard/sectors', label: 'ICT sector intelligence' },
       { to: '/dashboard/reports', label: 'Reports & exports' },
     ],
   },

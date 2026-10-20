@@ -166,15 +166,77 @@ export interface MacroIndicator {
   data_source: string
 }
 
+/* ---------- sectors (multi-sector expansion) ---------- */
+export interface SectorInfo {
+  id: number
+  name: string
+  slug: string
+  color: string
+  description: string
+  sort_order: number
+}
+
+export interface SectorEmploymentPoint {
+  id: number
+  sector_slug: string
+  sector_name: string
+  year: number
+  employment_count: number
+  employment_share_pct: number
+  gdp_contribution_pct: number | null
+  synthetic_flag: boolean
+}
+
+export interface SectorForecastEntry {
+  id: number
+  sector_slug: string
+  sector_name: string
+  sector_color: string
+  horizon: Horizon
+  employment_share_pct: number
+  employment_count: number
+  gdp_contribution_pct: number | null
+  confidence_lower: number | null
+  confidence_upper: number | null
+  share_trend: Trend
+  employment_trend: Trend
+  posting_count: number
+}
+
+export interface SectorForecastKpi {
+  sector_name: string
+  sector_slug: string
+  sector_color: string
+  employment_share_pct: number
+  employment_count: number
+  share_trend: Trend
+  employment_trend: Trend
+  posting_count: number
+}
+
 /* ---------- dashboard ---------- */
 export interface Kpis {
   total_ict_employment: number
   ict_share_pct: number
   total_roles_tracked: number
   total_postings: number
+  total_sectors: number
   latest_year: number | null
   top_growing_roles: { name: string; demand_index: number }[]
+  sector_forecasts: SectorForecastKpi[]
   model_accuracy: { spearman: number | null; r2: number | null }
+}
+
+export interface SectorForecastSummaryHorizon {
+  horizon: Horizon
+  sectors: {
+    sector_name: string
+    sector_slug: string
+    employment_share_pct: number
+    employment_count: number
+    share_trend: Trend
+    employment_trend: Trend
+  }[]
 }
 
 export interface Overview {
@@ -183,6 +245,7 @@ export interface Overview {
   forecast_summary: Partial<
     Record<Horizon, { role_name: string; demand_index: number; share_pct: number; trend: Trend }[]>
   >
+  sector_forecast_summary: SectorForecastSummaryHorizon[]
   model_info: { version: string | null; last_run: string | null; spearman: number | null }
 }
 

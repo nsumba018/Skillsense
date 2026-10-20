@@ -5,6 +5,7 @@ import {
   dashboardApi,
   predictionsApi,
   reportsApi,
+  sectorPredictionsApi,
   taxonomyApi,
   uploadsApi,
 } from './api'
@@ -54,6 +55,21 @@ export const useEmergingRoles = () =>
   useQuery({ queryKey: ['emerging'], queryFn: taxonomyApi.emerging, staleTime: STALE })
 
 export const useSectors = () => useQuery({ queryKey: ['sector'], queryFn: analyticsApi.sector, staleTime: STALE })
+
+export const useSectorList = () =>
+  useQuery({ queryKey: ['sector-list'], queryFn: taxonomyApi.sectorList, staleTime: 5 * STALE })
+export const useSectorEmployment = (sectorSlug?: string) =>
+  useQuery({
+    queryKey: ['sector-employment', sectorSlug ?? 'all'],
+    queryFn: () => taxonomyApi.sectorEmployment(sectorSlug ? { sector__slug: sectorSlug } : undefined),
+    staleTime: STALE,
+  })
+export const useSectorForecasts = (horizon?: Horizon, sectorSlug?: string) =>
+  useQuery({
+    queryKey: ['sector-forecasts', horizon ?? 'all', sectorSlug ?? 'all'],
+    queryFn: () => sectorPredictionsApi.forecasts({ horizon, sector: sectorSlug }),
+    staleTime: STALE,
+  })
 export const useGeographic = () =>
   useQuery({ queryKey: ['geographic'], queryFn: analyticsApi.geographic, staleTime: STALE })
 export const useEmployabilityOverview = () =>

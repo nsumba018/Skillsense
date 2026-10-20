@@ -29,6 +29,9 @@ import type {
   RoleBrief,
   RoleDetail,
   RoleGroup,
+  SectorEmploymentPoint,
+  SectorForecastEntry,
+  SectorInfo,
   SectorRow,
   TokenPair,
   TrendsResponse,
@@ -87,6 +90,19 @@ export const taxonomyApi = {
   roles: (search?: string) => request<RoleBrief[]>('/api/taxonomy/roles/', { params: { search } }),
   role: (id: number) => request<RoleDetail>(`/api/taxonomy/roles/${id}/`),
   emerging: () => request<RoleBrief[]>('/api/taxonomy/emerging/'),
+  sectorList: () => request<SectorInfo[]>('/api/taxonomy/sectors/'),
+  sectorEmployment: (params?: { sector__slug?: string; year?: number }) =>
+    request<SectorEmploymentPoint[]>('/api/taxonomy/sectors/employment/', { params }),
+}
+
+export const sectorPredictionsApi = {
+  forecasts: async (params?: { horizon?: Horizon; sector?: string }): Promise<SectorForecastEntry[]> => {
+    const res = await request<{ forecast_run: unknown; forecasts: SectorForecastEntry[] }>(
+      '/api/predictions/sector-forecasts/', { params },
+    )
+    return res.forecasts
+  },
+  run: () => request<{ id: number }>('/api/predictions/sector-run/', { method: 'POST' }),
 }
 
 export const predictionsApi = {

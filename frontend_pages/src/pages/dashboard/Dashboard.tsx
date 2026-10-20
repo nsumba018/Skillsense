@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   TrendingUp,
+  TrendingDown,
   BadgeCheck,
   Zap,
   Users,
@@ -15,6 +16,8 @@ import {
   Loader2,
   ArrowUpRight,
   ArrowDownRight,
+  Layers,
+  Minus,
 } from 'lucide-react'
 import DashboardLayout, { Card } from './DashboardLayout'
 import { Sparkline, EmploymentTrendChart, Donut, DONUT_COLORS } from './charts'
@@ -23,9 +26,10 @@ import { ROLE_LABELS, useAuth } from '../../auth/AuthContext'
 import { ROLE_FOCUS } from '../../auth/access'
 import { useForecasts, useKpis, useMacro, useOverview, useSectors, useTrends } from '../../services/queries'
 import { predictionsApi, reportsApi } from '../../services/api'
-import { employmentChartData, employmentSeries } from '../../lib/derive'
+import { employmentChartData, employmentSeries, TREND_LABEL, TREND_TONE } from '../../lib/derive'
 import { fmtDateTime, fmtInt, fmtNum, fmtPct } from '../../lib/format'
 import { ApiError } from '../../services/http'
+import type { SectorForecastKpi, Trend } from '../../types/api'
 
 const LINK_ICONS: Record<string, typeof FileText> = {
   '/dashboard/uploads': UploadCloud,
@@ -38,7 +42,7 @@ const LINK_ICONS: Record<string, typeof FileText> = {
   '/dashboard/education': FileText,
   '/dashboard/planning': FileText,
   '/dashboard/geography': FileText,
-  '/dashboard/sectors': FileText,
+  '/dashboard/sectors': Layers,
 }
 
 function Delta({ value, unit = '' }: { value: number | null; unit?: string }) {
@@ -51,6 +55,46 @@ function Delta({ value, unit = '' }: { value: number | null; unit?: string }) {
       {Math.abs(value).toFixed(1)}
       {unit}
     </span>
+  )
+}
+
+function TrendBadge({ trend, label }: { trend: Trend; label: string }) {
+  const Icon = trend === 'growing' ? TrendingUp : trend === 'declining' ? TrendingDown : Minus
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${TREND_TONE[trend]}`}>
+      <Icon className="h-3 w-3" />
+      {label} {TREND_LABEL[trend]}
+    </span>
+  )
+}
+
+function SectorCard({ sf }: { sf: SectorForecastKpi }) {
+  return (
+    <Link to={`/dashboard/sectors?sector=${sf.sector_slug}`} className="block">
+      <Card className="p-4 transition-colors hover:border-primary/40">
+        <div className="flex items-center gap-2.5">
+          <span className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: sf.sector_color }} />
+          <span className="text-sm font-bold text-gray-900 truncate">{sf.sector_name}</span>
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Share</div>
+            <div className="mt-0.5 text-lg font-extrabold tracking-tight text-navy">{fmtPct(sf.employment_share_pct)}</div>
+          </div>
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Employment</div>
+            <div className="mt-0.5 text-lg font-extrabold tracking-tight text-navy">{fmtInt(sf.employment_count)}</div>
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          <TrendBadge trend={sf.share_trend} label="Share" />
+          <TrendBadge trend={sf.employment_trend} label="Jobs" />
+        </div>
+        {sf.posting_count > 0 && (
+          <div className="mt-2 text-[11px] text-gray-500">{fmtInt(sf.posting_count)} job postings</div>
+        )}
+      </Card>
+    </Link>
   )
 }
 
@@ -81,6 +125,17 @@ export default function Dashboard() {
   const shareDelta = latest && prev ? latest.ict_employment_share_pct - prev.ict_employment_share_pct : null
 
   const top = overview.data?.forecast_summary['1y'] ?? []
+  const sectorForecasts = kpis.data?.sector_forecasts ?? []
+  const totalSectorPostings = sectorForecasts.reduce((s, sf) => s + sf.posting_count, 0)
+  const totalSectorEmployment = sectorForecasts.reduce((s, sf) => s + sf.employment_count, 0)
+  const growingSectors = sectorForecasts.filter((sf) => sf.employment_trend === 'growing')
+
+  const sectorDonutData = sectorForecasts.map((sf) => ({
+    name: sf.sector_name,
+    value: sf.employment_count,
+    color: sf.sector_color,
+  }))
+
   const industryRows = sectors.data ?? []
   const totalPostings = industryRows.reduce((s, r) => s + r.posting_count, 0)
   const donutData = [
@@ -105,7 +160,7 @@ export default function Dashboard() {
             </span>
             <span className="hidden h-4 w-px bg-gray-300 sm:block" />
             <span className="text-gray-500">
-              Rwanda ICT sector{kpis.data?.latest_year ? ` · data through ${kpis.data.latest_year}` : ''}
+              Rwanda workforce{kpis.data?.latest_year ? ` · data through ${kpis.data.latest_year}` : ''}{kpis.data?.total_sectors ? ` · ${kpis.data.total_sectors} sectors` : ''}
             </span>
           </div>
           {user && <p data-testid="role-tagline" className="mt-2 max-w-xl text-sm text-gray-500">{ROLE_FOCUS[user.role].tagline}</p>}
@@ -156,57 +211,76 @@ export default function Dashboard() {
       {runForecast.isSuccess && <p className="mt-3 text-sm font-medium text-emerald-700">New forecast run stored (#{runForecast.data.id}).</p>}
       {exportError && <p className="mt-3 text-sm font-medium text-red-600">{exportError}</p>}
 
-      {/* KPI cards */}
+      {/* Sector KPI row */}
       <QueryGate query={kpis} className="mt-8">
         {(k) => (
-          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            <Card className="p-5">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-500">ICT Employment</span>
-                <Users className="h-5 w-5 text-primary" />
+          <>
+            <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+              <Card className="p-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-500">Sectors Tracked</span>
+                  <Layers className="h-5 w-5 text-primary" />
+                </div>
+                <div className="mt-3 flex items-baseline gap-2">
+                  <span data-testid="kpi-sectors" className="text-4xl font-extrabold tracking-tight text-gray-900">{k.total_sectors || 9}</span>
+                </div>
+                <p className="mt-3 text-xs text-gray-500">{growingSectors.length} with growing employment</p>
+              </Card>
+              <Card className="p-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-500">Total Employment (forecast)</span>
+                  <Users className="h-5 w-5 text-primary" />
+                </div>
+                <div className="mt-3">
+                  <span data-testid="kpi-total-emp" className="text-4xl font-extrabold tracking-tight text-gray-900">{fmtInt(totalSectorEmployment)}</span>
+                </div>
+                <p className="mt-3 text-xs text-gray-500">Across all sectors · 1-year forecast</p>
+              </Card>
+              <Card className="p-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-500">ICT Employment</span>
+                  <Network className="h-5 w-5 text-primary" />
+                </div>
+                <div className="mt-3 flex items-baseline gap-2">
+                  <span data-testid="kpi-employment" className="text-4xl font-extrabold tracking-tight text-gray-900">{fmtInt(k.total_ict_employment)}</span>
+                  <Delta value={empDelta} unit="%" />
+                </div>
+                <div className="mt-3"><Sparkline points={series.map((m) => m.ict_employment)} color="#7DD3C0" /></div>
+              </Card>
+              <Card className="p-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-500">Job Postings (all sectors)</span>
+                  <Briefcase className="h-5 w-5 text-primary" />
+                </div>
+                <div className="mt-3">
+                  <span data-testid="kpi-postings" className="text-4xl font-extrabold tracking-tight text-gray-900">{fmtInt(totalSectorPostings || k.total_postings)}</span>
+                </div>
+                <p className="mt-3 text-xs text-gray-500">{k.total_roles_tracked} ICT roles tracked</p>
+              </Card>
+            </div>
+
+            {/* Sector overview grid */}
+            {sectorForecasts.length > 0 && (
+              <div className="mt-6">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900">Sector Overview</h2>
+                    <p className="mt-1 text-sm text-gray-500">1-year forecast · click a sector for details</p>
+                  </div>
+                  <Link to="/dashboard/sectors" className="text-sm font-semibold text-primary hover:underline">View all &rarr;</Link>
+                </div>
+                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="sector-grid">
+                  {sectorForecasts.map((sf) => (
+                    <SectorCard key={sf.sector_slug} sf={sf} />
+                  ))}
+                </div>
               </div>
-              <div className="mt-3 flex items-baseline gap-2">
-                <span data-testid="kpi-employment" className="text-4xl font-extrabold tracking-tight text-gray-900">{fmtInt(k.total_ict_employment)}</span>
-                <Delta value={empDelta} unit="%" />
-              </div>
-              <div className="mt-3"><Sparkline points={series.map((m) => m.ict_employment)} color="#7DD3C0" /></div>
-            </Card>
-            <Card className="p-5">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-500">ICT Share of Employment</span>
-                <Percent className="h-5 w-5 text-primary" />
-              </div>
-              <div className="mt-3 flex items-baseline gap-2">
-                <span data-testid="kpi-share" className="text-4xl font-extrabold tracking-tight text-gray-900">{fmtPct(k.ict_share_pct)}</span>
-                <Delta value={shareDelta} unit=" pts" />
-              </div>
-              <div className="mt-3"><Sparkline points={series.map((m) => m.ict_employment_share_pct)} color="#C9B99B" /></div>
-            </Card>
-            <Card className="p-5">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-500">ICT Roles Tracked</span>
-                <Network className="h-5 w-5 text-primary" />
-              </div>
-              <div className="mt-3">
-                <span data-testid="kpi-roles" className="text-4xl font-extrabold tracking-tight text-gray-900">{k.total_roles_tracked}</span>
-              </div>
-              <p className="mt-3 text-xs text-gray-500">{new Set(forecasts.data?.forecasts.map((f) => f.role_id)).size || '-'} with active forecasts</p>
-            </Card>
-            <Card className="p-5">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-500">Job Postings Analysed</span>
-                <Briefcase className="h-5 w-5 text-primary" />
-              </div>
-              <div className="mt-3">
-                <span data-testid="kpi-postings" className="text-4xl font-extrabold tracking-tight text-gray-900">{fmtInt(k.total_postings)}</span>
-              </div>
-              <p className="mt-3 text-xs text-gray-500">Current ICT postings used to validate the model</p>
-            </Card>
-          </div>
+            )}
+          </>
         )}
       </QueryGate>
 
-      {/* Trend + top roles */}
+      {/* Sector employment donut + ICT top roles */}
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="p-6 lg:col-span-2">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -254,31 +328,46 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Industries + movers */}
+      {/* Sector employment share donut + Forecast movers */}
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card className="p-6">
-          <h2 className="text-lg font-bold text-gray-900">Industries Hiring ICT Talent</h2>
-          <p className="mt-1 text-xs text-gray-500">Share of {fmtInt(totalPostings)} ICT job postings by industry</p>
-          <QueryGate query={sectors} className="mt-6">
-            {() => (
-              <div className="mt-6 flex flex-col items-center gap-8 sm:flex-row sm:justify-around" data-testid="industry-donut">
-                <Donut data={donutData} centerValue={fmtInt(totalPostings)} centerLabel="Postings" />
-                <ul className="space-y-2.5">
-                  {donutData.map((s) => (
-                    <li key={s.name} className="flex items-center gap-3 text-sm">
-                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.color }} />
-                      <span className="w-40 truncate text-gray-600" title={s.name}>{s.name}</span>
-                      <span className="font-bold text-gray-900">{s.value}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </QueryGate>
+          <h2 className="text-lg font-bold text-gray-900">Employment by Sector</h2>
+          <p className="mt-1 text-xs text-gray-500">Forecast employment distribution across {sectorForecasts.length || 9} sectors</p>
+          {sectorDonutData.length > 0 ? (
+            <div className="mt-6 flex flex-col items-center gap-8 sm:flex-row sm:justify-around" data-testid="sector-donut">
+              <Donut data={sectorDonutData} centerValue={fmtInt(totalSectorEmployment)} centerLabel="Total" />
+              <ul className="space-y-2.5">
+                {sectorDonutData.map((s) => (
+                  <li key={s.name} className="flex items-center gap-3 text-sm">
+                    <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
+                    <span className="w-40 truncate text-gray-600" title={s.name}>{s.name}</span>
+                    <span className="font-bold text-gray-900">{fmtInt(s.value)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <QueryGate query={sectors} className="mt-6">
+              {() => (
+                <div className="mt-6 flex flex-col items-center gap-8 sm:flex-row sm:justify-around" data-testid="industry-donut">
+                  <Donut data={donutData} centerValue={fmtInt(totalPostings)} centerLabel="Postings" />
+                  <ul className="space-y-2.5">
+                    {donutData.map((s) => (
+                      <li key={s.name} className="flex items-center gap-3 text-sm">
+                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.color }} />
+                        <span className="w-40 truncate text-gray-600" title={s.name}>{s.name}</span>
+                        <span className="font-bold text-gray-900">{s.value}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </QueryGate>
+          )}
         </Card>
 
         <Card className="p-6">
-          <h2 className="text-lg font-bold text-gray-900">Forecast Movers</h2>
+          <h2 className="text-lg font-bold text-gray-900">ICT Forecast Movers</h2>
           <p className="mt-1 text-xs text-gray-500">1-year outlook vs. current market share</p>
           <QueryGate query={trends} className="mt-6">
             {(t) => (

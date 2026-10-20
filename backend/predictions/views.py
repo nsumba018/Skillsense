@@ -9,11 +9,13 @@ from accounts.permissions import IsAdminUser
 from core.params import int_param
 from taxonomy.models import HistoricalDemand, MacroIndicator
 from taxonomy.serializers import MacroIndicatorSerializer
-from .models import ForecastRun, RoleForecast
+from .models import ForecastRun, RoleForecast, SectorForecastRun, SectorForecast
 from .serializers import (
     ForecastRunSerializer,
     RoleForecastSerializer,
     ForecastRunSummarySerializer,
+    SectorForecastSerializer,
+    SectorForecastRunSummarySerializer,
 )
 
 
@@ -188,5 +190,69 @@ class TriggerForecastRunView(APIView):
         except Exception as e:
             return Response(
                 {"detail": f"Forecast run failed: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+@extend_schema(
+    parameters=[
+        OpenApiParameter('horizon', OpenApiTypes.STR, description='6m, 1y or 2y'),
+        OpenApiParameter('sector', OpenApiTypes.STR, description='Filter by sector slug'),
+    ],
+    responses=OpenApiTypes.OBJECT,
+)
+class SectorForecastListView(APIView):
+    """
+    GET /api/predictions/sector-forecasts/
+    Returns the latest sector forecast run with all forecast rows.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        latest_run = SectorForecastRun.objects.prefetch_related(
+            'forecasts__sector'
+        ).first()
+
+        if not latest_run:
+            return Response(
+                {"detail": "No sector forecast runs available."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        forecasts = latest_run.forecasts.all()
+
+        horizon = request.query_params.get('horizon')
+        if horizon:
+            forecasts = forecasts.filter(horizon=horizon)
+
+        sector = request.query_params.get('sector')
+        if sector:
+            forecasts = forecasts.filter(sector__slug=sector)
+
+        return Response({
+            'forecast_run': SectorForecastRunSummarySerializer(latest_run).data,
+            'forecasts': SectorForecastSerializer(forecasts, many=True).data,
+        })
+
+
+@extend_schema(request=None, responses={201: SectorForecastRunSummarySerializer})
+class TriggerSectorForecastView(APIView):
+    """
+    POST /api/predictions/sector-run/ — Trigger a sector forecast run (admin only).
+    """
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        from predictions.ml.sector_forecaster import run_sector_forecast
+
+        try:
+            run = run_sector_forecast()
+            return Response(
+                SectorForecastRunSummarySerializer(run).data,
+                status=status.HTTP_201_CREATED,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": f"Sector forecast run failed: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )

@@ -1,0 +1,136 @@
+sector_slug,sector_name,year,employment_count,employment_share_pct,gdp_contribution_pct,posting_count,total_employment,data_source,synthetic_flag
+ict-technology,ICT & Technology,2010,9794,0.44,2.2,0,2250000,backcast_from_LFS_2017,True
+finance-business,Finance & Business,2010,33975,1.51,4.6,0,2250000,backcast_from_LFS_2017,True
+engineering,Engineering,2010,338368,15.04,15.3,0,2250000,backcast_from_LFS_2017,True
+healthcare,Healthcare,2010,36675,1.63,2.1,0,2250000,backcast_from_LFS_2017,True
+education-research,Education & Research,2010,74520,3.31,2.5,0,2250000,backcast_from_LFS_2017,True
+agriculture-environment,Agriculture & Environment,2010,911974,40.53,25.3,0,2250000,backcast_from_LFS_2017,True
+government-public-admin,Government & Public Admin,2010,44177,1.96,5.9,0,2250000,backcast_from_LFS_2017,True
+services-commerce,Services & Commerce,2010,761283,33.83,33.6,0,2250000,backcast_from_LFS_2017,True
+development-ngo,Development & NGO,2010,8100,0.36,0.5,0,2250000,backcast_from_LFS_2017,True
+ict-technology,ICT & Technology,2011,10134,0.42,2.1,0,2400000,backcast_from_LFS_2017,True
+finance-business,Finance & Business,2011,36240,1.51,4.6,0,2400000,backcast_from_LFS_2017,True
+engineering,Engineering,2011,373731,15.57,16.2,0,2400000,backcast_from_LFS_2017,True
+healthcare,Healthcare,2011,36885,1.54,1.9,0,2400000,backcast_from_LFS_2017,True
+education-research,Education & Research,2011,83021,3.46,2.7,0,2400000,backcast_from_LFS_2017,True
+agriculture-environment,Agriculture & Environment,2011,983751,40.99,25.8,0,2400000,backcast_from_LFS_2017,True
+government-public-admin,Government & Public Admin,2011,49904,2.08,6.5,0,2400000,backcast_from_LFS_2017,True
+services-commerce,Services & Commerce,2011,780495,32.52,31.5,0,2400000,backcast_from_LFS_2017,True
+development-ngo,Development & NGO,2011,8640,0.36,0.5,0,2400000,backcast_from_LFS_2017,True
+ict-technology,ICT & Technology,2012,11433,0.45,2.3,0,2550000,backcast_from_LFS_2017,True
+finance-business,Finance & Business,2012,39509,1.55,4.8,0,2550000,backcast_from_LFS_2017,True
+engineering,Engineering,2012,403136,15.81,16.6,0,2550000,backcast_from_LFS_2017,True
+healthcare,Healthcare,2012,41565,1.63,2.1,0,2550000,backcast_from_LFS_2017,True
+education-research,Education & Research,2012,91963,3.61,2.9,0,2550000,backcast_from_LFS_2017,True
+agriculture-environment,Agriculture & Environment,2012,1059235,41.54,26.4,0,2550000,backcast_from_LFS_2017,True
+government-public-admin,Government & Public Admin,2012,52530,2.06,6.4,0,2550000,backcast_from_LFS_2017,True
+services-commerce,Services & Commerce,2012,821297,32.21,31.0,0,2550000,backcast_from_LFS_2017,True
+development-ngo,Development & NGO,2012,9180,0.36,0.5,0,2550000,backcast_from_LFS_2017,True
+ict-technology,ICT & Technology,2013,11400,0.42,2.1,0,2700000,backcast_from_LFS_2017,True
+finance-business,Finance & Business,2013,43429,1.61,5.1,0,2700000,backcast_from_LFS_2017,True
+engineering,Engineering,2013,410843,15.22,15.6,0,2700000,backcast_from_LFS_2017,True
+healthcare,Healthcare,2013,46525,1.72,2.3,0,2700000,backcast_from_LFS_2017,True
+education-research,Education & Research,2013,113270,4.2,3.7,0,2700000,backcast_from_LFS_2017,True
+agriculture-environment,Agriculture & Environment,2013,1133894,42.0,26.9,0,2700000,backcast_from_LFS_2017,True
+government-public-admin,Government & Public Admin,2013,56663,2.1,6.6,0,2700000,backcast_from_LFS_2017,True
+services-commerce,Services & Commerce,2013,862850,31.96,30.6,0,2700000,backcast_from_LFS_2017,True
+development-ngo,Development & NGO,2013,9720,0.36,0.5,0,2700000,backcast_from_LFS_2017,True
+ict-technology,ICT & Technology,2014,12034,0.42,2.1,0,2850000,backcast_from_LFS_2017,True
+finance-business,Finance & Business,2014,42474,1.49,4.5,0,2850000,backcast_from_LFS_2017,True
+engineering,Engineering,2014,430289,15.1,15.4,0,2850000,backcast_from_LFS_2017,True
+healthcare,Healthcare,2014,49110,1.72,2.3,0,2850000,backcast_from_LFS_2017,True
+education-research,Education & Research,2014,117466,4.12,3.6,0,2850000,backcast_from_LFS_2017,True
+agriculture-environment,Agriculture & Environment,2014,1194281,41.9,26.8,0,2850000,backcast_from_LFS_2017,True
+government-public-admin,Government & Public Admin,2014,58710,2.06,6.4,0,2850000,backcast_from_LFS_2017,True
+services-commerce,Services & Commerce,2014,912570,32.02,30.7,0,2850000,backcast_from_LFS_2017,True
+development-ngo,Development & NGO,2014,10260,0.36,0.5,0,2850000,backcast_from_LFS_2017,True
+ict-technology,ICT & Technology,2015,13059,0.44,2.2,0,3000000,backcast_from_LFS_2017,True
+finance-business,Finance & Business,2015,45891,1.53,4.7,0,3000000,backcast_from_LFS_2017,True
+engineering,Engineering,2015,458271,15.28,15.7,0,3000000,backcast_from_LFS_2017,True
+healthcare,Healthcare,2015,50297,1.68,2.2,0,3000000,backcast_from_LFS_2017,True
+education-research,Education & Research,2015,119232,3.97,3.4,0,3000000,backcast_from_LFS_2017,True
+agriculture-environment,Agriculture & Environment,2015,1226944,40.9,25.7,0,3000000,backcast_from_LFS_2017,True
+government-public-admin,Government & Public Admin,2015,64118,2.14,6.8,0,3000000,backcast_from_LFS_2017,True
+services-commerce,Services & Commerce,2015,975619,32.52,31.5,0,3000000,backcast_from_LFS_2017,True
+development-ngo,Development & NGO,2015,10800,0.36,0.5,0,3000000,backcast_from_LFS_2017,True
+ict-technology,ICT & Technology,2016,12684,0.41,2.0,0,3100000,backcast_from_LFS_2017,True
+finance-business,Finance & Business,2016,46199,1.49,4.5,0,3100000,backcast_from_LFS_2017,True
+engineering,Engineering,2016,464358,14.98,15.2,0,3100000,backcast_from_LFS_2017,True
+healthcare,Healthcare,2016,49086,1.58,2.0,0,3100000,backcast_from_LFS_2017,True
+education-research,Education & Research,2016,118643,3.83,3.2,0,3100000,backcast_from_LFS_2017,True
+agriculture-environment,Agriculture & Environment,2016,1299042,41.9,26.8,0,3100000,backcast_from_LFS_2017,True
+government-public-admin,Government & Public Admin,2016,64459,2.08,6.5,0,3100000,backcast_from_LFS_2017,True
+services-commerce,Services & Commerce,2016,1008140,32.52,31.5,0,3100000,backcast_from_LFS_2017,True
+development-ngo,Development & NGO,2016,11160,0.36,0.5,0,3100000,backcast_from_LFS_2017,True
+ict-technology,ICT & Technology,2017,11105,0.37,1.7,0,3027983,NISR_LFS_2017,False
+finance-business,Finance & Business,2017,45732,1.51,4.6,0,3027983,NISR_LFS_2017,False
+engineering,Engineering,2017,451671,14.92,15.1,0,3027983,NISR_LFS_2017,False
+healthcare,Healthcare,2017,49252,1.63,2.1,0,3027983,NISR_LFS_2017,False
+education-research,Education & Research,2017,111329,3.68,3.0,0,3027983,NISR_LFS_2017,False
+agriculture-environment,Agriculture & Environment,2017,1315959,43.46,28.5,0,3027983,NISR_LFS_2017,False
+government-public-admin,Government & Public Admin,2017,62520,2.06,6.4,0,3027983,NISR_LFS_2017,False
+services-commerce,Services & Commerce,2017,969412,32.02,30.7,0,3027983,NISR_LFS_2017,False
+development-ngo,Development & NGO,2017,11002,0.36,0.5,0,3027983,NISR_LFS_2017,False
+ict-technology,ICT & Technology,2018,13669,0.42,1.7,0,3239292,NISR_LFS_2018,False
+finance-business,Finance & Business,2018,54057,1.67,4.7,0,3239292,NISR_LFS_2018,False
+engineering,Engineering,2018,545651,16.84,15.1,0,3239292,NISR_LFS_2018,False
+healthcare,Healthcare,2018,49072,1.51,1.8,0,3239292,NISR_LFS_2018,False
+education-research,Education & Research,2018,106339,3.28,2.9,0,3239292,NISR_LFS_2018,False
+agriculture-environment,Agriculture & Environment,2018,1341877,41.43,26.8,0,3239292,NISR_LFS_2018,False
+government-public-admin,Government & Public Admin,2018,60489,1.87,6.3,0,3239292,NISR_LFS_2018,False
+services-commerce,Services & Commerce,2018,1050287,32.42,32.7,0,3239292,NISR_LFS_2018,False
+development-ngo,Development & NGO,2018,17851,0.55,0.5,0,3239292,NISR_LFS_2018,False
+ict-technology,ICT & Technology,2020,8962,0.26,2.0,0,3495187,NISR_LFS_2020,False
+finance-business,Finance & Business,2020,56977,1.63,4.6,0,3495187,NISR_LFS_2020,False
+engineering,Engineering,2020,658387,18.84,17.4,0,3495187,NISR_LFS_2020,False
+healthcare,Healthcare,2020,55984,1.6,1.9,0,3495187,NISR_LFS_2020,False
+education-research,Education & Research,2020,107624,3.08,1.7,0,3495187,NISR_LFS_2020,False
+agriculture-environment,Agriculture & Environment,2020,1474140,42.18,27.8,0,3495187,NISR_LFS_2020,False
+government-public-admin,Government & Public Admin,2020,65349,1.87,6.1,0,3495187,NISR_LFS_2020,False
+services-commerce,Services & Commerce,2020,1060685,30.35,30.5,0,3495187,NISR_LFS_2020,False
+development-ngo,Development & NGO,2020,7079,0.2,0.5,0,3495187,NISR_LFS_2020,False
+ict-technology,ICT & Technology,2021,12026,0.36,2.0,0,3308800,NISR_LFS_2021,False
+finance-business,Finance & Business,2021,51976,1.57,4.8,0,3308800,NISR_LFS_2021,False
+engineering,Engineering,2021,537748,16.25,17.7,0,3308800,NISR_LFS_2021,False
+healthcare,Healthcare,2021,48685,1.47,1.7,0,3308800,NISR_LFS_2021,False
+education-research,Education & Research,2021,124340,3.76,3.0,0,3308800,NISR_LFS_2021,False
+agriculture-environment,Agriculture & Environment,2021,1608445,48.61,26.9,0,3308800,NISR_LFS_2021,False
+government-public-admin,Government & Public Admin,2021,67489,2.04,6.6,0,3308800,NISR_LFS_2021,False
+services-commerce,Services & Commerce,2021,855350,25.85,30.7,0,3308800,NISR_LFS_2021,False
+development-ngo,Development & NGO,2021,2741,0.08,0.5,0,3308800,NISR_LFS_2021,False
+ict-technology,ICT & Technology,2022,8228,0.23,1.5,0,3568275,NISR_LFS_2022,False
+finance-business,Finance & Business,2022,53295,1.49,4.8,0,3568275,NISR_LFS_2022,False
+engineering,Engineering,2022,566007,15.86,18.4,0,3568275,NISR_LFS_2022,False
+healthcare,Healthcare,2022,48447,1.36,1.3,0,3568275,NISR_LFS_2022,False
+education-research,Education & Research,2022,143995,4.04,3.6,0,3568275,NISR_LFS_2022,False
+agriculture-environment,Agriculture & Environment,2022,1718452,48.16,27.7,0,3568275,NISR_LFS_2022,False
+government-public-admin,Government & Public Admin,2022,60590,1.7,6.4,0,3568275,NISR_LFS_2022,False
+services-commerce,Services & Commerce,2022,965685,27.06,30.1,0,3568275,NISR_LFS_2022,False
+development-ngo,Development & NGO,2022,3577,0.1,0.5,0,3568275,NISR_LFS_2022,False
+ict-technology,ICT & Technology,2023,11279,0.28,1.5,0,3985164,NISR_LFS_2023,False
+finance-business,Finance & Business,2023,62022,1.56,4.4,0,3985164,NISR_LFS_2023,False
+engineering,Engineering,2023,615714,15.45,18.5,0,3985164,NISR_LFS_2023,False
+healthcare,Healthcare,2023,43905,1.1,0.9,0,3985164,NISR_LFS_2023,False
+education-research,Education & Research,2023,164997,4.14,4.3,0,3985164,NISR_LFS_2023,False
+agriculture-environment,Agriculture & Environment,2023,1780349,44.67,28.9,0,3985164,NISR_LFS_2023,False
+government-public-admin,Government & Public Admin,2023,56093,1.41,6.2,0,3985164,NISR_LFS_2023,False
+services-commerce,Services & Commerce,2023,1246547,31.28,29.3,0,3985164,NISR_LFS_2023,False
+development-ngo,Development & NGO,2023,4259,0.11,0.5,0,3985164,NISR_LFS_2023,False
+ict-technology,ICT & Technology,2024,12127,0.27,1.6,0,4501393,NISR_LFS_2024,False
+finance-business,Finance & Business,2024,66179,1.47,3.8,0,4501393,NISR_LFS_2024,False
+engineering,Engineering,2024,693577,15.41,18.4,0,4501393,NISR_LFS_2024,False
+healthcare,Healthcare,2024,59120,1.31,0.9,0,4501393,NISR_LFS_2024,False
+education-research,Education & Research,2024,197265,4.38,4.0,0,4501393,NISR_LFS_2024,False
+agriculture-environment,Agriculture & Environment,2024,1873669,41.62,27.2,0,4501393,NISR_LFS_2024,False
+government-public-admin,Government & Public Admin,2024,84141,1.87,5.5,0,4501393,NISR_LFS_2024,False
+services-commerce,Services & Commerce,2024,1512544,33.6,31.9,0,4501393,NISR_LFS_2024,False
+development-ngo,Development & NGO,2024,2770,0.06,0.5,0,4501393,NISR_LFS_2024,False
+ict-technology,ICT & Technology,2025,17492,0.36,1.6,0,4846623,NISR_LFS_2025,False
+finance-business,Finance & Business,2025,77402,1.6,3.8,0,4846623,NISR_LFS_2025,False
+engineering,Engineering,2025,709940,14.65,18.4,0,4846623,NISR_LFS_2025,False
+healthcare,Healthcare,2025,48913,1.01,0.9,0,4846623,NISR_LFS_2025,False
+education-research,Education & Research,2025,202852,4.19,4.0,0,4846623,NISR_LFS_2025,False
+agriculture-environment,Agriculture & Environment,2025,1980002,40.85,27.2,0,4846623,NISR_LFS_2025,False
+government-public-admin,Government & Public Admin,2025,82027,1.69,5.5,0,4846623,NISR_LFS_2025,False
+services-commerce,Services & Commerce,2025,1725092,35.59,31.9,0,4846623,NISR_LFS_2025,False
+development-ngo,Development & NGO,2025,2902,0.06,0.5,0,4846623,NISR_LFS_2025,False

@@ -6,6 +6,8 @@ from .views import (
     HistoricalDemandView,
     MacroIndicatorView,
     TriggerForecastRunView,
+    SectorForecastListView,
+    TriggerSectorForecastView,
 )
 
 urlpatterns = [
@@ -15,4 +17,6 @@ urlpatterns = [
     path('historical/', HistoricalDemandView.as_view(), name='predictions-historical'),
     path('macro/', MacroIndicatorView.as_view(), name='predictions-macro'),
     path('run/', TriggerForecastRunView.as_view(), name='predictions-run'),
+    path('sector-forecasts/', SectorForecastListView.as_view(), name='predictions-sector-forecasts'),
+    path('sector-run/', TriggerSectorForecastView.as_view(), name='predictions-sector-run'),
 ]
