@@ -19,6 +19,7 @@ import {
   BarChart,
   Bar,
   LabelList,
+  Legend,
 } from 'recharts'
 import { fmtCompact, fmtInt } from '../../lib/format'
 
@@ -228,5 +229,34 @@ export function RwandaDemandHeatmap() {
         })}
       </g>
     </svg>
+  )
+}
+
+/* ---------- Sector Employment vs Demand Chart ---------- */
+export interface SectorGapPoint {
+  name: string
+  current: number
+  forecast: number
+  color: string
+}
+
+export function SectorEmploymentChart({ data, height = 400 }: { data: SectorGapPoint[]; height?: number }) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart data={data} layout="vertical" margin={{ top: 8, right: 60, left: 8, bottom: 0 }} barCategoryGap="20%" barGap={2}>
+        <CartesianGrid horizontal={false} stroke="#f1f5f9" />
+        <XAxis type="number" tickFormatter={fmtCompact} tick={tick} axisLine={false} tickLine={false} />
+        <YAxis type="category" dataKey="name" width={160} tick={{ fontSize: 11, fill: '#334155', fontWeight: 600 }} axisLine={false} tickLine={false} />
+        <Tooltip formatter={(v) => fmtInt(Number(v))} labelStyle={{ fontWeight: 700 }} />
+        <Legend verticalAlign="top" align="right" wrapperStyle={{ fontSize: 11, fontWeight: 700 }} />
+        <Bar dataKey="current" name="Current" fill="#94a3b8" radius={[0, 4, 4, 0]} isAnimationActive={false} />
+        <Bar dataKey="forecast" name="1-Year Forecast" radius={[0, 4, 4, 0]} isAnimationActive={false}>
+          {data.map((d) => (
+            <Cell key={d.name} fill={d.color} />
+          ))}
+          <LabelList dataKey="forecast" position="right" formatter={(v: number) => fmtCompact(v)} style={{ fill: NAVY, fontSize: 10, fontWeight: 800 }} />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
   )
 }

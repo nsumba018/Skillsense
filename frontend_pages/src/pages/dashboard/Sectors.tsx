@@ -33,12 +33,31 @@ function TrendBadge({ trend, label }: { trend: Trend; label: string }) {
 }
 
 function AllSectorsView({ horizon, forecasts }: { horizon: Horizon; forecasts: SectorForecastEntry[] }) {
+  const sectorEmployment = useSectorEmployment()
   const filtered = forecasts.filter((f) => f.horizon === horizon)
   const totalEmp = filtered.reduce((s, f) => s + f.employment_count, 0)
   const totalPostings = filtered.reduce((s, f) => s + f.posting_count, 0)
   const growing = filtered.filter((f) => f.employment_trend === 'growing')
-  const declining = filtered.filter((f) => f.share_trend === 'declining')
   const maxShare = Math.max(1, ...filtered.map((f) => f.employment_share_pct))
+
+  const empBySlug = new Map<string, number>()
+  if (sectorEmployment.data) {
+    const latestYear = new Map<string, number>()
+    for (const row of sectorEmployment.data) {
+      if (!latestYear.has(row.sector_slug) || row.year > latestYear.get(row.sector_slug)!) {
+        latestYear.set(row.sector_slug, row.year)
+        empBySlug.set(row.sector_slug, row.employment_count)
+      }
+    }
+  }
+
+  const growthBySlug = new Map<string, number>()
+  for (const f of filtered) {
+    const current = empBySlug.get(f.sector_slug)
+    if (current && current > 0) {
+      growthBySlug.set(f.sector_slug, (f.employment_count - current) / current * 100)
+    }
+  }
 
   return (
     <>
@@ -89,7 +108,7 @@ function AllSectorsView({ horizon, forecasts }: { horizon: Horizon; forecasts: S
               <th className="px-6 py-4 font-bold">Employment share</th>
               <th className="px-6 py-4 font-bold">Employment</th>
               <th className="px-6 py-4 font-bold">GDP %</th>
-              <th className="px-6 py-4 font-bold">Share trend</th>
+              <th className="px-6 py-4 font-bold">Growth</th>
               <th className="px-6 py-4 font-bold">Jobs trend</th>
               <th className="px-6 py-4 font-bold">Postings</th>
             </tr>
@@ -113,7 +132,17 @@ function AllSectorsView({ horizon, forecasts }: { horizon: Horizon; forecasts: S
                 </td>
                 <td className="px-6 py-4 text-gray-700 font-variant-numeric-tabular">{fmtInt(f.employment_count)}</td>
                 <td className="px-6 py-4 text-gray-700">{f.gdp_contribution_pct != null ? fmtPct(f.gdp_contribution_pct) : '-'}</td>
-                <td className="px-6 py-4"><TrendBadge trend={f.share_trend} label="" /></td>
+                <td className="px-6 py-4">
+                  {(() => {
+                    const g = growthBySlug.get(f.sector_slug)
+                    if (g == null) return <span className="text-gray-400">—</span>
+                    return (
+                      <span className={`font-bold ${g >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                        {g >= 0 ? '+' : ''}{g.toFixed(1)}%
+                      </span>
+                    )
+                  })()}
+                </td>
                 <td className="px-6 py-4"><TrendBadge trend={f.employment_trend} label="" /></td>
                 <td className="px-6 py-4 text-gray-700">{fmtInt(f.posting_count)}</td>
               </tr>
@@ -127,36 +156,43 @@ function AllSectorsView({ horizon, forecasts }: { horizon: Horizon; forecasts: S
         <h2 className="text-xl font-extrabold tracking-tight text-navy">Sector Cards</h2>
         <p className="mt-1 text-sm text-gray-500">Click a sector above to see its full detail</p>
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="sector-cards">
-          {[...filtered].sort((a, b) => b.employment_share_pct - a.employment_share_pct).map((f) => (
-            <Card key={f.sector_slug} className="p-5">
-              <div className="flex items-center gap-2.5">
-                <span className="h-3.5 w-3.5 rounded-full shrink-0" style={{ backgroundColor: f.sector_color }} />
-                <span className="text-base font-bold text-gray-900">{f.sector_name}</span>
-              </div>
-              <div className="mt-4 grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Share</div>
-                  <div className="mt-1 text-2xl font-extrabold tracking-tight text-navy">{fmtPct(f.employment_share_pct)}</div>
+          {[...filtered].sort((a, b) => b.employment_share_pct - a.employment_share_pct).map((f) => {
+            const g = growthBySlug.get(f.sector_slug)
+            return (
+              <Card key={f.sector_slug} className="p-5">
+                <div className="flex items-center gap-2.5">
+                  <span className="h-3.5 w-3.5 rounded-full shrink-0" style={{ backgroundColor: f.sector_color }} />
+                  <span className="text-base font-bold text-gray-900">{f.sector_name}</span>
                 </div>
-                <div>
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Employment</div>
-                  <div className="mt-1 text-2xl font-extrabold tracking-tight text-navy">{fmtInt(f.employment_count)}</div>
+                <div className="mt-4 grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Share</div>
+                    <div className="mt-1 text-2xl font-extrabold tracking-tight text-navy">{fmtPct(f.employment_share_pct)}</div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Employment</div>
+                    <div className="mt-1 text-2xl font-extrabold tracking-tight text-navy">{fmtInt(f.employment_count)}</div>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                <TrendBadge trend={f.share_trend} label="Share" />
-                <TrendBadge trend={f.employment_trend} label="Jobs" />
-              </div>
-              {f.posting_count > 0 && (
-                <p className="mt-2 text-xs text-gray-500">{fmtInt(f.posting_count)} job postings</p>
-              )}
-              {f.confidence_lower != null && f.confidence_upper != null && (
-                <p className="mt-1 text-[11px] text-gray-400">
-                  Confidence: {fmtPct(f.confidence_lower)} – {fmtPct(f.confidence_upper)}
-                </p>
-              )}
-            </Card>
-          ))}
+                <div className="mt-3 flex items-center gap-2">
+                  <TrendBadge trend={f.employment_trend} label="Jobs" />
+                  {g != null && (
+                    <span className={`text-xs font-bold ${g >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                      {g >= 0 ? '+' : ''}{g.toFixed(1)}%
+                    </span>
+                  )}
+                </div>
+                {f.posting_count > 0 && (
+                  <p className="mt-2 text-xs text-gray-500">{fmtInt(f.posting_count)} job postings</p>
+                )}
+                {f.confidence_lower != null && f.confidence_upper != null && (
+                  <p className="mt-1 text-[11px] text-gray-400">
+                    Confidence: {fmtPct(f.confidence_lower)} – {fmtPct(f.confidence_upper)}
+                  </p>
+                )}
+              </Card>
+            )
+          })}
         </div>
       </div>
     </>
@@ -247,9 +283,16 @@ function SingleSectorView({ slug, sectorName, sectorColor, forecasts }: {
 
       {/* Trends */}
       {fc1y && (
-        <div className="mt-6 flex flex-wrap gap-3">
-          <TrendBadge trend={fc1y.share_trend} label="Share" />
+        <div className="mt-6 flex flex-wrap items-center gap-3">
           <TrendBadge trend={fc1y.employment_trend} label="Jobs" />
+          {latestHistory && latestHistory.employment_count > 0 && (
+            <span className={`text-sm font-bold ${
+              fc1y.employment_count >= latestHistory.employment_count ? 'text-emerald-600' : 'text-red-500'
+            }`}>
+              {((fc1y.employment_count - latestHistory.employment_count) / latestHistory.employment_count * 100) >= 0 ? '+' : ''}
+              {((fc1y.employment_count - latestHistory.employment_count) / latestHistory.employment_count * 100).toFixed(1)}% forecast growth
+            </span>
+          )}
         </div>
       )}
 
@@ -282,7 +325,7 @@ function SingleSectorView({ slug, sectorName, sectorColor, forecasts }: {
               <th className="pb-3 font-bold">Employment share</th>
               <th className="pb-3 font-bold">Employment</th>
               <th className="pb-3 font-bold">Confidence band</th>
-              <th className="pb-3 font-bold">Share trend</th>
+              <th className="pb-3 font-bold">Growth</th>
               <th className="pb-3 font-bold">Jobs trend</th>
             </tr>
           </thead>
@@ -297,7 +340,16 @@ function SingleSectorView({ slug, sectorName, sectorColor, forecasts }: {
                     ? `${fmtPct(fc.confidence_lower)} – ${fmtPct(fc.confidence_upper)}`
                     : '-'}
                 </td>
-                <td className="py-4"><TrendBadge trend={fc.share_trend} label="" /></td>
+                <td className="py-4">
+                  {latestHistory && latestHistory.employment_count > 0 ? (() => {
+                    const g = (fc.employment_count - latestHistory.employment_count) / latestHistory.employment_count * 100
+                    return (
+                      <span className={`font-bold ${g >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                        {g >= 0 ? '+' : ''}{g.toFixed(1)}%
+                      </span>
+                    )
+                  })() : '—'}
+                </td>
                 <td className="py-4"><TrendBadge trend={fc.employment_trend} label="" /></td>
               </tr>
             ))}
@@ -346,7 +398,7 @@ export default function Sectors() {
   const sectorList = useSectorList()
   const sectorForecasts = useSectorForecasts()
 
-  const allForecasts = sectorForecasts.data ?? []
+  const allForecasts = sectorForecasts.data?.forecasts ?? []
   const sectors = sectorList.data ?? []
   const selectedSector = sectors.find((s) => s.slug === selectedSlug)
 

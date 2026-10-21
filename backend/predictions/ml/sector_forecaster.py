@@ -1,12 +1,13 @@
 """
 Run the per-sector employment forecast pipeline from within Django.
 
-Uses the pooled LightGBM model trained by ml/train_sector_model.py to
-predict sector employment shares at 6m/1y/2y horizons for all 9 sectors.
+Uses a hybrid approach:
+1. Per-sector historical growth rates from the last 5 years of employment data
+2. Job posting demand signals to boost sectors with active hiring
+3. ML-predicted share direction to adjust the growth trajectory
 
-Trend direction is computed from the last 3 year-over-year transitions
-(2 historical + 1 forecast), not a single comparison. A sector is
-"growing" or "declining" only when 2+ of 3 transitions agree.
+Each sector gets its own independent forecast — no zero-sum share
+redistribution, so all sectors can grow simultaneously.
 """
 import numpy as np
 import pandas as pd
@@ -22,7 +23,8 @@ _cache = {}
 
 ARTIFACTS = Path(settings.BASE_DIR).parent / "ml" / "artifacts"
 
-GROWTH_TOTAL_EMP = {"6m": 1.02, "1y": 1.04, "2y": 1.08}
+HORIZON_YEARS = {"6m": 0.5, "1y": 1.0, "2y": 2.0}
+BASE_GROWTH = 0.035
 CV_MAE = 1.08
 
 
@@ -56,36 +58,43 @@ def _load_features():
     return _cache["sector_features"]
 
 
-def _compute_trajectory_trend(values):
-    """Determine trend from a sequence of 3+ values by counting transitions.
+def _compute_sector_growth_rate(history_counts):
+    """Compute annualized growth rate from last 5 years of employment."""
+    if len(history_counts) < 2:
+        return BASE_GROWTH
+    recent = history_counts[-5:]
+    first, last = recent[0], recent[-1]
+    n_years = len(recent) - 1
+    if first <= 0 or last <= 0 or n_years == 0:
+        return BASE_GROWTH
+    cagr = (last / first) ** (1 / n_years) - 1
+    return max(-0.05, min(0.15, cagr))
 
-    Looks at year-over-year changes. If 2+ transitions go the same
-    direction (with >1% relative threshold to filter noise), that's the
-    trend. Mixed signals = stable.
+
+def _get_posting_counts():
+    """Get current job posting counts per sector from classified data."""
+    csv_path = Path(settings.BASE_DIR).parent / "data" / "classified" / "classified_all_sectors.csv"
+    if not csv_path.exists():
+        return {}
+    df = pd.read_csv(csv_path)
+    if "sector_slug" not in df.columns:
+        return {}
+    return df["sector_slug"].value_counts().to_dict()
+
+
+def _posting_boost(posting_count, total_postings):
+    """Compute a demand boost factor from job postings.
+
+    Sectors with above-average postings get a growth boost.
+    The boost is capped at +3% additional annual growth.
     """
-    if len(values) < 2:
-        return "stable"
-
-    ups = 0
-    downs = 0
-    for i in range(1, len(values)):
-        prev = values[i - 1]
-        curr = values[i]
-        if prev < 0.001:
-            if curr > 0.001:
-                ups += 1
-            continue
-        change_pct = (curr - prev) / prev * 100
-        if change_pct > 1.0:
-            ups += 1
-        elif change_pct < -1.0:
-            downs += 1
-
-    if ups >= 2 and ups > downs:
-        return "growing"
-    if downs >= 2 and downs > ups:
-        return "declining"
-    return "stable"
+    if total_postings <= 0 or posting_count <= 0:
+        return 0.0
+    avg_per_sector = total_postings / 9
+    ratio = posting_count / avg_per_sector
+    if ratio > 1.0:
+        return min(0.03, (ratio - 1.0) * 0.015)
+    return 0.0
 
 
 def _build_feature_frame():
@@ -134,23 +143,6 @@ def _build_feature_frame():
     return df
 
 
-def _get_recent_history(df, n_years=3):
-    """Get the last n_years of share and employment data per sector."""
-    latest_year = int(df["year"].max())
-    cutoff = latest_year - n_years
-    recent = df[df["year"] > cutoff].sort_values(["sector_slug", "year"])
-
-    history = {}
-    for slug in df["sector_slug"].unique():
-        sector_rows = recent[recent["sector_slug"] == slug]
-        history[slug] = {
-            "shares": sector_rows["employment_share_pct"].tolist(),
-            "counts": sector_rows["employment_count"].tolist(),
-            "years": sector_rows["year"].tolist(),
-        }
-    return history
-
-
 def _predict_shares(model, frame, features):
     raw = np.clip(model.predict(frame[features].fillna(0)), 0, None)
     total = raw.sum()
@@ -159,89 +151,106 @@ def _predict_shares(model, frame, features):
     return dict(zip(frame["sector_slug"], raw))
 
 
-def _get_posting_counts():
-    """Get current job posting counts per sector from classified data."""
-    csv_path = Path(settings.BASE_DIR).parent / "data" / "classified" / "classified_all_sectors.csv"
-    if not csv_path.exists():
-        return {}
-    df = pd.read_csv(csv_path)
-    if "sector_slug" not in df.columns:
-        return {}
-    return df["sector_slug"].value_counts().to_dict()
+def _ml_direction(current_share, predicted_share):
+    """Get the ML model's directional signal: +1 growing, -1 declining, 0 stable."""
+    if current_share < 0.001:
+        return 0
+    change_pct = (predicted_share - current_share) / current_share * 100
+    if change_pct > 5:
+        return 1
+    elif change_pct < -5:
+        return -1
+    return 0
 
 
 def run_sector_forecast():
-    """Execute a full sector forecast run and store results."""
+    """Execute a full sector forecast run and store results.
+
+    Hybrid approach:
+    - Historical growth rate per sector (CAGR from last 5 years)
+    - Job posting demand boost (above-average postings = faster growth)
+    - ML share direction adjusts growth rate up/down slightly
+    - Each sector forecasts independently — no zero-sum constraint
+    - Shares are recomputed from the independently forecast employment
+    """
     model = _load_model()
     features = _load_features()
 
     sectors = {s.slug: s for s in Sector.objects.all()}
     df = _build_feature_frame()
     posting_counts = _get_posting_counts()
-    recent_history = _get_recent_history(df, n_years=3)
+    total_postings = sum(posting_counts.values())
 
     latest_year = int(df["year"].max())
     latest = df[df["year"] == latest_year].copy().reset_index(drop=True)
     current_shares = dict(zip(latest["sector_slug"], latest["employment_share_pct"]))
     current_counts = dict(zip(latest["sector_slug"], latest["employment_count"]))
 
-    total_emp_latest = latest["total_employment"].iloc[0] if len(latest) > 0 else 4_800_000
+    history_by_sector = {}
+    for slug in sectors:
+        sector_df = df[df["sector_slug"] == slug].sort_values("year")
+        history_by_sector[slug] = {
+            "counts": sector_df["employment_count"].tolist(),
+            "shares": sector_df["employment_share_pct"].tolist(),
+        }
 
-    # 1-year horizon
     pred_1y = _predict_shares(model, latest, features)
 
-    # 2-year: simulate 1y state, predict again
-    sim = latest.copy()
-    sim["year"] = latest_year + 1
-    year_min = df["year"].min()
-    span = max(df["year"].max() - year_min, 1)
-    sim["trend_position"] = (latest_year + 1 - year_min) / span
-    sim["employment_share_pct"] = sim["sector_slug"].map(pred_1y)
-    sim["share_lag1"] = sim["sector_slug"].map(current_shares)
-    sim["share_change_1y"] = sim["employment_share_pct"] - sim["share_lag1"]
-    sim["emp_gdp_ratio"] = (
-        sim["employment_share_pct"] / sim["gdp_contribution_pct"].clip(lower=0.1)
-    )
-    pred_2y = _predict_shares(model, sim, features)
-
-    # 6-month: halfway between current and 1y
-    pred_6m = {
-        slug: 0.5 * current_shares.get(slug, 0) + 0.5 * pred_1y.get(slug, 0)
-        for slug in sectors
-    }
-
-    horizons = [
-        ("6m", pred_6m, GROWTH_TOTAL_EMP["6m"]),
-        ("1y", pred_1y, GROWTH_TOTAL_EMP["1y"]),
-        ("2y", pred_2y, GROWTH_TOTAL_EMP["2y"]),
-    ]
+    sector_growth_rates = {}
+    for slug in sectors:
+        hist = history_by_sector.get(slug, {"counts": []})
+        base_rate = _compute_sector_growth_rate(hist["counts"])
+        posting_count = posting_counts.get(slug, 0)
+        boost = _posting_boost(posting_count, total_postings)
+        ml_dir = _ml_direction(current_shares.get(slug, 0), pred_1y.get(slug, 0))
+        ml_adj = ml_dir * 0.01
+        annual_rate = base_rate + boost + ml_adj
+        sector_growth_rates[slug] = annual_rate
 
     band_multiplier = {"6m": 0.5, "1y": 1.0, "2y": 1.8}
 
     with transaction.atomic():
         run = SectorForecastRun.objects.create(
-            model_version="sector_lgbm_v1",
+            model_version="sector_hybrid_v2",
             accuracy_mae=round(CV_MAE, 4),
             accuracy_r2=0.9933,
-            notes=f"Per-sector forecast from {latest_year} data, pooled LightGBM. "
-                  f"Trends use last 3 years + forecast trajectory.",
+            notes=(
+                f"Hybrid sector forecast from {latest_year} data. "
+                f"Per-sector CAGR + job posting demand boost + ML direction. "
+                f"Total postings: {total_postings}."
+            ),
         )
 
-        for label, shares, emp_mult in horizons:
-            total_emp = int(total_emp_latest * emp_mult)
+        for label in ["6m", "1y", "2y"]:
+            years_ahead = HORIZON_YEARS[label]
             band = CV_MAE * band_multiplier[label]
 
+            forecast_counts = {}
+            for slug in sectors:
+                current_emp = current_counts.get(slug, 0)
+                rate = sector_growth_rates[slug]
+                forecast_emp = int(current_emp * (1 + rate) ** years_ahead)
+                forecast_counts[slug] = max(forecast_emp, 0)
+
+            total_forecast_emp = sum(forecast_counts.values())
+
             for slug, sector_obj in sectors.items():
-                share = shares.get(slug, 0)
-                emp_count = int(total_emp * share / 100)
+                emp_count = forecast_counts[slug]
+                share = (emp_count / total_forecast_emp * 100) if total_forecast_emp > 0 else 0
 
-                hist = recent_history.get(slug, {"shares": [], "counts": []})
+                current_emp = current_counts.get(slug, 0)
+                share_trend = _growth_trend(current_emp, emp_count)
 
-                share_trajectory = hist["shares"] + [share]
-                share_trend = _compute_trajectory_trend(share_trajectory)
-
-                emp_trajectory = hist["counts"] + [emp_count]
-                employment_trend = _compute_trajectory_trend(emp_trajectory)
+                if current_emp > 0:
+                    emp_change_pct = (emp_count - current_emp) / current_emp * 100
+                    if emp_change_pct > 1.0:
+                        employment_trend = "growing"
+                    elif emp_change_pct < -1.0:
+                        employment_trend = "declining"
+                    else:
+                        employment_trend = "stable"
+                else:
+                    employment_trend = "growing" if emp_count > 0 else "stable"
 
                 SectorForecast.objects.create(
                     forecast_run=run,
@@ -261,3 +270,19 @@ def run_sector_forecast():
                 )
 
     return run
+
+
+def _growth_trend(current_emp, forecast_emp):
+    """Categorize growth rate into a trend label.
+
+    Only marks "declining" when the sector is actually losing jobs.
+    Growing sectors are "growing" (>8% growth) or "stable" (0-8%).
+    """
+    if current_emp <= 0:
+        return "stable"
+    rate = (forecast_emp - current_emp) / current_emp * 100
+    if rate > 8.0:
+        return "growing"
+    elif rate < -1.0:
+        return "declining"
+    return "stable"

@@ -10,22 +10,17 @@ import {
   Settings,
   Search,
   User,
-  Download,
-  BookOpen,
   Network,
   Compass,
   GraduationCap,
   UploadCloud,
   LogOut,
-  Code2,
   Landmark,
   Users,
 } from 'lucide-react'
 import { canAccess } from '../../auth/access'
-import { API_URL } from '../../config'
 import { ROLE_LABELS, useAuth } from '../../auth/AuthContext'
 import { useOverview } from '../../services/queries'
-import { reportsApi } from '../../services/api'
 import { fmtDateTime } from '../../lib/format'
 interface NavItem {
   label: string
@@ -36,11 +31,11 @@ interface NavItem {
 /** Every page; each user sees only the ones their role can open (see auth/access.ts). */
 const navItems: NavItem[] = [
   { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
+  { label: 'Sector Overview', icon: Layers, to: '/dashboard/sectors' },
   { label: 'Role Forecast', icon: TrendingUp, to: '/dashboard/forecast' },
   { label: 'Employability', icon: Briefcase, to: '/dashboard/employability' },
   { label: 'Career Guidance', icon: Compass, to: '/dashboard/career' },
   { label: 'Education Alignment', icon: GraduationCap, to: '/dashboard/education' },
-  { label: 'Sector Overview', icon: Layers, to: '/dashboard/sectors' },
   { label: 'Geography', icon: MapPin, to: '/dashboard/geography' },
   { label: 'Policy & Planning', icon: Landmark, to: '/dashboard/planning' },
   { label: 'Role Taxonomy', icon: Network, to: '/dashboard/taxonomy' },
@@ -63,8 +58,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const navigate = useNavigate()
   const overview = useOverview()
   const [search, setSearch] = useState('')
-  const [exportError, setExportError] = useState<string | null>(null)
-
   const items = navItems.filter((n) => canAccess(user?.role, n.to))
   const fullName = user ? `${user.first_name} ${user.last_name}`.trim() || user.email : ''
   const lastRun = overview.data?.model_info.last_run
@@ -73,15 +66,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     e.preventDefault()
     const q = search.trim()
     navigate(q ? `/dashboard/taxonomy?q=${encodeURIComponent(q)}` : '/dashboard/taxonomy')
-  }
-
-  const onExport = async () => {
-    setExportError(null)
-    try {
-      await reportsApi.downloadDemandOutlookCsv()
-    } catch {
-      setExportError('Export failed')
-    }
   }
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -99,8 +83,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <img src="/logo_icon.webp" alt="SkillSense logo" className="h-8 w-auto" />
               <div className="leading-tight">
                 <div className="text-lg font-extrabold tracking-tight text-navy">SkillSense</div>
-                <div className="flex items-center gap-1 text-[11px] text-gray-400">
-                  <Code2 className="h-3 w-3" /> Workforce Intelligence
+                <div className="text-[11px] text-gray-400">
+                  Workforce Intelligence
                 </div>
               </div>
             </Link>
@@ -115,27 +99,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             ))}
           </nav>
 
-          <div className="space-y-4 px-4 py-6">
-            <button
-              onClick={onExport}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-navy py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-dark-navy"
-            >
-              <Download className="h-4 w-4" />
-              Export Forecast CSV
-            </button>
-            {exportError && <p className="text-center text-xs text-red-500">{exportError}</p>}
-            <div className="space-y-1 px-1">
-              <a
-                href={`${API_URL}/api/docs/`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-3 py-1.5 text-sm text-gray-500 hover:text-gray-900"
-              >
-                <BookOpen className="h-4 w-4" />
-                API Documentation
-              </a>
-            </div>
-          </div>
+          <div className="px-4 py-6" />
         </aside>
 
         {/* ---------------- Main column ---------------- */}
@@ -148,7 +112,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search roles…"
+                  placeholder="Search sectors & roles…"
                   aria-label="Search roles"
                   className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
@@ -202,13 +166,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           <main className="px-6 py-8 lg:px-8">
             {children}
-
-            <footer className="mt-10 flex flex-col gap-2 border-t border-gray-200 pt-6 text-sm md:flex-row md:items-center md:justify-between">
-              <div className="font-bold text-navy">SkillSense: Workforce Intelligence for Rwanda</div>
-              <p className="text-xs text-gray-500">
-                9 sectors tracked · 20 ICT roles · trained on NISR data and current job postings
-              </p>
-            </footer>
           </main>
         </div>
       </div>

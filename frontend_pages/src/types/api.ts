@@ -187,6 +187,14 @@ export interface SectorEmploymentPoint {
   synthetic_flag: boolean
 }
 
+export interface SectorForecastRun {
+  id: number
+  created_at: string
+  model_version: string
+  accuracy_mae: number | null
+  accuracy_r2: number | null
+}
+
 export interface SectorForecastEntry {
   id: number
   sector_slug: string
@@ -337,7 +345,7 @@ export interface CurriculumDetail extends CurriculumSummary {
 }
 
 export interface GeographicSummary {
-  total_ict_postings: number
+  total_postings: number
   located_postings: number
   unlocated_postings: number
   by_province: { province: string; postings: number; share_pct: number; districts_in_province: number }[]
@@ -348,6 +356,38 @@ export interface GeographicSummary {
     top_role: string
     roles: { name: string; count: number }[]
   }[]
+}
+
+export interface SectorRoleDetail {
+  title: string
+  sector_name: string
+  posting_count: number
+  sector_share_pct: number
+  total_sector_postings: number
+  companies: { name: string; count: number }[]
+  locations: { location: string; count: number }[]
+  by_year: { year: number; count: number }[]
+}
+
+export interface SectorRoleTaxonomy {
+  sector_name: string
+  total: number
+  groups: { letter: string; roles: { title: string; count: number }[] }[]
+}
+
+export interface SectorPositionsResponse {
+  positions: { title: string; count: number }[]
+}
+
+export interface PolicyInsight {
+  type: string
+  priority: 'high' | 'medium' | 'low'
+  title: string
+  description: string
+}
+
+export interface PolicyInsightsResponse {
+  insights: PolicyInsight[]
 }
 
 /* ---------- reports ---------- */
@@ -380,6 +420,57 @@ export interface DemandOutlookReport {
       }[]
     >
   >
+}
+
+export interface SectorOutlookReport {
+  title: string
+  model_version: string
+  generated_at: string
+  accuracy: { mae: number | null; r2: number | null }
+  forecasts: Partial<
+    Record<
+      Horizon,
+      {
+        sector: string
+        sector_slug: string
+        employment_count: number
+        employment_share_pct: number
+        growth_pct: number
+        employment_trend: Trend
+        posting_count: number
+        confidence_lower: number | null
+        confidence_upper: number | null
+      }[]
+    >
+  >
+}
+
+export interface SectorDetailReport {
+  title: string
+  sector_name: string
+  sector_slug: string
+  model_version: string
+  generated_at: string
+  accuracy: { mae: number | null; r2: number | null }
+  current_employment: number
+  employment_history: { year: number; employment_count: number; share_pct: number }[]
+  forecasts: Partial<
+    Record<
+      Horizon,
+      {
+        employment_count: number
+        employment_share_pct: number
+        growth_pct: number
+        employment_trend: Trend
+        confidence_lower: number | null
+        confidence_upper: number | null
+      }
+    >
+  >
+  total_postings: number
+  top_positions: { title: string; count: number }[]
+  top_companies: { name: string; count: number }[]
+  top_locations: { location: string; count: number }[]
 }
 
 /* ---------- uploads ---------- */

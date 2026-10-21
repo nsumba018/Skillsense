@@ -15,7 +15,7 @@ from .serializers import (
     CurriculumCreateSerializer, CurriculumDetailSerializer, CurriculumSerializer,
     EmployabilityInputSerializer, GeographicDemandSerializer,
 )
-from .services import geographic_summary, latest_forecast_map
+from .services import _compute_policy_insights, geographic_summary, latest_forecast_map, sector_role_detail, sector_role_taxonomy, sector_top_positions
 from .skills import SKILL_ROLES
 
 
@@ -214,13 +214,91 @@ class CurriculumDetailView(generics.RetrieveDestroyAPIView):
 @extend_schema(responses=OpenApiTypes.OBJECT)
 class GeographicSummaryView(APIView):
     """
-    GET /api/analytics/geographic/summary/
-    ICT job-posting demand by province and district (only postings that state a location in Rwanda).
+    GET /api/analytics/geographic/summary/?sector=<slug>
+    Job-posting demand by province and district. Optional sector filter.
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        return Response(geographic_summary())
+        sector_slug = request.query_params.get('sector')
+        return Response(geographic_summary(sector_slug))
+
+
+@extend_schema(
+    parameters=[OpenApiParameter('sector', str, OpenApiParameter.QUERY, required=False)],
+    responses=OpenApiTypes.OBJECT,
+)
+class SectorTopPositionsView(APIView):
+    """
+    GET /api/analytics/sector/positions/?sector=<slug>
+    Top job titles from postings, optionally filtered by sector.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        sector_slug = request.query_params.get('sector')
+        positions = sector_top_positions(sector_slug, limit=10)
+        return Response({'positions': positions})
+
+
+@extend_schema(
+    parameters=[OpenApiParameter('sector', str, OpenApiParameter.QUERY, required=False)],
+    responses=OpenApiTypes.OBJECT,
+)
+@extend_schema(
+    parameters=[OpenApiParameter('sector', str, OpenApiParameter.QUERY, required=True)],
+    responses=OpenApiTypes.OBJECT,
+)
+class SectorRoleTaxonomyView(APIView):
+    """
+    GET /api/analytics/sector/taxonomy/?sector=<slug>
+    Job titles for a sector, grouped alphabetically.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        sector_slug = request.query_params.get('sector')
+        if not sector_slug:
+            return Response({'detail': 'sector parameter required'}, status=400)
+        return Response(sector_role_taxonomy(sector_slug))
+
+
+@extend_schema(
+    parameters=[
+        OpenApiParameter('sector', str, OpenApiParameter.QUERY, required=True),
+        OpenApiParameter('title', str, OpenApiParameter.QUERY, required=True),
+    ],
+    responses=OpenApiTypes.OBJECT,
+)
+class SectorRoleDetailView(APIView):
+    """
+    GET /api/analytics/sector/role-detail/?sector=<slug>&title=<title>
+    Detail for a specific job title within a sector.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        sector_slug = request.query_params.get('sector')
+        title = request.query_params.get('title')
+        if not sector_slug or not title:
+            return Response({'detail': 'sector and title parameters required'}, status=400)
+        data = sector_role_detail(sector_slug, title)
+        if not data:
+            return Response({'detail': 'Not found'}, status=404)
+        return Response(data)
+
+
+class PolicyInsightsView(APIView):
+    """
+    GET /api/analytics/policy-insights/?sector=<slug>
+    Data-driven policy insights computed from forecasts, employment and postings.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        sector_slug = request.query_params.get('sector')
+        insights = _compute_policy_insights(sector_slug)
+        return Response({'insights': insights})
 
 
 @extend_schema(responses=OpenApiTypes.OBJECT)

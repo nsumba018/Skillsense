@@ -1,23 +1,12 @@
 import { useMemo } from 'react'
-import { ArrowDownRight, ArrowUpRight, Landmark, Lightbulb, TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import { AlertTriangle, ArrowDownRight, ArrowUpRight, Briefcase, Landmark, Lightbulb, MapPin, Shield, Sparkles, TrendingUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import DashboardLayout, { Card } from './DashboardLayout'
 import SectorSelector, { useSectorParam } from '../../components/ui/SectorSelector'
 import { QueryGate } from '../../components/ui/State'
-import { useForecasts, useHistoricalSince, useKpis, useTaxonomy, useSectorForecasts } from '../../services/queries'
+import { useForecasts, useHistoricalSince, useKpis, useTaxonomy, useSectorForecasts, useSectorEmployment, useSectorPositions, usePolicyInsights } from '../../services/queries'
 import { fmtInt, fmtPct, HORIZON_LABEL } from '../../lib/format'
-import { TREND_LABEL, TREND_TONE } from '../../lib/derive'
-import type { Horizon, Trend } from '../../types/api'
-
-function TrendBadge({ trend }: { trend: Trend }) {
-  const Icon = trend === 'growing' ? TrendingUp : trend === 'declining' ? TrendingDown : Minus
-  return (
-    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${TREND_TONE[trend]}`}>
-      <Icon className="h-3 w-3" />
-      {TREND_LABEL[trend]}
-    </span>
-  )
-}
+import type { Horizon } from '../../types/api'
 
 interface RolePlan {
   roleId: number
@@ -30,7 +19,8 @@ interface RolePlan {
 
 function SectorInvestmentBrief({ sectorSlug }: { sectorSlug: string | null }) {
   const sectorForecasts = useSectorForecasts()
-  const forecasts = sectorForecasts.data ?? []
+  const sectorEmployment = useSectorEmployment()
+  const forecasts = sectorForecasts.data?.forecasts ?? []
 
   const horizonData = useMemo(() => {
     const filtered = sectorSlug
@@ -45,9 +35,23 @@ function SectorInvestmentBrief({ sectorSlug }: { sectorSlug: string | null }) {
     return byHorizon
   }, [forecasts, sectorSlug])
 
+  const empBySlug = useMemo(() => {
+    const m = new Map<string, number>()
+    if (sectorEmployment.data) {
+      const latestYear = new Map<string, number>()
+      for (const row of sectorEmployment.data) {
+        if (!latestYear.has(row.sector_slug) || row.year > latestYear.get(row.sector_slug)!) {
+          latestYear.set(row.sector_slug, row.year)
+          m.set(row.sector_slug, row.employment_count)
+        }
+      }
+    }
+    return m
+  }, [sectorEmployment.data])
+
   const oneYear = horizonData.get('1y') ?? []
   const growing = oneYear.filter((f) => f.employment_trend === 'growing')
-  const declining = oneYear.filter((f) => f.share_trend === 'declining')
+  const stable = oneYear.filter((f) => f.employment_trend === 'stable')
   const sorted = [...oneYear].sort((a, b) => b.employment_share_pct - a.employment_share_pct)
   const totalEmp = oneYear.reduce((s, f) => s + f.employment_count, 0)
 
@@ -77,56 +81,161 @@ function SectorInvestmentBrief({ sectorSlug }: { sectorSlug: string | null }) {
               <div className="mt-2 text-2xl font-extrabold text-emerald-700">{growing.length}</div>
               <div className="mt-1 text-xs text-emerald-600">adding jobs</div>
             </div>
-            <div className="rounded-xl bg-red-50 p-4">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-red-600">Declining share</div>
-              <div className="mt-2 text-2xl font-extrabold text-red-600">{declining.length}</div>
-              <div className="mt-1 text-xs text-red-500">shrinking relative to total</div>
+            <div className="rounded-xl bg-blue-50 p-4">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-blue-700">Stable sectors</div>
+              <div className="mt-2 text-2xl font-extrabold text-blue-700">{stable.length}</div>
+              <div className="mt-1 text-xs text-blue-500">steady employment</div>
             </div>
           </div>
 
           <div className="mt-5 space-y-3" data-testid="sector-brief">
-            {sorted.map((f) => (
-              <div key={f.sector_slug} className="flex items-center gap-3">
-                <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: f.sector_color }} />
-                <span className="w-48 shrink-0 text-sm font-medium text-gray-800 truncate">{f.sector_name}</span>
-                <div className="h-2 flex-1 rounded-full bg-gray-100">
-                  <div
-                    className="h-2 rounded-full"
-                    style={{ width: `${(f.employment_share_pct / (sorted[0]?.employment_share_pct || 1)) * 100}%`, backgroundColor: f.sector_color }}
-                  />
+            {sorted.map((f) => {
+              const current = empBySlug.get(f.sector_slug)
+              const growth = current && current > 0 ? (f.employment_count - current) / current * 100 : null
+              return (
+                <div key={f.sector_slug} className="flex items-center gap-3">
+                  <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: f.sector_color }} />
+                  <span className="w-48 shrink-0 text-sm font-medium text-gray-800 truncate">{f.sector_name}</span>
+                  <div className="h-2 flex-1 rounded-full bg-gray-100">
+                    <div
+                      className="h-2 rounded-full"
+                      style={{ width: `${(f.employment_share_pct / (sorted[0]?.employment_share_pct || 1)) * 100}%`, backgroundColor: f.sector_color }}
+                    />
+                  </div>
+                  <span className="w-14 text-right text-sm font-bold text-gray-900">{fmtPct(f.employment_share_pct)}</span>
+                  {growth !== null && (
+                    <span className={`w-16 text-right text-sm font-bold ${growth >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                      {growth >= 0 ? '+' : ''}{growth.toFixed(1)}%
+                    </span>
+                  )}
                 </div>
-                <span className="w-14 text-right text-sm font-bold text-gray-900">{fmtPct(f.employment_share_pct)}</span>
-                <TrendBadge trend={f.employment_trend} />
-              </div>
-            ))}
+              )
+            })}
           </div>
         </>
       )}
 
-      {sectorSlug && oneYear[0] && (
-        <div className="mt-5">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="rounded-xl bg-gray-50 p-4">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Projected employment</div>
-              <div className="mt-2 text-2xl font-extrabold text-navy">{fmtInt(oneYear[0].employment_count)}</div>
-            </div>
-            <div className="rounded-xl bg-gray-50 p-4">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Employment share</div>
-              <div className="mt-2 text-2xl font-extrabold text-navy">{fmtPct(oneYear[0].employment_share_pct)}</div>
-            </div>
-            <div className="rounded-xl bg-gray-50 p-4">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Job postings</div>
-              <div className="mt-2 text-2xl font-extrabold text-navy">{fmtInt(oneYear[0].posting_count)}</div>
+      {sectorSlug && oneYear[0] && (() => {
+        const f = oneYear[0]
+        const current = empBySlug.get(f.sector_slug)
+        const growth = current && current > 0 ? (f.employment_count - current) / current * 100 : null
+        return (
+          <div className="mt-5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+              <div className="rounded-xl bg-gray-50 p-4">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Projected employment</div>
+                <div className="mt-2 text-2xl font-extrabold text-navy">{fmtInt(f.employment_count)}</div>
+              </div>
+              <div className="rounded-xl bg-gray-50 p-4">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Employment share</div>
+                <div className="mt-2 text-2xl font-extrabold text-navy">{fmtPct(f.employment_share_pct)}</div>
+              </div>
+              <div className="rounded-xl bg-gray-50 p-4">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Forecast growth</div>
+                <div className={`mt-2 text-2xl font-extrabold ${growth !== null && growth >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                  {growth !== null ? `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%` : '—'}
+                </div>
+              </div>
+              <div className="rounded-xl bg-gray-50 p-4">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Job postings</div>
+                <div className="mt-2 text-2xl font-extrabold text-navy">{fmtInt(f.posting_count)}</div>
+              </div>
             </div>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span className="text-xs text-gray-500">Share trend:</span>
-            <TrendBadge trend={oneYear[0].share_trend} />
-            <span className="ml-2 text-xs text-gray-500">Jobs trend:</span>
-            <TrendBadge trend={oneYear[0].employment_trend} />
-          </div>
-        </div>
-      )}
+        )
+      })()}
+    </Card>
+  )
+}
+
+const INSIGHT_STYLE: Record<string, { icon: typeof Sparkles; bg: string; border: string; iconColor: string }> = {
+  opportunity: { icon: TrendingUp, bg: 'bg-emerald-50', border: 'border-emerald-200', iconColor: 'text-emerald-600' },
+  training: { icon: Lightbulb, bg: 'bg-amber-50', border: 'border-amber-200', iconColor: 'text-amber-600' },
+  risk: { icon: AlertTriangle, bg: 'bg-red-50', border: 'border-red-200', iconColor: 'text-red-500' },
+  protection: { icon: Shield, bg: 'bg-blue-50', border: 'border-blue-200', iconColor: 'text-blue-600' },
+  geographic: { icon: MapPin, bg: 'bg-violet-50', border: 'border-violet-200', iconColor: 'text-violet-600' },
+  demand: { icon: Briefcase, bg: 'bg-orange-50', border: 'border-orange-200', iconColor: 'text-orange-600' },
+  overview: { icon: Sparkles, bg: 'bg-gray-50', border: 'border-gray-200', iconColor: 'text-gray-600' },
+  stability: { icon: Shield, bg: 'bg-blue-50', border: 'border-blue-200', iconColor: 'text-blue-600' },
+  ranking: { icon: TrendingUp, bg: 'bg-gray-50', border: 'border-gray-200', iconColor: 'text-gray-500' },
+  data: { icon: AlertTriangle, bg: 'bg-yellow-50', border: 'border-yellow-200', iconColor: 'text-yellow-600' },
+}
+
+const PRIORITY_LABEL: Record<string, { text: string; color: string }> = {
+  high: { text: 'High priority', color: 'bg-red-100 text-red-700' },
+  medium: { text: 'Medium', color: 'bg-amber-100 text-amber-700' },
+  low: { text: 'Info', color: 'bg-gray-100 text-gray-600' },
+}
+
+function PolicyInsights({ sectorSlug }: { sectorSlug: string | null }) {
+  const insights = usePolicyInsights(sectorSlug)
+  const list = insights.data?.insights ?? []
+  if (insights.isLoading) return null
+  if (list.length === 0) return null
+
+  return (
+    <Card className="p-6">
+      <h2 className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-navy">
+        <Sparkles className="h-5 w-5 text-primary" />
+        AI Policy Insights
+      </h2>
+      <p className="mt-1 text-sm text-gray-500">
+        Data-driven recommendations computed from forecasts, employment trends, and job postings
+      </p>
+      <div className="mt-5 space-y-3">
+        {list.map((insight, i) => {
+          const style = INSIGHT_STYLE[insight.type] ?? INSIGHT_STYLE.overview!
+          const priority = PRIORITY_LABEL[insight.priority] ?? PRIORITY_LABEL.low!
+          const Icon = style.icon
+          return (
+            <div key={i} className={`flex items-start gap-4 rounded-xl border ${style.border} ${style.bg} p-4`}>
+              <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/80 ${style.iconColor}`}>
+                <Icon className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-gray-900">{insight.title}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${priority.color}`}>{priority.text}</span>
+                </div>
+                <p className="mt-1 text-sm leading-relaxed text-gray-700">{insight.description}</p>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </Card>
+  )
+}
+
+function TopPositions({ sectorSlug }: { sectorSlug: string | null }) {
+  const positions = useSectorPositions(sectorSlug)
+  const list = positions.data?.positions ?? []
+  if (positions.isLoading) return null
+  if (list.length === 0) return null
+  const maxCount = Math.max(1, ...list.map((p) => p.count))
+
+  return (
+    <Card className="p-6">
+      <h2 className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-navy">
+        <Briefcase className="h-5 w-5 text-primary" />
+        {sectorSlug ? 'Top Positions in This Sector' : 'Top Positions Across All Sectors'}
+      </h2>
+      <p className="mt-1 text-sm text-gray-500">
+        Most common job titles from current postings{sectorSlug ? '' : ' across all sectors'}
+      </p>
+      <ul className="mt-5 space-y-3">
+        {list.map((p, i) => (
+          <li key={p.title}>
+            <div className="flex items-center justify-between gap-3 text-sm">
+              <span className="font-bold text-gray-900">{i + 1}. {p.title}</span>
+              <span className="shrink-0 text-sm font-bold text-navy">{p.count} posting{p.count !== 1 ? 's' : ''}</span>
+            </div>
+            <div className="mt-1.5 h-2 rounded-full bg-gray-100">
+              <div className="h-2 rounded-full bg-primary" style={{ width: `${(p.count / maxCount) * 100}%` }} />
+            </div>
+          </li>
+        ))}
+      </ul>
     </Card>
   )
 }
@@ -139,7 +248,7 @@ export default function PolicyPlanning() {
   const latestYear = kpis.data?.latest_year ?? null
   const history = useHistoricalSince(latestYear ?? 2026)
 
-  const showIctDetail = !sectorSlug || sectorSlug === 'ict-technology'
+  const showIctDetail = sectorSlug === 'ict-technology'
 
   const plan = useMemo(() => {
     if (!forecasts.data || !taxonomy.data || !history.data) return null
@@ -194,6 +303,16 @@ export default function PolicyPlanning() {
         <SectorInvestmentBrief sectorSlug={sectorSlug} />
       </div>
 
+      <div className="mt-6">
+        <PolicyInsights sectorSlug={sectorSlug} />
+      </div>
+
+      {sectorSlug && (
+        <div className="mt-6">
+          <TopPositions sectorSlug={sectorSlug} />
+        </div>
+      )}
+
       {showIctDetail && (
         <QueryGate query={query} className="mt-6">
           {(p) => {
@@ -240,7 +359,7 @@ export default function PolicyPlanning() {
                   </Card>
                   <Card className="p-6">
                     <h2 className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-navy"><ArrowDownRight className="h-5 w-5 text-red-500" /> Reskilling watch-list</h2>
-                    <p className="mt-1 text-sm text-gray-500">ICT roles projected to need fewer people, so plan transitions rather than new intake</p>
+                    <p className="mt-1 text-sm text-gray-500">ICT roles projected to need fewer people — plan transitions rather than new intake</p>
                     <ul className="mt-5 space-y-4" data-testid="plan-reskill">
                       {p.reskill.length === 0 && <li className="text-sm text-gray-500">No roles are projected to shrink.</li>}
                       {p.reskill.map((r) => (
@@ -265,7 +384,6 @@ export default function PolicyPlanning() {
                     </tbody>
                   </table>
                   <p className="mt-4 text-xs text-gray-400">
-                    Projected jobs apply the model's ICT growth assumptions to each role's forecast share (+15% in year one, a further +12% in year two).
                     See <Link to="/dashboard/geography" className="font-bold text-primary hover:underline">Geography</Link> for where demand is located.
                   </p>
                 </Card>
@@ -273,17 +391,6 @@ export default function PolicyPlanning() {
             )
           }}
         </QueryGate>
-      )}
-
-      {!showIctDetail && sectorSlug && sectorSlug !== 'ict-technology' && (
-        <Card className="mt-6 p-6 text-center">
-          <p className="text-sm text-gray-500">
-            Role-level training priorities are currently available for the ICT & Technology sector.
-            Select <button onClick={() => setSectorSlug('ict-technology')} className="font-bold text-primary hover:underline">ICT & Technology</button> or{' '}
-            <button onClick={() => setSectorSlug(null)} className="font-bold text-primary hover:underline">All Sectors</button> to see the full policy brief.
-          </p>
-          <p className="mt-2 text-xs text-gray-400">Role-level detail for other sectors will be added as the taxonomy expands.</p>
-        </Card>
       )}
     </DashboardLayout>
   )

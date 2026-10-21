@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from core.models import TimestampedModel
-from taxonomy.models import NormalizedRole
+from taxonomy.models import NormalizedRole, Sector
 
 
 class DataUpload(TimestampedModel):
@@ -62,6 +62,13 @@ class JobPosting(TimestampedModel):
     posted_date = models.DateField(null=True, blank=True)
     description = models.TextField(blank=True, default='')
     raw_text = models.TextField(blank=True, default='')
+    sector = models.ForeignKey(
+        Sector,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='postings',
+    )
     is_ict = models.BooleanField(default=False)
     ict_role_confidence = models.FloatField(default=0.0)
     normalized_role = models.ForeignKey(

@@ -17,6 +17,8 @@ import type {
   ForecastRunSummary,
   ForecastsResponse,
   GeneratedReport,
+  SectorDetailReport,
+  SectorOutlookReport,
   GeographicRow,
   Horizon,
   HistoricalResponse,
@@ -31,7 +33,12 @@ import type {
   RoleGroup,
   SectorEmploymentPoint,
   SectorForecastEntry,
+  SectorForecastRun,
   SectorInfo,
+  PolicyInsightsResponse,
+  SectorPositionsResponse,
+  SectorRoleDetail,
+  SectorRoleTaxonomy,
   SectorRow,
   TokenPair,
   TrendsResponse,
@@ -96,11 +103,11 @@ export const taxonomyApi = {
 }
 
 export const sectorPredictionsApi = {
-  forecasts: async (params?: { horizon?: Horizon; sector?: string }): Promise<SectorForecastEntry[]> => {
-    const res = await request<{ forecast_run: unknown; forecasts: SectorForecastEntry[] }>(
+  forecasts: async (params?: { horizon?: Horizon; sector?: string }) => {
+    const res = await request<{ forecast_run: SectorForecastRun; forecasts: SectorForecastEntry[] }>(
       '/api/predictions/sector-forecasts/', { params },
     )
-    return res.forecasts
+    return res
   },
   run: () => request<{ id: number }>('/api/predictions/sector-run/', { method: 'POST' }),
 }
@@ -122,13 +129,22 @@ export const dashboardApi = {
 
 export const analyticsApi = {
   sector: () => request<SectorRow[]>('/api/analytics/sector/'),
+  sectorPositions: (sector?: string) =>
+    request<SectorPositionsResponse>('/api/analytics/sector/positions/', { params: sector ? { sector } : undefined }),
+  policyInsights: (sector?: string) =>
+    request<PolicyInsightsResponse>('/api/analytics/policy-insights/', { params: sector ? { sector } : undefined }),
+  sectorTaxonomy: (sector: string) =>
+    request<SectorRoleTaxonomy>('/api/analytics/sector/taxonomy/', { params: { sector } }),
+  sectorRoleDetail: (sector: string, title: string) =>
+    request<SectorRoleDetail>('/api/analytics/sector/role-detail/', { params: { sector, title } }),
   geographic: () => request<Paginated<GeographicRow>>('/api/analytics/geographic/'),
   employability: () => request<EmployabilityOverview>('/api/analytics/employability/'),
   score: (skills: number[]) =>
     request<EmployabilityScore>('/api/analytics/employability/score/', { method: 'POST', body: { skills } }),
   career: () => request<CareerGuidance>('/api/analytics/career/'),
   education: () => request<EducationAlignment>('/api/analytics/education/'),
-  geographicSummary: () => request<GeographicSummary>('/api/analytics/geographic/summary/'),
+  geographicSummary: (sector?: string) =>
+    request<GeographicSummary>('/api/analytics/geographic/summary/', { params: sector ? { sector } : undefined }),
   curricula: () => request<Paginated<CurriculumSummary>>('/api/analytics/education/curricula/'),
   curriculum: (id: number) => request<CurriculumDetail>(`/api/analytics/education/curricula/${id}/`),
   submitCurriculum: (form: FormData) =>
@@ -139,9 +155,21 @@ export const analyticsApi = {
 export const reportsApi = {
   list: () => request<Paginated<GeneratedReport>>('/api/reports/'),
   demandOutlook: () => request<DemandOutlookReport>('/api/reports/demand_outlook/'),
+  sectorOutlook: () => request<SectorOutlookReport>('/api/reports/sector_outlook/'),
   roleDeepDive: (roleId: number) =>
     request<RoleDeepDiveReport>('/api/reports/role_deep_dive/', { params: { role_id: roleId } }),
+  sectorDetail: (sector: string) =>
+    request<SectorDetailReport>('/api/reports/sector_detail/', { params: { sector } }),
   downloadDemandOutlookCsv: () => download('/api/reports/demand_outlook/csv/', 'demand_outlook.csv'),
+  downloadSectorOutlookCsv: () => download('/api/reports/sector_outlook/csv/', 'sector_outlook.csv'),
+  downloadSectorDetailCsv: (sector: string) =>
+    download(`/api/reports/sector_detail/csv/?sector=${encodeURIComponent(sector)}`, `sector_detail_${sector}.csv`),
+  downloadSectorOutlookPdf: () => download('/api/reports/sector_outlook/pdf/', 'sector_outlook.pdf'),
+  downloadSectorDetailPdf: (sector: string) =>
+    download(`/api/reports/sector_detail/pdf/?sector=${encodeURIComponent(sector)}`, `sector_detail_${sector}.pdf`),
+  downloadDemandOutlookPdf: () => download('/api/reports/demand_outlook/pdf/', 'demand_outlook.pdf'),
+  downloadRoleDeepDivePdf: (roleId: number) =>
+    download(`/api/reports/role_deep_dive/pdf/?role_id=${roleId}`, `role_deep_dive_${roleId}.pdf`),
 }
 
 export const uploadsApi = {

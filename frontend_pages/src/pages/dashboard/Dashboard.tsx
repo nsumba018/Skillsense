@@ -8,7 +8,6 @@ import {
   Zap,
   Users,
   Briefcase,
-  Percent,
   FileText,
   UploadCloud,
   Network,
@@ -20,14 +19,14 @@ import {
   Minus,
 } from 'lucide-react'
 import DashboardLayout, { Card } from './DashboardLayout'
-import { Sparkline, EmploymentTrendChart, Donut, DONUT_COLORS } from './charts'
+import { Sparkline, EmploymentTrendChart, Donut, DONUT_COLORS, SectorEmploymentChart } from './charts'
 import { QueryGate } from '../../components/ui/State'
 import { ROLE_LABELS, useAuth } from '../../auth/AuthContext'
 import { ROLE_FOCUS } from '../../auth/access'
-import { useForecasts, useKpis, useMacro, useOverview, useSectors, useTrends } from '../../services/queries'
+import { useKpis, useMacro, useOverview, useSectors, useSectorEmployment, useTrends } from '../../services/queries'
 import { predictionsApi, reportsApi } from '../../services/api'
 import { employmentChartData, employmentSeries, TREND_LABEL, TREND_TONE } from '../../lib/derive'
-import { fmtDateTime, fmtInt, fmtNum, fmtPct } from '../../lib/format'
+import { fmtInt, fmtPct } from '../../lib/format'
 import { ApiError } from '../../services/http'
 import type { SectorForecastKpi, Trend } from '../../types/api'
 
@@ -68,7 +67,7 @@ function TrendBadge({ trend, label }: { trend: Trend; label: string }) {
   )
 }
 
-function SectorCard({ sf }: { sf: SectorForecastKpi }) {
+function SectorCard({ sf, growthPct }: { sf: SectorForecastKpi; growthPct: number | null }) {
   return (
     <Link to={`/dashboard/sectors?sector=${sf.sector_slug}`} className="block">
       <Card className="p-4 transition-colors hover:border-primary/40">
@@ -86,9 +85,13 @@ function SectorCard({ sf }: { sf: SectorForecastKpi }) {
             <div className="mt-0.5 text-lg font-extrabold tracking-tight text-navy">{fmtInt(sf.employment_count)}</div>
           </div>
         </div>
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          <TrendBadge trend={sf.share_trend} label="Share" />
+        <div className="mt-3 flex items-center gap-2">
           <TrendBadge trend={sf.employment_trend} label="Jobs" />
+          {growthPct !== null && (
+            <span className={`text-xs font-bold ${growthPct >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+              {growthPct >= 0 ? '+' : ''}{growthPct.toFixed(1)}%
+            </span>
+          )}
         </div>
         {sf.posting_count > 0 && (
           <div className="mt-2 text-[11px] text-gray-500">{fmtInt(sf.posting_count)} job postings</div>
@@ -104,9 +107,9 @@ export default function Dashboard() {
   const kpis = useKpis()
   const overview = useOverview()
   const macro = useMacro()
-  const forecasts = useForecasts()
   const trends = useTrends()
   const sectors = useSectors()
+  const sectorEmployment = useSectorEmployment()
   const [confirmRun, setConfirmRun] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
 
@@ -129,6 +132,25 @@ export default function Dashboard() {
   const totalSectorPostings = sectorForecasts.reduce((s, sf) => s + sf.posting_count, 0)
   const totalSectorEmployment = sectorForecasts.reduce((s, sf) => s + sf.employment_count, 0)
   const growingSectors = sectorForecasts.filter((sf) => sf.employment_trend === 'growing')
+
+  const empBySlug = new Map<string, number>()
+  if (sectorEmployment.data) {
+    const latestYear = new Map<string, number>()
+    for (const row of sectorEmployment.data) {
+      if (!latestYear.has(row.sector_slug) || row.year > latestYear.get(row.sector_slug)!) {
+        latestYear.set(row.sector_slug, row.year)
+        empBySlug.set(row.sector_slug, row.employment_count)
+      }
+    }
+  }
+
+  const sectorGrowth = new Map<string, number>()
+  for (const sf of sectorForecasts) {
+    const current = empBySlug.get(sf.sector_slug)
+    if (current && current > 0) {
+      sectorGrowth.set(sf.sector_slug, (sf.employment_count - current) / current * 100)
+    }
+  }
 
   const sectorDonutData = sectorForecasts.map((sf) => ({
     name: sf.sector_name,
@@ -160,16 +182,16 @@ export default function Dashboard() {
             </span>
             <span className="hidden h-4 w-px bg-gray-300 sm:block" />
             <span className="text-gray-500">
-              Rwanda workforce{kpis.data?.latest_year ? ` · data through ${kpis.data.latest_year}` : ''}{kpis.data?.total_sectors ? ` · ${kpis.data.total_sectors} sectors` : ''}
+              Rwanda workforce{kpis.data?.total_sectors ? ` · ${kpis.data.total_sectors} sectors` : ''}
             </span>
           </div>
           {user && <p data-testid="role-tagline" className="mt-2 max-w-xl text-sm text-gray-500">{ROLE_FOCUS[user.role].tagline}</p>}
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <Link to="/dashboard/forecast" className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+          <Link to="/dashboard/sectors" className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
             <TrendingUp className="h-4 w-4" />
-            Role forecast
+            Sector forecast
           </Link>
           {isAdmin &&
             (confirmRun ? (
@@ -238,24 +260,38 @@ export default function Dashboard() {
               </Card>
               <Card className="p-5">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-500">ICT Employment</span>
-                  <Network className="h-5 w-5 text-primary" />
+                  <span className="text-sm font-medium text-gray-500">Top Growing Sector</span>
+                  <TrendingUp className="h-5 w-5 text-emerald-600" />
                 </div>
-                <div className="mt-3 flex items-baseline gap-2">
-                  <span data-testid="kpi-employment" className="text-4xl font-extrabold tracking-tight text-gray-900">{fmtInt(k.total_ict_employment)}</span>
-                  <Delta value={empDelta} unit="%" />
-                </div>
-                <div className="mt-3"><Sparkline points={series.map((m) => m.ict_employment)} color="#7DD3C0" /></div>
+                {growingSectors.length > 0 ? (() => {
+                  const top = [...sectorForecasts].sort((a, b) => b.employment_count - a.employment_count).find(s => s.employment_trend === 'growing')
+                  if (!top) return <p className="mt-3 text-sm text-gray-400">No growing sectors</p>
+                  return (
+                    <>
+                      <div className="mt-3 flex items-center gap-2">
+                        <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: top.sector_color }} />
+                        <span data-testid="kpi-top-sector" className="text-lg font-extrabold tracking-tight text-gray-900 truncate">{top.sector_name}</span>
+                      </div>
+                      <div className="mt-2 flex items-baseline gap-2">
+                        <span className="text-2xl font-extrabold text-navy">{fmtPct(top.employment_share_pct)}</span>
+                        <span className="text-xs text-gray-500">share · {fmtInt(top.employment_count)} jobs</span>
+                      </div>
+                      <TrendBadge trend={top.employment_trend} label="Jobs" />
+                    </>
+                  )
+                })() : <p className="mt-3 text-sm text-gray-400">No forecast data</p>}
               </Card>
               <Card className="p-5">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-500">Job Postings (all sectors)</span>
+                  <span className="text-sm font-medium text-gray-500">Job Postings</span>
                   <Briefcase className="h-5 w-5 text-primary" />
                 </div>
-                <div className="mt-3">
-                  <span data-testid="kpi-postings" className="text-4xl font-extrabold tracking-tight text-gray-900">{fmtInt(totalSectorPostings || k.total_postings)}</span>
+                <div className="mt-3 flex items-baseline gap-2">
+                  <span data-testid="kpi-postings" className="text-4xl font-extrabold tracking-tight text-gray-900">{fmtInt(totalSectorPostings || k.total_postings)}+</span>
                 </div>
-                <p className="mt-3 text-xs text-gray-500">{k.total_roles_tracked} ICT roles tracked</p>
+                <p className="mt-3 text-xs text-gray-500">
+                  From job posting platforms · {sectorForecasts.filter(s => s.posting_count > 0).length} of {sectorForecasts.length} sectors
+                </p>
               </Card>
             </div>
 
@@ -271,7 +307,7 @@ export default function Dashboard() {
                 </div>
                 <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="sector-grid">
                   {sectorForecasts.map((sf) => (
-                    <SectorCard key={sf.sector_slug} sf={sf} />
+                    <SectorCard key={sf.sector_slug} sf={sf} growthPct={sectorGrowth.get(sf.sector_slug) ?? null} />
                   ))}
                 </div>
               </div>
@@ -280,53 +316,57 @@ export default function Dashboard() {
         )}
       </QueryGate>
 
-      {/* Sector employment donut + ICT top roles */}
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="p-6 lg:col-span-2">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">ICT Employment Trend & Forecast</h2>
-              <p className="mt-1 text-sm text-gray-500">Rwanda ICT employment, with model-projected totals at 6 months, 1 year and 2 years</p>
-            </div>
-            <div className="flex items-center gap-4 text-[11px] font-bold uppercase tracking-wide">
-              <span className="flex items-center gap-1.5 text-navy"><span className="h-2.5 w-2.5 rounded-sm bg-navy" /> Historical</span>
-              <span className="flex items-center gap-1.5 text-gray-400"><span className="h-2.5 w-2.5 rounded-sm border border-dashed border-navy" /> Forecast</span>
-            </div>
-          </div>
-          <QueryGate query={macro} className="mt-4">
-            {(m) => (
-              <div className="mt-4" data-testid="employment-chart">
-                <EmploymentTrendChart data={employmentChartData(m, forecasts.data)} />
+      {/* Sector employment growth outlook */}
+      {sectorForecasts.length > 0 && (() => {
+        const chartData = [...sectorForecasts]
+          .sort((a, b) => a.employment_count - b.employment_count)
+          .map(sf => ({
+            name: sf.sector_name,
+            current: empBySlug.get(sf.sector_slug) ?? 0,
+            forecast: sf.employment_count,
+            color: sf.sector_color,
+          }))
+        const ranked = [...sectorForecasts]
+          .map(sf => ({ ...sf, growth: sectorGrowth.get(sf.sector_slug) ?? 0 }))
+          .sort((a, b) => b.growth - a.growth)
+        return (
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <Card className="p-6 lg:col-span-2">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900">Sector Employment Forecast</h2>
+                  <p className="mt-1 text-sm text-gray-500">Current employment vs. 1-year forecast — the gap shows where demand is heading</p>
+                </div>
               </div>
-            )}
-          </QueryGate>
-          <p className="mt-3 text-xs text-gray-400">
-            2017 onward: computed from NISR Labour Force Survey microdata. Earlier years are back-extrapolated estimates.
-          </p>
-        </Card>
+              <div className="mt-4" data-testid="sector-employment-chart">
+                <SectorEmploymentChart data={chartData} />
+              </div>
+              <p className="mt-2 text-xs text-gray-400">
+                Based on SkillSense sector forecast model · NISR Labour Force Survey + GDP national accounts
+              </p>
+            </Card>
 
-        <Card className="p-6">
-          <h2 className="text-lg font-bold text-gray-900">Top 5 In-Demand ICT Roles</h2>
-          <p className="mt-1 text-xs text-gray-500">1-year forecast · demand index (0–100)</p>
-          <QueryGate query={overview} className="mt-6">
-            {() => (
-              <div className="mt-6 space-y-5">
-                {top.map((r, i) => (
-                  <div key={r.role_name}>
-                    <div className="flex items-center justify-between gap-3 text-sm">
-                      <span data-testid={`top-role-${i}`} className="font-bold text-gray-900">{r.role_name}</span>
-                      <span className="font-bold text-navy">{fmtNum(r.demand_index)}</span>
-                    </div>
-                    <div className="mt-2 h-2 w-full rounded-full bg-gray-100">
-                      <div className="h-2 rounded-full bg-navy" style={{ width: `${r.demand_index}%` }} />
-                    </div>
-                  </div>
+            <Card className="p-6">
+              <h2 className="text-lg font-bold text-gray-900">Growth Ranking</h2>
+              <p className="mt-1 text-xs text-gray-500">Sectors ranked by forecast employment growth rate</p>
+              <ol className="mt-5 space-y-3" data-testid="growth-ranking">
+                {ranked.map((sf, i) => (
+                  <li key={sf.sector_slug} className="flex items-center gap-3 text-sm">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-[11px] font-bold text-gray-500">
+                      {i + 1}
+                    </span>
+                    <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: sf.sector_color }} />
+                    <span className="font-medium text-gray-800 truncate flex-1">{sf.sector_name}</span>
+                    <span className={`shrink-0 font-bold ${sf.growth >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                      {sf.growth >= 0 ? '+' : ''}{sf.growth.toFixed(1)}%
+                    </span>
+                  </li>
                 ))}
-              </div>
-            )}
-          </QueryGate>
-        </Card>
-      </div>
+              </ol>
+            </Card>
+          </div>
+        )
+      })()}
 
       {/* Sector employment share donut + Forecast movers */}
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -367,80 +407,45 @@ export default function Dashboard() {
         </Card>
 
         <Card className="p-6">
-          <h2 className="text-lg font-bold text-gray-900">ICT Forecast Movers</h2>
-          <p className="mt-1 text-xs text-gray-500">1-year outlook vs. current market share</p>
-          <QueryGate query={trends} className="mt-6">
-            {(t) => (
-              <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div>
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">Growing ({t.growing.length})</div>
-                  <ul className="mt-3 space-y-2" data-testid="movers-growing">
-                    {t.growing.slice(0, 4).map((r) => (
-                      <li key={r.role_id} className="flex items-center justify-between gap-2 text-sm">
-                        <span className="truncate font-medium text-gray-800" title={r.role_name}>{r.role_name}</span>
-                        <span className="shrink-0 font-bold text-emerald-600">{fmtNum(r.demand_index, 0)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-red-600">Declining ({t.declining.length})</div>
-                  <ul className="mt-3 space-y-2" data-testid="movers-declining">
-                    {t.declining.slice(0, 4).map((r) => (
-                      <li key={r.role_id} className="flex items-center justify-between gap-2 text-sm">
-                        <span className="truncate font-medium text-gray-800" title={r.role_name}>{r.role_name}</span>
-                        <span className="shrink-0 font-bold text-red-500">{fmtNum(r.demand_index, 0)}</span>
-                      </li>
-                    ))}
-                  </ul>
+          <h2 className="text-lg font-bold text-gray-900">Sector Outlook</h2>
+          <p className="mt-1 text-xs text-gray-500">Forecast share and employment growth per sector</p>
+          <div className="mt-6 space-y-3">
+            {[...sectorForecasts]
+              .map(sf => ({ ...sf, growth: sectorGrowth.get(sf.sector_slug) ?? 0 }))
+              .sort((a, b) => b.growth - a.growth)
+              .map((sf) => (
+              <div key={sf.sector_slug} className="flex items-center justify-between gap-2">
+                <span className="flex items-center gap-2 text-sm min-w-0">
+                  <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: sf.sector_color }} />
+                  <span className="font-medium text-gray-800 truncate">{sf.sector_name}</span>
+                </span>
+                <div className="flex items-center gap-3 shrink-0 text-sm">
+                  <span className="text-gray-500">{fmtPct(sf.employment_share_pct)}</span>
+                  <span className={`min-w-[60px] text-right font-bold ${sf.growth >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                    {sf.growth >= 0 ? '+' : ''}{sf.growth.toFixed(1)}%
+                  </span>
                 </div>
               </div>
-            )}
-          </QueryGate>
-        </Card>
-      </div>
-
-      {/* Model + quick links */}
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="p-6 lg:col-span-2">
-          <h2 className="text-lg font-bold text-gray-900">Forecasting Model</h2>
-          <QueryGate query={forecasts} className="mt-4">
-            {(f) => (
-              <div className="mt-5 grid grid-cols-2 gap-6 sm:grid-cols-4" data-testid="model-card">
-                {[
-                  ['Version', f.forecast_run.model_version],
-                  ['Rank correlation', fmtNum(f.forecast_run.accuracy_spearman, 4)],
-                  ['Pearson correlation', fmtNum(f.forecast_run.accuracy_pearson, 4)],
-                  ['CV R²', fmtNum(f.forecast_run.accuracy_r2, 4)],
-                ].map(([label, value]) => (
-                  <div key={label}>
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-gray-400">{label}</div>
-                    <div className="mt-1.5 text-2xl font-extrabold tracking-tight text-navy">{value}</div>
-                  </div>
-                ))}
-                <div className="col-span-2 text-xs text-gray-500 sm:col-span-4">
-                  Last run {fmtDateTime(f.forecast_run.created_at)} · validated against {fmtInt(kpis.data?.total_postings)} real ICT job postings
-                </div>
-              </div>
-            )}
-          </QueryGate>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-lg font-bold text-gray-900">Quick Links</h2>
-          <div className="mt-4 space-y-3">
-            {(user ? ROLE_FOCUS[user.role].links : []).map((q) => {
-              const Icon = LINK_ICONS[q.to] ?? FileText
-              return (
-                <Link key={q.to} to={q.to} className="flex items-center gap-3 rounded-xl border border-gray-200 p-3.5 text-sm font-semibold text-gray-800 transition-colors hover:border-primary/40 hover:bg-gray-50">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-light text-primary"><Icon className="h-4 w-4" /></span>
-                  {q.label}
-                </Link>
-              )
-            })}
+            ))}
           </div>
         </Card>
       </div>
+
+      {/* Quick links */}
+      <Card className="mt-6 p-6">
+        <h2 className="text-lg font-bold text-gray-900">Quick Links</h2>
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {(user ? ROLE_FOCUS[user.role].links : []).map((q) => {
+            const Icon = LINK_ICONS[q.to] ?? FileText
+            return (
+              <Link key={q.to} to={q.to} className="flex items-center gap-3 rounded-xl border border-gray-200 p-3.5 text-sm font-semibold text-gray-800 transition-colors hover:border-primary/40 hover:bg-gray-50">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-light text-primary"><Icon className="h-4 w-4" /></span>
+                {q.label}
+              </Link>
+            )
+          })}
+        </div>
+      </Card>
     </DashboardLayout>
   )
 }

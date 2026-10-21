@@ -8,11 +8,11 @@ export const ALL_ROLES: UserRole[] = ['admin', 'career_training_advisor', 'educa
 
 export const ACCESS: Record<string, UserRole[]> = {
   '/dashboard': ALL_ROLES,
-  '/dashboard/forecast': ALL_ROLES,
+  '/dashboard/forecast': ['admin', 'career_training_advisor', 'education_curriculum_planner'],
   '/dashboard/taxonomy': ALL_ROLES,
   '/dashboard/reports': ALL_ROLES,
   '/dashboard/settings': ALL_ROLES,
-  '/dashboard/employability': ['admin', 'career_training_advisor', 'labor_market_analyst'],
+  '/dashboard/employability': ['admin', 'career_training_advisor'],
   '/dashboard/career': ['admin', 'career_training_advisor'],
   '/dashboard/education': ['admin', 'education_curriculum_planner'],
   '/dashboard/sectors': ['admin', 'labor_market_analyst'],

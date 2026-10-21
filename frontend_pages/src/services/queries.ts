@@ -72,13 +72,43 @@ export const useSectorForecasts = (horizon?: Horizon, sectorSlug?: string) =>
   })
 export const useGeographic = () =>
   useQuery({ queryKey: ['geographic'], queryFn: analyticsApi.geographic, staleTime: STALE })
+export const useSectorPositions = (sector?: string | null) =>
+  useQuery({
+    queryKey: ['sector-positions', sector ?? 'all'],
+    queryFn: () => analyticsApi.sectorPositions(sector ?? undefined),
+    staleTime: STALE,
+  })
+export const usePolicyInsights = (sector?: string | null) =>
+  useQuery({
+    queryKey: ['policy-insights', sector ?? 'all'],
+    queryFn: () => analyticsApi.policyInsights(sector ?? undefined),
+    staleTime: STALE,
+  })
+export const useSectorTaxonomy = (sector: string | null) =>
+  useQuery({
+    queryKey: ['sector-taxonomy', sector],
+    queryFn: () => analyticsApi.sectorTaxonomy(sector!),
+    enabled: !!sector,
+    staleTime: STALE,
+  })
+export const useSectorRoleDetail = (sector: string | null, title: string | null) =>
+  useQuery({
+    queryKey: ['sector-role-detail', sector, title],
+    queryFn: () => analyticsApi.sectorRoleDetail(sector!, title!),
+    enabled: !!sector && !!title,
+    staleTime: STALE,
+  })
 export const useEmployabilityOverview = () =>
   useQuery({ queryKey: ['employability'], queryFn: analyticsApi.employability, staleTime: STALE })
 export const useCareer = () => useQuery({ queryKey: ['career'], queryFn: analyticsApi.career, staleTime: STALE })
 export const useEducation = () =>
   useQuery({ queryKey: ['education'], queryFn: analyticsApi.education, staleTime: STALE })
-export const useGeographicSummary = () =>
-  useQuery({ queryKey: ['geo-summary'], queryFn: analyticsApi.geographicSummary, staleTime: STALE })
+export const useGeographicSummary = (sector?: string | null) =>
+  useQuery({
+    queryKey: ['geo-summary', sector ?? 'all'],
+    queryFn: () => analyticsApi.geographicSummary(sector ?? undefined),
+    staleTime: STALE,
+  })
 export const useInstitutions = () =>
   useQuery({ queryKey: ['institutions'], queryFn: authApi.institutions, staleTime: 5 * STALE })
 export const useCurricula = (enabled = true) =>
@@ -89,6 +119,15 @@ export const useCurriculum = (id: number | null) =>
 export const useReportList = () => useQuery({ queryKey: ['reports'], queryFn: reportsApi.list })
 export const useDemandOutlook = (enabled = true) =>
   useQuery({ queryKey: ['demand-outlook'], queryFn: reportsApi.demandOutlook, enabled, staleTime: STALE })
+export const useSectorOutlook = (enabled = true) =>
+  useQuery({ queryKey: ['sector-outlook'], queryFn: reportsApi.sectorOutlook, enabled, staleTime: STALE })
+export const useSectorDetail = (sector: string | null, enabled = true) =>
+  useQuery({
+    queryKey: ['sector-detail', sector],
+    queryFn: () => reportsApi.sectorDetail(sector!),
+    enabled: enabled && !!sector,
+    staleTime: STALE,
+  })
 
 /** Polls while any upload is still pending/processing. */
 export const useUploads = (enabled = true) =>
