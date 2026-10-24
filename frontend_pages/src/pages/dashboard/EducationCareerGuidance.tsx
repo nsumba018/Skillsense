@@ -31,12 +31,12 @@ const AUCA_SE_COURSES = {
 }
 
 const SE_SKILLS_TAUGHT = [
-  'Java', 'C', '.NET', 'PL/SQL', 'Python', 'React',
+  'Java', 'Java/SpringBoot', 'C', '.NET', 'C#', 'PL/SQL', 'Python', 'React',
   'DBMS', 'Software Testing', 'QA', 'Software Security',
-  'Web Design', 'Mobile Programming', 'Linux',
+  'Web Design', 'Mobile Programming',
   'OOP', 'Data Structures', 'Algorithms', 'Design Patterns',
   'Project Management', 'Requirements Engineering',
-  'Big Data', 'Statistics',
+  'Statistics', 'Git', 'Agile/Scrum', 'REST APIs',
 ]
 
 const SE_SKILLS_MISSING = [
@@ -47,21 +47,16 @@ const SE_SKILLS_MISSING = [
   'Node.js / Express',
   'TypeScript',
   'AI / Machine Learning',
-  'Cybersecurity Frameworks',
-  'Agile / Scrum Certification',
-  'API Design & REST',
-  'Git & Version Control (advanced)',
+  'Cybersecurity Frameworks (ISO 27001, NIST)',
+  'Microservices Architecture',
+  'Redis / Caching',
 ]
 
 const AUCA_PROGRAMS: Record<string, string[]> = {
-  'Software Engineering (from bulletin)': SE_SKILLS_TAUGHT,
-  'Information Management': ['Information Systems', 'Database Management', 'IT Governance', 'Business Process'],
-  'Networks & Communication': ['Networking', 'Security', 'Linux', 'System Administration'],
-  'Big Data Analytics (MSc)': ['Data Analysis', 'Statistics', 'Machine Learning', 'Python', 'SQL'],
-  'Accounting': ['Financial Accounting', 'Auditing', 'Tax', 'IFRS'],
-  'Finance': ['Corporate Finance', 'Investment', 'Risk Management', 'Financial Analysis'],
-  'Management': ['Strategic Management', 'Operations', 'HR Management', 'Project Management'],
-  'Marketing': ['Digital Marketing', 'Market Research', 'Brand Management', 'Social Media'],
+  'Software Engineering': ['Java', 'Java/SpringBoot', 'Python', '.NET/C#', 'React', 'SQL/PL/SQL', 'HTML/CSS', 'JavaScript', 'Git', 'Agile/Scrum', 'REST APIs', 'Software Testing', 'Design Patterns', 'Data Structures', 'Algorithms', 'DBMS', 'Project Management'],
+  'Network & Info Management': ['TCP/IP', 'Networking', 'LAN/WAN', 'Linux', 'Windows Server', 'Network Security', 'Penetration Testing', 'System Administration', 'IT Support', 'SQL', 'DBMS', 'Hardware Troubleshooting', 'Information Systems'],
+  'Finance': ['Financial Accounting', 'Auditing', 'Tax', 'IFRS', 'Corporate Finance', 'Investment', 'Banking', 'Financial Analysis', 'Budgeting', 'Economics', 'Business Law'],
+  'Business Administration': ['Strategic Management', 'HR Management', 'Operations', 'Marketing Principles', 'Market Research', 'Negotiation', 'Leadership', 'Project Management', 'Entrepreneurship', 'Business Communication'],
 }
 
 interface CourseRecommendation {
@@ -107,7 +102,7 @@ function generateRecommendations(
   if (hasRole(['security', 'cyber', 'information security'], topIctRoles)) {
     recs.push({
       course: 'Advanced Cybersecurity & Ethical Hacking',
-      reason: 'AUCA teaches Software Security in semester 7, but employers want hands-on penetration testing, SIEM tools, and security frameworks (ISO 27001, NIST). Extend the existing course.',
+      reason: 'AUCA Network & Info Management teaches Network Security and Penetration Testing fundamentals, but employers want SIEM tools, incident response, compliance frameworks (ISO 27001, NIST), and advanced threat analysis. Extend the existing foundation with hands-on labs.',
       priority: 'high',
       targetRoles: ictPositions.filter(p => ['security', 'cyber'].some(k => p.title.toLowerCase().includes(k))).map(p => p.title).slice(0, 4),
       faculty: 'IT',
@@ -116,8 +111,8 @@ function generateRecommendations(
 
   if (hasRole(['developer', 'software', 'engineer', 'full stack', 'web'], topIctRoles)) {
     recs.push({
-      course: 'Advanced Full-Stack Development (Node.js, TypeScript, APIs)',
-      reason: 'AUCA teaches Java, C, .NET, and React (in Web Technology). The market also demands Node.js, TypeScript, and REST API design — adding these would complete the full-stack picture.',
+      course: 'Advanced Full-Stack Development (Node.js, TypeScript)',
+      reason: 'AUCA SE covers Java/SpringBoot, React, REST APIs, and Git. The market also demands Node.js, TypeScript, Docker, and cloud deployment — adding these would complete the modern full-stack picture.',
       priority: 'high',
       targetRoles: ictPositions.filter(p => ['developer', 'software', 'engineer', 'full stack', 'web', 'mobile'].some(k => p.title.toLowerCase().includes(k))).map(p => p.title).slice(0, 4),
       faculty: 'IT',
@@ -126,8 +121,8 @@ function generateRecommendations(
 
   if (hasRole(['project', 'manager', 'product', 'scrum', 'agile'], topIctRoles)) {
     recs.push({
-      course: 'IT Project Management & Agile',
-      reason: 'Tech companies need graduates who can manage projects, not just code. Agile/Scrum certification is highly valued.',
+      course: 'Advanced IT Project & Product Management',
+      reason: 'AUCA teaches Agile/Scrum and Project Management fundamentals. Employers also want Jira proficiency, product ownership skills, stakeholder management, and PMP/CSM certification readiness.',
       priority: 'medium',
       targetRoles: ictPositions.filter(p => ['project', 'manager', 'product', 'scrum'].some(k => p.title.toLowerCase().includes(k))).map(p => p.title).slice(0, 4),
       faculty: 'IT',
@@ -286,7 +281,7 @@ export default function EducationCareerGuidance() {
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card className="p-6">
           <h2 className="text-lg font-bold text-gray-900">SE Curriculum Skills (from Bulletin)</h2>
-          <p className="mt-1 text-xs text-gray-500">4-year programme · 137 credits · 8 semesters</p>
+          <p className="mt-1 text-xs text-gray-500">Software Engineering · 4-year programme · 8 semesters</p>
           <div className="mt-4 space-y-3">
             {Object.entries(AUCA_SE_COURSES).map(([sem, courses]) => (
               <div key={sem}>

@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { BarChart3, Briefcase, Building2, Download, FileSpreadsheet, FileText, FileUp, GraduationCap, Layers, Loader2, MapPin, PieChart, Table2, TrendingUp } from 'lucide-react'
+import { BarChart3, BookOpen, Briefcase, Building2, Download, FileSpreadsheet, FileText, FileUp, GraduationCap, Layers, Loader2, MapPin, PieChart, Sparkles, Table2, TrendingUp } from 'lucide-react'
 import DashboardLayout, { Card } from './DashboardLayout'
 import { ErrorState, QueryGate } from '../../components/ui/State'
 import { useDemandOutlook, useForecasts, useSectorDetail, useSectorList, useSectorOutlook } from '../../services/queries'
@@ -10,14 +10,93 @@ import { fmtDate, fmtInt, fmtNum, fmtPct, HORIZON_LABEL } from '../../lib/format
 import { TREND_LABEL, TREND_TONE } from '../../lib/derive'
 import type { Horizon } from '../../types/api'
 
-type ReportType = 'sector_outlook' | 'sector_detail' | 'demand_outlook' | 'role_deep_dive'
+const AUCA_SECTORS = new Set(['ict-technology', 'finance-business'])
+
+type ReportType = 'sector_outlook' | 'sector_detail' | 'demand_outlook' | 'role_deep_dive' | 'curriculum_alignment'
 
 const TEMPLATES: { id: ReportType; title: string; desc: string; icon: typeof FileText; tone: string }[] = [
-  { id: 'sector_outlook', title: 'Cross-Sector Outlook', desc: 'All 9 sectors — employment, growth & hiring signals.', icon: Layers, tone: 'bg-primary-light text-primary' },
+  { id: 'sector_outlook', title: 'Cross-Sector Outlook', desc: 'AUCA-tracked sectors — employment, growth & hiring signals.', icon: Layers, tone: 'bg-primary-light text-primary' },
   { id: 'sector_detail', title: 'Sector Detail', desc: 'Deep dive into one sector with forecasts & positions.', icon: PieChart, tone: 'bg-violet-50 text-violet-600' },
   { id: 'demand_outlook', title: 'ICT Role Demand', desc: 'Forecast demand for every ICT role with confidence.', icon: FileText, tone: 'bg-red-50 text-red-500' },
   { id: 'role_deep_dive', title: 'ICT Role Deep Dive', desc: 'Full history & forecast for a single ICT role.', icon: Table2, tone: 'bg-emerald-50 text-emerald-600' },
+  { id: 'curriculum_alignment', title: 'Curriculum Alignment', desc: 'AUCA curriculum vs employer-demanded skills per department.', icon: BookOpen, tone: 'bg-amber-50 text-amber-600' },
 ]
+
+/* ── AUCA curriculum data for alignment report ── */
+
+type Dept = 'Software Engineering' | 'Network & Info Management' | 'Finance' | 'Business Administration'
+
+const DEPT_CURRICULA: Record<Dept, Set<string>> = {
+  'Software Engineering': new Set([
+    'Java', 'Python', '.NET', 'C#', 'PL/SQL', 'SQL', 'HTML/CSS', 'JavaScript', 'React',
+    'Data Structures', 'Algorithms', 'Operating Systems', 'DBMS', 'Database Design',
+    'Software Engineering', 'Design Patterns', 'Software Testing', 'Project Management',
+    'Statistics', 'Probability', 'Computer Networks', 'Mathematics', 'Discrete Mathematics',
+    'Git', 'Agile/Scrum', 'Java/SpringBoot', 'REST APIs',
+  ]),
+  'Network & Info Management': new Set([
+    'TCP/IP', 'Networking', 'LAN/WAN', 'Network Administration', 'Windows Server', 'Linux',
+    'SQL', 'DBMS', 'Database Design', 'IT Support', 'Help Desk', 'Hardware Troubleshooting',
+    'Operating Systems', 'System Administration', 'HTML/CSS', 'Visual Basic',
+    'Information Systems', 'Computer Networks', 'Project Management', 'Statistics', 'Mathematics',
+    'Network Security', 'Penetration Testing',
+  ]),
+  'Finance': new Set([
+    'Financial Accounting', 'Principles of Accounting', 'Auditing', 'Tax', 'IFRS',
+    'Corporate Finance', 'Investment', 'Banking', 'Financial Analysis', 'Budgeting',
+    'Economics', 'Business Law', 'Business Ethics', 'Statistics', 'Mathematics',
+    'Communication', 'English', 'French', 'Entrepreneurship', 'Project Management',
+  ]),
+  'Business Administration': new Set([
+    'Principles of Management', 'Strategic Management', 'Operations', 'HR Management',
+    'Organizational Behavior', 'Leadership', 'Marketing Principles', 'Market Research',
+    'Principles of Accounting', 'Economics', 'Business Law', 'Business Ethics',
+    'Business Communication', 'Statistics', 'Mathematics', 'Entrepreneurship',
+    'Project Management', 'Communication', 'English', 'French', 'Negotiation',
+  ]),
+}
+
+const MARKET_SKILLS: Record<Dept, string[]> = {
+  'Software Engineering': [
+    'Java', 'Python', 'JavaScript', 'TypeScript', 'React', 'Node.js', 'Git', 'REST APIs',
+    'Docker', 'CI/CD', 'Agile/Scrum', 'SQL', 'Cloud (AWS/Azure)', 'Microservices',
+    'Machine Learning', 'TensorFlow/PyTorch', 'Data Visualization', 'Power BI/Tableau',
+    'Figma', 'UI/UX', 'Testing (Jest)', 'Responsive Design', 'MongoDB',
+  ],
+  'Network & Info Management': [
+    'TCP/IP', 'Linux', 'Windows Server', 'Network Security', 'Penetration Testing',
+    'Cloud (AWS/Azure)', 'Docker', 'Kubernetes', 'CI/CD', 'Terraform',
+    'SIEM', 'Firewall Management', 'Incident Response', 'Compliance (ISO 27001)',
+    'Monitoring', 'Scripting (Bash/PowerShell)', 'VPN', 'Cloud Networking',
+  ],
+  'Finance': [
+    'IFRS', 'Financial Reporting', 'Tax', 'Auditing', 'ERP Systems',
+    'Financial Modeling', 'Excel (Advanced/VBA)', 'Power BI/Tableau',
+    'CAAT Tools', 'Fraud Detection', 'Risk Management', 'Budgeting',
+    'Corporate Finance', 'Investment', 'Financial Analysis',
+  ],
+  'Business Administration': [
+    'Strategic Management', 'HR Management', 'Project Management', 'Leadership',
+    'Digital Marketing', 'SEO/SEM', 'Google Analytics', 'Social Media Marketing',
+    'CRM (Salesforce)', 'Negotiation', 'Market Research',
+    'Agile/Scrum', 'Jira', 'Team Leadership', 'Stakeholder Communication',
+  ],
+}
+
+const ALL_DEPTS: Dept[] = ['Software Engineering', 'Network & Info Management', 'Finance', 'Business Administration']
+
+function isSkillTaught(skill: string, taughtSet: Set<string>): boolean {
+  const lower = skill.toLowerCase()
+  for (const t of taughtSet) {
+    const tl = t.toLowerCase()
+    if (tl === lower) return true
+    if (tl.length <= 2 || lower.length <= 2) continue
+    const wb = (hay: string, needle: string) =>
+      new RegExp(`\\b${needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(hay)
+    if (wb(lower, tl) || wb(tl, lower)) return true
+  }
+  return false
+}
 
 export default function EducationReports() {
   const forecasts = useForecasts('1y')
@@ -29,7 +108,8 @@ export default function EducationReports() {
   const [exportError, setExportError] = useState<string | null>(null)
   const [generated, setGenerated] = useState(false)
 
-  const sectorList = sectorListQ.data ?? []
+  const allSectors = sectorListQ.data ?? []
+  const sectorList = allSectors.filter(s => AUCA_SECTORS.has(s.slug))
   const roles = [...(forecasts.data?.forecasts ?? [])].sort((a, b) => a.role_name.localeCompare(b.role_name))
   const activeRole = roleId ?? roles[0]?.role_id ?? null
   const activeSector = sectorSlug ?? sectorList[0]?.slug ?? null
@@ -59,7 +139,7 @@ export default function EducationReports() {
     if (type === 'role_deep_dive' && activeRole !== null) deepDive.mutate(activeRole)
   }
 
-  const sectorRows = sectorOutlook.data?.forecasts[horizon] ?? []
+  const sectorRows = (sectorOutlook.data?.forecasts[horizon] ?? []).filter(x => AUCA_SECTORS.has(x.sector_slug))
   const demandRows = outlook.data?.forecasts[horizon] ?? []
 
   return (
@@ -419,6 +499,121 @@ export default function EducationReports() {
               </div>
             </>
           )}
+        </Card>
+      )}
+      {/* Curriculum Alignment report */}
+      {generated && type === 'curriculum_alignment' && (
+        <Card className="mt-6 overflow-hidden" data-testid="report-curriculum">
+          <div className="bg-navy p-8 text-white">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-extrabold tracking-tight">AUCA Curriculum Alignment Report</h2>
+                <p className="mt-2 text-sm text-blue-200/80">4 departments · {ALL_DEPTS.reduce((n, d) => n + MARKET_SKILLS[d].length, 0)} market-demanded skills analysed</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Summary table */}
+          <div className="overflow-x-auto p-6">
+            <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-navy"><TrendingUp className="h-4 w-4" /> Department Overview</h3>
+            <table className="mt-3 w-full text-left">
+              <thead>
+                <tr className="border-b border-gray-200 text-[11px] font-bold uppercase tracking-wider text-gray-400">
+                  <th className="pb-4 font-bold">Department</th>
+                  <th className="pb-4 font-bold">Faculty</th>
+                  <th className="pb-4 font-bold">Market skills</th>
+                  <th className="pb-4 font-bold">Covered</th>
+                  <th className="pb-4 font-bold">Gaps</th>
+                  <th className="pb-4 font-bold">Alignment</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {ALL_DEPTS.map(dept => {
+                  const curriculum = DEPT_CURRICULA[dept]
+                  const market = MARKET_SKILLS[dept]
+                  const covered = market.filter(s => isSkillTaught(s, curriculum))
+                  const gaps = market.filter(s => !isSkillTaught(s, curriculum))
+                  const pct = market.length > 0 ? Math.round((covered.length / market.length) * 100) : 0
+                  const faculty = dept === 'Software Engineering' || dept === 'Network & Info Management' ? 'IT' : 'Business'
+                  return (
+                    <tr key={dept} className="text-sm">
+                      <td className="py-3 pr-4 font-bold text-gray-900">{dept}</td>
+                      <td className="py-3 pr-4 text-gray-600">{faculty}</td>
+                      <td className="py-3 pr-4 text-gray-700">{market.length}</td>
+                      <td className="py-3 pr-4 font-bold text-emerald-600">{covered.length}</td>
+                      <td className="py-3 pr-4 font-bold text-red-500">{gaps.length}</td>
+                      <td className="py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="h-2 w-20 rounded-full bg-gray-100">
+                            <div className={`h-2 rounded-full ${pct >= 70 ? 'bg-emerald-500' : pct >= 40 ? 'bg-amber-500' : 'bg-red-400'}`} style={{ width: `${pct}%` }} />
+                          </div>
+                          <span className="text-sm font-bold text-navy">{pct}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Per-department breakdown */}
+          {ALL_DEPTS.map(dept => {
+            const curriculum = DEPT_CURRICULA[dept]
+            const market = MARKET_SKILLS[dept]
+            const covered = market.filter(s => isSkillTaught(s, curriculum))
+            const gaps = market.filter(s => !isSkillTaught(s, curriculum))
+            const pct = market.length > 0 ? Math.round((covered.length / market.length) * 100) : 0
+
+            return (
+              <div key={dept} className="border-t border-gray-100 p-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-navy">
+                    <GraduationCap className="h-4 w-4" /> {dept}
+                  </h3>
+                  <span className={`rounded-full px-3 py-1 text-xs font-bold ${pct >= 70 ? 'bg-emerald-50 text-emerald-700' : pct >= 40 ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-600'}`}>
+                    {pct}% aligned
+                  </span>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Covered ({covered.length})</span>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {covered.map(s => (
+                        <span key={s} className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">{s}</span>
+                      ))}
+                      {covered.length === 0 && <span className="text-xs text-gray-400">None</span>}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-red-600">Gaps — not in curriculum ({gaps.length})</span>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {gaps.map(s => (
+                        <span key={s} className="rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-medium text-red-600">{s}</span>
+                      ))}
+                      {gaps.length === 0 && <span className="text-xs text-gray-400">Fully covered</span>}
+                    </div>
+                  </div>
+                </div>
+
+                {gaps.length > 0 && (
+                  <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50/50 p-4">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-amber-600" />
+                      <span className="text-xs font-bold text-amber-800">AI Recommendation</span>
+                    </div>
+                    <p className="mt-1 text-sm text-amber-900">
+                      {gaps.length <= 3
+                        ? `Add ${gaps.join(', ')} to the ${dept} curriculum to reach full market alignment.`
+                        : `Prioritize adding ${gaps.slice(0, 3).join(', ')} to the ${dept} curriculum. ${gaps.length - 3} more skills still missing — consider covering through Innovation Center training or elective courses.`
+                      }
+                    </p>
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </Card>
       )}
     </DashboardLayout>

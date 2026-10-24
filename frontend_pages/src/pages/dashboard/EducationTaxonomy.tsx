@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Briefcase, Building2, ChevronRight, MapPin, Search, Sparkles } from 'lucide-react'
+import { Building2, ChevronRight, GraduationCap, MapPin, Search, Sparkles } from 'lucide-react'
 import DashboardLayout, { Card } from './DashboardLayout'
 import { useSectorParam } from '../../components/ui/SectorSelector'
 import { useSectorList } from '../../services/queries'
@@ -11,6 +11,197 @@ import { useEmergingRoles, useForecasts, useRoleDetail, useSectorRoleDetail, use
 import { taxonomyApi } from '../../services/api'
 import { fmtNum, fmtPct, HORIZON_LABEL } from '../../lib/format'
 import type { RoleBrief } from '../../types/api'
+
+/* ══════════════════════════════════════════════════
+   AUCA curriculum data for alignment indicators
+   ══════════════════════════════════════════════════ */
+
+const AUCA_SECTORS = new Set(['ict-technology', 'finance-business'])
+
+type Dept = 'Software Engineering' | 'Network & Info Management' | 'Finance' | 'Business Administration'
+
+const DEPT_CURRICULA: Record<Dept, Set<string>> = {
+  'Software Engineering': new Set([
+    'Java', 'Python', '.NET', 'C#', 'PL/SQL', 'SQL',
+    'HTML/CSS', 'JavaScript', 'React',
+    'Data Structures', 'Algorithms', 'Operating Systems',
+    'DBMS', 'Database Design',
+    'Software Engineering', 'Design Patterns', 'Software Testing', 'Project Management',
+    'Statistics', 'Probability', 'Computer Networks',
+    'Mathematics', 'Discrete Mathematics',
+    'Git', 'Agile/Scrum', 'Java/SpringBoot', 'REST APIs',
+  ]),
+  'Network & Info Management': new Set([
+    'TCP/IP', 'Networking', 'LAN/WAN', 'Network Administration',
+    'Windows Server', 'Linux',
+    'SQL', 'DBMS', 'Database Design',
+    'IT Support', 'Help Desk', 'Hardware Troubleshooting',
+    'Operating Systems', 'System Administration',
+    'HTML/CSS', 'Visual Basic',
+    'Information Systems', 'Computer Networks',
+    'Project Management', 'Statistics', 'Mathematics',
+    'Network Security', 'Penetration Testing',
+  ]),
+  'Finance': new Set([
+    'Financial Accounting', 'Principles of Accounting', 'Auditing', 'Tax',
+    'IFRS', 'Corporate Finance', 'Investment', 'Banking',
+    'Financial Analysis', 'Budgeting',
+    'Economics', 'Business Law', 'Business Ethics',
+    'Statistics', 'Mathematics',
+    'Communication', 'English', 'French',
+    'Entrepreneurship', 'Project Management',
+  ]),
+  'Business Administration': new Set([
+    'Principles of Management', 'Strategic Management', 'Operations',
+    'HR Management', 'Organizational Behavior', 'Leadership',
+    'Marketing Principles', 'Market Research',
+    'Principles of Accounting', 'Economics',
+    'Business Law', 'Business Ethics', 'Business Communication',
+    'Statistics', 'Mathematics',
+    'Entrepreneurship', 'Project Management',
+    'Communication', 'English', 'French',
+    'Negotiation',
+  ]),
+}
+
+const ICT_ROLE_SKILLS: Record<string, { dept: Dept; skills: string[] }> = {
+  'Software Developer': { dept: 'Software Engineering', skills: ['Java', 'Python', 'JavaScript', 'TypeScript', 'React', 'Node.js', 'Git', 'REST APIs', 'SQL', 'Agile/Scrum', 'Docker', 'CI/CD', 'Testing (Jest)', 'Design Patterns'] },
+  'Full-Stack Developer': { dept: 'Software Engineering', skills: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Python', 'SQL', 'MongoDB', 'Git', 'REST APIs', 'Docker', 'CI/CD', 'Responsive Design', 'Agile/Scrum'] },
+  'Frontend Developer': { dept: 'Software Engineering', skills: ['JavaScript', 'TypeScript', 'React', 'HTML/CSS', 'Tailwind/Bootstrap', 'Responsive Design', 'Figma', 'Git', 'Testing (Jest)', 'Accessibility'] },
+  'Backend Developer': { dept: 'Software Engineering', skills: ['Python', 'Java', 'Node.js', 'SQL', 'REST APIs', 'Docker', 'Microservices', 'Redis/Caching', 'Git', 'CI/CD', 'Cloud (AWS/Azure)'] },
+  'Mobile Developer': { dept: 'Software Engineering', skills: ['React Native', 'Flutter', 'Swift/Kotlin', 'Mobile UI/UX', 'Firebase', 'Git', 'REST APIs', 'App Store Deployment'] },
+  'Data Analyst': { dept: 'Software Engineering', skills: ['Python', 'SQL', 'Power BI/Tableau', 'Excel (Advanced/VBA)', 'Statistics', 'Data Visualization', 'R', 'ETL'] },
+  'Data Scientist': { dept: 'Software Engineering', skills: ['Python', 'Machine Learning', 'TensorFlow/PyTorch', 'SQL', 'Statistics', 'Deep Learning', 'NLP', 'Data Visualization'] },
+  'DevOps Engineer': { dept: 'Software Engineering', skills: ['Docker', 'Kubernetes', 'CI/CD', 'Terraform', 'Linux', 'Cloud (AWS/Azure)', 'Monitoring', 'Scripting (Bash/PowerShell)', 'Git'] },
+  'Cloud Engineer': { dept: 'Network & Info Management', skills: ['AWS/Azure/GCP', 'Docker', 'Kubernetes', 'Terraform', 'Networking', 'Linux', 'CI/CD', 'Cost Optimization', 'Security'] },
+  'Network Engineer': { dept: 'Network & Info Management', skills: ['TCP/IP', 'Networking', 'LAN/WAN', 'Cisco/Juniper', 'Firewall Management', 'VPN', 'Cloud Networking', 'Linux', 'Monitoring'] },
+  'System Administrator': { dept: 'Network & Info Management', skills: ['Linux', 'Windows Server', 'Active Directory', 'Networking', 'Scripting (Bash/PowerShell)', 'Monitoring', 'Backup/Recovery', 'Virtualization'] },
+  'Cybersecurity Analyst': { dept: 'Network & Info Management', skills: ['SIEM', 'Firewall Management', 'Incident Response', 'Penetration Testing', 'Network Security', 'Compliance (ISO 27001)', 'Cryptography', 'Linux'] },
+  'IT Support Specialist': { dept: 'Network & Info Management', skills: ['Help Desk', 'IT Support', 'Hardware Troubleshooting', 'Windows Server', 'Networking', 'Active Directory', 'Ticketing Systems'] },
+  'Database Administrator': { dept: 'Software Engineering', skills: ['SQL', 'PostgreSQL/MySQL', 'Performance Tuning', 'Backup/Recovery', 'Cloud Databases', 'MongoDB', 'Data Warehousing', 'Linux'] },
+  'QA / Test Engineer': { dept: 'Software Engineering', skills: ['Software Testing', 'Selenium/Cypress', 'Testing (Jest)', 'CI/CD', 'API Testing', 'Git', 'Agile/Scrum', 'Performance Testing'] },
+  'UI/UX Designer': { dept: 'Software Engineering', skills: ['Figma', 'Adobe XD', 'User Research', 'Wireframing', 'Prototyping', 'Design Systems', 'HTML/CSS', 'Accessibility'] },
+  'Project Manager (IT)': { dept: 'Software Engineering', skills: ['Agile/Scrum', 'Jira', 'MS Project', 'Risk Management', 'Stakeholder Communication', 'Budgeting', 'Team Leadership', 'Project Management'] },
+  'Business Analyst (IT)': { dept: 'Software Engineering', skills: ['Requirements Gathering', 'SQL', 'Power BI/Tableau', 'Agile/Scrum', 'Jira', 'Stakeholder Communication', 'Process Mapping', 'Data Visualization'] },
+  'AI/ML Engineer': { dept: 'Software Engineering', skills: ['Python', 'TensorFlow/PyTorch', 'Machine Learning', 'Deep Learning', 'MLOps', 'Docker', 'Cloud (AWS/Azure)', 'Data Engineering'] },
+  'Product Manager': { dept: 'Software Engineering', skills: ['Agile/Scrum', 'Jira', 'User Research', 'Stakeholder Communication', 'Market Research', 'Data Visualization', 'Roadmapping', 'A/B Testing'] },
+  'Solutions Architect': { dept: 'Software Engineering', skills: ['Cloud (AWS/Azure)', 'Microservices', 'Docker', 'Kubernetes', 'REST APIs', 'Design Patterns', 'Networking', 'Security'] },
+}
+
+const BIZ_ROLE_SKILLS: Record<string, { dept: Dept; skills: string[] }> = {
+  'Accountant': { dept: 'Finance', skills: ['Financial Accounting', 'IFRS', 'Tax', 'Auditing', 'QuickBooks/Sage', 'Excel (Advanced/VBA)', 'Budgeting', 'Financial Analysis'] },
+  'Financial Analyst': { dept: 'Finance', skills: ['Financial Modeling', 'Excel (Advanced/VBA)', 'Power BI/Tableau', 'Corporate Finance', 'Budgeting', 'Financial Analysis', 'Investment', 'Bloomberg Terminal'] },
+  'Auditor': { dept: 'Finance', skills: ['Auditing', 'IFRS', 'CAAT Tools', 'Risk Management', 'Compliance', 'Financial Accounting', 'Tax', 'Fraud Detection'] },
+  'Tax Consultant': { dept: 'Finance', skills: ['Tax', 'IFRS', 'Financial Accounting', 'Compliance', 'Business Law', 'Excel (Advanced/VBA)', 'Auditing'] },
+  'Investment Analyst': { dept: 'Finance', skills: ['Investment', 'Financial Modeling', 'Bloomberg Terminal', 'Corporate Finance', 'Financial Analysis', 'Excel (Advanced/VBA)', 'Risk Management'] },
+  'Banking Officer': { dept: 'Finance', skills: ['Banking', 'Financial Accounting', 'Compliance', 'Risk Management', 'Economics', 'Corporate Finance', 'Communication'] },
+  'Budget Analyst': { dept: 'Finance', skills: ['Budgeting', 'Financial Analysis', 'Excel (Advanced/VBA)', 'Power BI/Tableau', 'Financial Accounting', 'Economics', 'Financial Modeling'] },
+  'ERP Specialist': { dept: 'Finance', skills: ['ERP Systems', 'Financial Accounting', 'SQL', 'Process Mapping', 'Budgeting', 'Project Management', 'Excel (Advanced/VBA)'] },
+  'Credit Analyst': { dept: 'Finance', skills: ['Financial Analysis', 'Risk Management', 'Banking', 'Financial Modeling', 'Economics', 'Compliance', 'Excel (Advanced/VBA)'] },
+  'HR Manager': { dept: 'Business Administration', skills: ['HR Management', 'Organizational Behavior', 'Leadership', 'Negotiation', 'Strategic Management', 'Business Communication', 'Project Management'] },
+  'Marketing Manager': { dept: 'Business Administration', skills: ['Marketing Principles', 'Market Research', 'Digital Marketing', 'SEO/SEM', 'Google Analytics', 'Content Creation', 'Social Media Marketing', 'A/B Testing'] },
+  'Operations Manager': { dept: 'Business Administration', skills: ['Operations', 'Strategic Management', 'Project Management', 'Leadership', 'Budgeting', 'Negotiation', 'Team Leadership'] },
+  'Business Development Manager': { dept: 'Business Administration', skills: ['Strategic Management', 'Negotiation', 'Market Research', 'Business Communication', 'Leadership', 'Stakeholder Communication', 'CRM (Salesforce)'] },
+  'Supply Chain Manager': { dept: 'Business Administration', skills: ['Operations', 'Strategic Management', 'Negotiation', 'Project Management', 'Budgeting', 'ERP Systems', 'Leadership'] },
+  'Project Manager (Business)': { dept: 'Business Administration', skills: ['Project Management', 'Agile/Scrum', 'Jira', 'Stakeholder Communication', 'Budgeting', 'Risk Management', 'Team Leadership', 'MS Project'] },
+  'Sales Manager': { dept: 'Business Administration', skills: ['Negotiation', 'CRM (Salesforce)', 'Marketing Principles', 'Market Research', 'Business Communication', 'Leadership', 'Strategic Management'] },
+  'Entrepreneur / Startup Founder': { dept: 'Business Administration', skills: ['Entrepreneurship', 'Business Development', 'Market Research', 'Financial Acumen', 'Leadership', 'Design Thinking', 'Negotiation'] },
+  'Management Consultant': { dept: 'Business Administration', skills: ['Strategic Management', 'Market Research', 'Financial Analysis', 'Leadership', 'Stakeholder Communication', 'Project Management', 'Design Thinking'] },
+  'Digital Marketing Specialist': { dept: 'Business Administration', skills: ['Digital Marketing', 'SEO/SEM', 'Google Analytics', 'Social Media Marketing', 'Content Creation', 'Email Marketing', 'Marketing Automation', 'A/B Testing'] },
+}
+
+function isSkillTaught(skill: string, taughtSet: Set<string>): boolean {
+  const lower = skill.toLowerCase()
+  for (const t of taughtSet) {
+    const tl = t.toLowerCase()
+    if (tl === lower) return true
+    if (tl.length <= 2 || lower.length <= 2) continue
+    const wb = (hay: string, needle: string) =>
+      new RegExp(`\\b${needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(hay)
+    if (wb(lower, tl) || wb(tl, lower)) return true
+  }
+  return false
+}
+
+function findClosestRole(roleName: string, isIct: boolean): { dept: Dept; skills: string[] } | null {
+  const pool = isIct ? ICT_ROLE_SKILLS : BIZ_ROLE_SKILLS
+  const lower = roleName.toLowerCase()
+  if (pool[roleName]) return pool[roleName]
+  for (const [key, val] of Object.entries(pool)) {
+    if (key.toLowerCase() === lower) return val
+  }
+  for (const [key, val] of Object.entries(pool)) {
+    const kl = key.toLowerCase()
+    if (lower.includes(kl) || kl.includes(lower)) return val
+  }
+  for (const [key, val] of Object.entries(pool)) {
+    const words = key.toLowerCase().split(/[\s/()]+/).filter(w => w.length > 3)
+    if (words.some(w => lower.includes(w))) return val
+  }
+  return null
+}
+
+function AucaAlignmentCard({ roleName, isIct }: { roleName: string; isIct: boolean }) {
+  const match = findClosestRole(roleName, isIct)
+  if (!match) return (
+    <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50/60 p-5">
+      <div className="flex items-center gap-2">
+        <GraduationCap className="h-5 w-5 text-gray-400" />
+        <h3 className="text-sm font-bold text-gray-500">AUCA Curriculum Alignment</h3>
+      </div>
+      <p className="mt-2 text-sm text-gray-400">No matching role profile found in AUCA's tracked departments for this position.</p>
+    </div>
+  )
+
+  const curriculum = DEPT_CURRICULA[match.dept]
+  const covered = match.skills.filter(s => isSkillTaught(s, curriculum))
+  const missing = match.skills.filter(s => !isSkillTaught(s, curriculum))
+  const pct = match.skills.length > 0 ? Math.round((covered.length / match.skills.length) * 100) : 0
+
+  return (
+    <div className="mt-6 rounded-xl border border-indigo-200 bg-indigo-50/40 p-5">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <GraduationCap className="h-5 w-5 text-indigo-600" />
+          <h3 className="text-sm font-bold text-navy">AUCA Curriculum Alignment</h3>
+        </div>
+        <span className="rounded-full bg-white px-3 py-1 text-sm font-extrabold text-navy shadow-sm">{pct}%</span>
+      </div>
+      <p className="mt-1 text-xs text-gray-500">
+        AUCA {match.dept} department covers {covered.length} of {match.skills.length} employer-demanded skills for this role
+      </p>
+
+      <div className="mt-3 h-2.5 w-full rounded-full bg-white">
+        <div
+          className={`h-2.5 rounded-full transition-all ${pct >= 70 ? 'bg-emerald-500' : pct >= 40 ? 'bg-amber-500' : 'bg-red-400'}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+
+      {covered.length > 0 && (
+        <div className="mt-4">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Covered by AUCA</span>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {covered.map(s => (
+              <span key={s} className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">{s}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {missing.length > 0 && (
+        <div className="mt-3">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-red-600">Gaps — not in curriculum</span>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {missing.map(s => (
+              <span key={s} className="rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-medium text-red-600">{s}</span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 function IctTaxonomyView() {
   const [params, setParams] = useSearchParams()
@@ -136,6 +327,8 @@ function IctTaxonomyView() {
                       </tbody>
                     </table>
                   )}
+
+                  <AucaAlignmentCard roleName={d.name} isIct={true} />
                 </>
               )}
             </QueryGate>
@@ -318,6 +511,8 @@ function SectorTaxonomyView({ sectorSlug }: { sectorSlug: string }) {
                               </table>
                             </>
                           )}
+
+                          <AucaAlignmentCard roleName={d.title} isIct={sectorSlug === 'ict-technology'} />
                         </>
                       )
                     }}
@@ -334,7 +529,8 @@ function SectorTaxonomyView({ sectorSlug }: { sectorSlug: string }) {
 
 export default function EducationTaxonomy() {
   const [sectorSlug, setSectorSlug] = useSectorParam()
-  const { data: sectors = [] } = useSectorList()
+  const { data: allSectors = [] } = useSectorList()
+  const sectors = allSectors.filter(s => AUCA_SECTORS.has(s.slug))
   const active = sectorSlug ?? 'ict-technology'
   const isIct = active === 'ict-technology'
 
@@ -342,10 +538,11 @@ export default function EducationTaxonomy() {
     <DashboardLayout>
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-navy">Role Taxonomy</h1>
+        <p className="mt-2 text-sm text-gray-500">Explore roles across AUCA's tracked faculties — IT and Business — with curriculum alignment insights.</p>
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-2" role="tablist" data-testid="taxonomy-sector-selector">
-        <span className="mr-1 text-[11px] font-bold uppercase tracking-wider text-gray-400">Sector</span>
+        <span className="mr-1 text-[11px] font-bold uppercase tracking-wider text-gray-400">Faculty</span>
         {sectors.map((s) => (
           <button
             key={s.slug}
