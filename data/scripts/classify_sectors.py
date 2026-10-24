@@ -100,54 +100,64 @@ LABEL_TO_SECTOR = {
 KEYWORD_SECTORS = {
     "ict-technology": [
         r'\b(software|developer|devops|IT\b|ICT|data\s+(?:engineer|scientist|analyst)|'
-        r'system\s*admin|network|cyber|cloud|database|full.?stack|front.?end|back.?end|'
+        r'system\s*admin|network\s+(?:engineer|admin|architect|analyst)|cyber|cloud|database|full.?stack|front.?end|back.?end|'
         r'machine\s+learning|AI\b|UX|UI|web\s+develop|mobile\s+develop|GIS|'
-        r'programmer|digital\s+transform|e-?commerce|blockchain|SaaS|'
-        r'syst[eè]m|tech\s+lead|CTO|information\s+technology)\b',
+        r'programmer|digital\s+transform|e-?commerce|blockchain|SaaS|ITSM|'
+        r'syst[eè]m|tech\s+lead|CTO|information\s+technology|SAP\b|ERP\b|'
+        r'java\b|python\b|php\b|\.net\b|dotnet|kotlin|react\b|angular|node\.?js|'
+        r'android|ios\s+develop|swift\b|ruby|laravel|automation\s+engineer|'
+        r'video\s+edit|graphic\s+design|social\s+media|content\s+creat|digital\s+market)',
     ],
     "finance-business": [
-        r'\b(financ|accountant|accounting|auditor|audit|bank|teller|credit|'
-        r'tax|treasury|CFO|controller|budget|investment|insurance|actuari|'
-        r'economist|business\s+analyst|risk\s+(?:analyst|officer|compliance))\b',
+        r'\b(financ|accountant|accounting|accounts?\s+(?:payable|receivable|assistant|officer)|'
+        r'auditor|audit|bank|teller|credit|bookkeep|'
+        r'tax\b|treasury|CFO|controller|budget|investment|insurance|actuari|'
+        r'economist|business\s+analyst|risk\s+(?:analyst|officer|compliance)|'
+        r'chief\s+executive|CEO\b|managing\s+director|venture\s+build)',
     ],
     "engineering": [
-        r'\b(engineer|civil|structural|electrical|mechanical|plumb|'
+        r'\b(engineer|civil\b|structural|electrical|mechanical|plumb|'
         r'construction|architect|surveyor|maintenance|HVAC|power\s+plant|'
         r'generator|technician|plant\s+(?:operator|supervisor|manager)|'
-        r'water\s+engineer)\b',
+        r'water\s+engineer|automated\s+operations|truck\s+(?:driver|operator))',
     ],
     "healthcare": [
         r'\b(doctor|nurse|physician|pharmacist|health|medical|clinic|'
         r'hospital|surgeon|dentist|radiol|laborator|biobank|patholog|'
         r'infection|wellbeing|wellness|mental\s+health|nutrition|GP\b|'
-        r'maternal|newborn|epidemiolog)\b',
+        r'maternal|newborn|epidemiolog|midwi|physiotherap|optometri)',
     ],
     "education-research": [
         r'\b(teacher|professor|lecturer|academ|universit|school|'
         r'curriculum|education|trainer|tutor|research|bootcamp|training\s+institute|'
-        r'inclusive\s+education)\b',
+        r'inclusive\s+education|clerkship|fellowship|data\s+anal)',
     ],
     "agriculture-environment": [
         r'\b(agri|farm|agronomy|livestock|fish|crop|dairy|seed|harvest|'
-        r'mine|mining|mineral|geolog|environment|forest|conservation|'
-        r'tea\s+shop|food\s+process|vet|poultry|pig)\b',
+        r'mine\b|mining|mineral|geolog|environment|forest|conservation|'
+        r'tea\s+shop|food\s+process|veterinar|poultry|pig\b|machine\s+operator)',
     ],
     "government-public-admin": [
         r'\b(government|public\s+admin|procurement\s+(?:officer|specialist)|'
-        r'legal|lawyer|attorney|judge|regulat|policy\s+analyst|'
-        r'governance|compliance\s+officer|public\s+sector)\b',
+        r'legal\b|lawyer|attorney|judge|regulat|policy\s+analyst|'
+        r'governance|compliance\s+officer|public\s+sector|fraud\s+investigat)',
     ],
     "services-commerce": [
-        r'\b(hotel|hospitality|chef|cook|butler|waiter|receptionist|cleaner|'
-        r'marketing|sales|PR\b|public\s+relations|logistics|driver|'
+        r'\b(hotel|hospitality|chef|cook\b|butler|waiter|receptionist|cleaner|'
+        r'marketing|sales|PR\b|public\s+relations|logistics|driver|chauffeur|'
         r'transport|warehouse|HR\b|human\s+resource|recruit|real\s+estate|'
-        r'customer\s+care|merchandise|store\s+assist)\b',
+        r'customer\s+(?:care|service)|merchandise|store\s+assist|'
+        r'team\s+leader|branch\s+(?:business|manager|coordinator)|operat|'
+        r'admin\s+(?:assistant|officer)|office\s+(?:assistant|manager)|'
+        r'creative\s+writ|communicat|partnership|head\s+of\s+(?:growth|strategic))',
     ],
     "development-ngo": [
         r'\b(NGO|donor|humanitarian|development\s+(?:officer|program)|'
         r'WASH|field\s+officer|program\s+(?:coordinator|manager)|'
         r'M&E|monitoring|fundrais|international\s+(?:development|relations)|'
-        r'human\s+rights|social\s+(?:worker|scientist))\b',
+        r'human\s+rights|social\s+(?:worker|scientist|specialist)|'
+        r'community\s+(?:officer|engag)|protection\s+(?:associate|officer)|'
+        r'resource\s+mobilis)',
     ],
 }
 
@@ -179,7 +189,9 @@ def classify_by_labels(industry_raw):
 
 def classify_by_keywords(title, raw_text):
     """Pass 2: Keyword matching on title and raw_text."""
-    text = f"{title or ''} {(raw_text or '')[:2000]}"
+    title = str(title) if title and not (isinstance(title, float)) else ''
+    raw_text = str(raw_text) if raw_text and not (isinstance(raw_text, float)) else ''
+    text = f"{title} {raw_text[:2000]}"
     votes = Counter()
     for sector_slug, patterns in KEYWORD_SECTORS.items():
         for pattern in patterns:
