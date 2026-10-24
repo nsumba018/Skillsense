@@ -4,7 +4,7 @@
 
 Rwanda-focused. First sector: ICT / Computer Science / Digital Technology.
 
-Last updated: Oct 9, 2026 (Phase 3 done, Phase 4 in progress, Prototype Review 1 feedback logged)
+Last updated: Oct 24, 2026 (Phase 4C education planner pages complete, multi-sector expansion done, career advisor spec written, page isolation rule established)
 
 ---
 
@@ -364,26 +364,124 @@ When complete, SkillSense will:
 - [x] Sign Up page (institutional registration, connected to API)
 - [x] Forgot Password page (multi-step OTP flow)
 
-### 4C: Dashboard Pages [PARTIAL — UI built, role-based content needs cleanup]
+### 4C: Dashboard Pages [PARTIAL — education planner done, career advisor spec written, analyst pages need live data]
 
-All 13 dashboard pages exist with UI shells. Auth + routing + role-based sidebar filtering all work. **Next step: ensure each role sees the correct data/charts for their pages.**
+All dashboard pages exist with UI shells. Auth + routing + role-based sidebar filtering all work.
+
+**Page isolation rule (established Oct 24, 2026):**
+> Every role has its own standalone pages. No page is shared between roles except Settings.
 
 - [x] Dashboard Layout — sidebar nav filtered by role, top header
 - [x] Main Dashboard — KPI cards, demand trend chart, top skills, role-specific quick links
 - [x] Skills Forecast — filter bar, AI advisory, demand index chart, rising/declining tables
 - [x] Employability — radar chart, sector probability bars, skill velocity table
 - [x] Career Guidance — personalised recommendations (career_training_advisor + admin)
-- [x] Education — curriculum analysis (education_curriculum_planner + admin)
 - [x] Sector Intelligence — industry breakdown charts (labor_market_analyst + admin)
 - [x] Geographic Intelligence — Rwanda map, district rankings (labor_market_analyst + admin)
 - [x] Policy & Planning — decision-support dashboard (labor_market_analyst + admin)
-- [x] Taxonomy — ICT role browser (all roles)
-- [x] Reports — report builder, template gallery (all roles)
-- [x] Settings — profile, security, notifications (all roles)
+- [x] Settings — profile, security, notifications (all roles — the ONLY shared page)
 - [x] Data Upload — CSV upload (admin only)
 - [x] User Management — admin panel (admin only)
 
-**Known issue:** Dashboard pages still use mock/hardcoded data in many places. Role-based content filtering (what each user type sees) needs cleanup before moving to Phase 5.
+### 4D: Multi-Sector Expansion [DONE]
+
+**Done by:** IRAKOZE Nsumba Herve
+
+- [x] Expanded from ICT-only to 9 sectors: ICT & Technology, Finance & Business, Agriculture, Healthcare, Education & Training, Energy & Environment, Construction & Infrastructure, Tourism & Hospitality, Manufacturing
+- [x] Added multi-platform job scrapers for broader sector coverage
+- [x] Improved sector classifier for accurate role-to-sector mapping
+- [x] Added multi-sector reports with PDF generation
+- [x] Dashboard UI updated to support multi-sector views
+
+### 4E: Education Planner Pages — AUCA Integration [DONE]
+
+**Done by:** IRAKOZE Nsumba Herve (Oct 2026)
+
+Rewrote all education planner pages from generic shells into AUCA-specific tools. These pages are standalone for the `education_curriculum_planner` role.
+
+**Education.tsx (Innovation Center Training Management):**
+- [x] Rewrote from generic curriculum upload into AUCA Innovation Center training management page
+- [x] Innovation Center banner (Mastercard Foundation partnership, ~50 students/year, 70% female)
+- [x] Add Training Cohort form with multi-course selection from 12-course Innovation Center catalog
+- [x] Custom course input — advisors can add courses not in the catalog (e.g. IoT) with comma-separated skills
+- [x] Real-time Transformation View showing before/after curriculum coverage with AI recommendations
+- [x] Cohort list with alignment scores
+- [x] Department Curriculum Update section at bottom
+- [x] Removed institution dropdown (AUCA-only, no need for other institutions)
+- [x] Button text changed to generic "Update curriculum"
+
+**EducationTaxonomy.tsx (Role Taxonomy by Faculty):**
+- [x] Filtered sectors to only AUCA's two faculties: ICT & Technology, Finance & Business
+- [x] Changed "Sector" label to "Faculty" throughout
+- [x] Added AUCA Curriculum Alignment card in ICT role detail panels (21 roles with skill mappings)
+- [x] Added AUCA Curriculum Alignment card in Business role detail panels (19 roles with skill mappings)
+- [x] Uses `isSkillTaught()` word-boundary matching and `findClosestRole()` fuzzy matching
+- [x] Added page subtitle about AUCA's tracked faculties
+- [x] 4 department curricula defined: Software Engineering, Network & Info Management, Finance, Business Administration
+
+**EducationReports.tsx (Reports):**
+- [x] Filtered sector dropdown to only AUCA's two sectors (ICT & Technology, Finance & Business)
+- [x] Filtered Cross-Sector Outlook table to only AUCA sectors
+- [x] Added 5th report template: "Curriculum Alignment" with per-department skills gap analysis
+- [x] Curriculum Alignment report includes: department overview table, per-department skill breakdown (covered/gaps), alignment progress bars, AI recommendations per department
+
+**EducationEmployability.tsx, EducationForecast.tsx, EducationCareerGuidance.tsx:**
+- [x] Exist as role-specific pages for education planner (separate from analyst versions)
+
+**Key data structures shared across education pages:**
+- `DEPT_CURRICULA` — 4 AUCA departments with their course/skill sets
+- `ICT_ROLE_SKILLS` — 21 ICT roles with employer-demanded skills
+- `BIZ_ROLE_SKILLS` — 19 business roles with employer-demanded skills
+- `MARKET_SKILLS` — per-department market skill sets
+- `INNOVATION_COURSES` — 12 Innovation Center courses with skill mappings
+- `isSkillTaught()` — word-boundary regex matching function
+- `AUCA_SECTORS = new Set(['ict-technology', 'finance-business'])`
+
+### 4F: Career & Training Advisor — Developer Spec [DONE]
+
+**Done by:** IRAKOZE Nsumba Herve (Oct 24, 2026)
+
+Created comprehensive developer handoff document for a colleague to build the career advisor role's 6 unique pages.
+
+- [x] Document written: `docs/Career_Training_Advisor_Developer_Spec.md`
+- [x] Defines new Django app `advisory` with 4 models: StudentProfile, Assessment, SavedPathway, Placement
+- [x] 14 API endpoints under `/api/advisory/` with full request/response shapes
+- [x] 6 unique frontend pages specified with wireframes:
+  - AdvisorDashboard.tsx — KPIs, students needing attention, hot roles, skill heatmap
+  - AdvisorAssessment.tsx — student skill assessment against target roles with scoring
+  - AdvisorJobs.tsx — job market navigator with student-job matching
+  - AdvisorPathways.tsx — career pathway generation with Innovation Center course mapping
+  - AdvisorPlacements.tsx — placement recording, stats, CSV bulk import
+  - AdvisorReports.tsx — 4 report templates (readiness, outcomes, demand brief, skills gap)
+- [x] TypeScript types, API functions, query hooks — copy-paste ready
+- [x] Access control changes documented (remove advisor from old shared routes, add new advisor-only routes)
+- [x] Implementation order: 6 phases, estimated 6-9 working days
+- [x] Testing checklist with page isolation verification
+
+**Status:** Spec complete, ready for handoff. Implementation NOT started.
+
+### 4G: Career Advisor Implementation [NOT STARTED — assigned to colleague]
+
+- [ ] Phase 1: Create `advisory` Django app + models + migrations
+- [ ] Phase 2: Page isolation — remove `career_training_advisor` from old shared routes, add new routes
+- [ ] Phase 3: Build AdvisorAssessment.tsx with client-side fallback scoring
+- [ ] Phase 4: Build AdvisorDashboard.tsx + AdvisorJobs.tsx
+- [ ] Phase 5: Build AdvisorPathways.tsx + AdvisorPlacements.tsx
+- [ ] Phase 6: Build AdvisorReports.tsx, extract shared skill data, delete old Career*.tsx clones
+
+### 4C Status Summary
+
+| Role | Pages | Status |
+|------|-------|--------|
+| Admin | User Management, Data Upload, Settings + access to all | DONE |
+| Labor Market Analyst | Dashboard, Forecast, Employability, Taxonomy, Reports, Sector, Geographic, Policy, Settings | UI built, needs live API data |
+| Education Planner | Education, EducationTaxonomy, EducationReports, EducationEmployability, EducationForecast, EducationCareerGuidance, Settings | **DONE — AUCA-integrated** |
+| Career Advisor | 6 unique Advisor pages + Settings | **Spec written, implementation not started** |
+
+**Known issues:**
+- Analyst pages still use mock/hardcoded data — need live API integration
+- Old `Career*.tsx` files (clones of analyst pages) still exist — to be deleted when advisor pages are built
+- Shared skill data (ICT_ROLE_SKILLS, BIZ_ROLE_SKILLS, etc.) is duplicated across education pages — should be extracted to `frontend_pages/src/data/auca-skills.ts`
 
 ---
 
@@ -662,9 +760,14 @@ Phase 3  [DONE]     Django Backend (schema → API → auth → ML integration)
    ↓                  └── 7 apps, JWT auth, 4 seed users, all endpoints live
    ↓
 Phase 4  [IN PROGRESS]  Frontend Integration (wire React → Django)
-   ↓                  └── Auth flow + API client done
-   ↓                  └── All 13 dashboard pages built with role-based routing
-   ↓                  └── TODO: role-based content cleanup per dashboard page
+   ↓                  └── 4A Auth flow + API client — DONE
+   ↓                  └── 4B Landing + auth pages — DONE
+   ↓                  └── 4D Multi-sector expansion (9 sectors, scrapers) — DONE
+   ↓                  └── 4E Education planner pages (AUCA-integrated) — DONE
+   ↓                  └── 4F Career advisor developer spec — DONE (handoff ready)
+   ↓                  └── 4G Career advisor implementation — NOT STARTED (assigned to colleague)
+   ↓                  └── TODO: Analyst pages need live API data
+   ↓                  └── TODO: Invite-only auth flow (plan exists, not built)
    ↓
 Phase 5             Core Modules — replace mock data with live API data
    ↓
@@ -677,12 +780,14 @@ Phase 8             Layer 2: Emerging Skills Radar (global trends, new roles)
 Phase 9             Testing & Deployment (tests, Docker, CI/CD, security)
 ```
 
-**Critical path:** Phase 4 (content cleanup) → Phase 5 (live data) → everything else branches off
+**Critical path:** Phase 4G (career advisor build, parallel) → Phase 5 (live data for analyst) → everything else
 **Gate:** Phase 2D Spearman > 0.85 — **PASSED** (0.9898)
 
 **Can be parallelised:**
+- Phase 4G (career advisor build by colleague) runs in parallel with analyst live data work
 - Phase 6 + Phase 7 (independent modules, can be built simultaneously)
 - Phase 8 data collection can start now (research doesn't block development)
+- Invite-only auth flow can be built independently of any dashboard work
 
 ---
 
@@ -693,12 +798,13 @@ Phase 9             Testing & Deployment (tests, Docker, CI/CD, security)
 ### PR1-1: Admin User Invitations
 **Feedback:** Admin should be able to invite users by email with a pre-assigned role. Invited users create their own account using that email.
 **Current state:** Users self-register and pick their own role. No invite flow exists.
-**Status:** [ ] Decision pending — [ ] Implemented
+**Plan written:** Full invite-only auth flow planned (Invitation model, AcceptInvite page, disable self-registration). See plan file.
+**Status:** [x] Decision made — plan approved — [ ] Implemented
 
 ### PR1-2: Labour Market Demand Focus (Cross-Sector)
 **Feedback:** Main focus should be on labour market demand, not just trends. Should collect insights from different sectors. Should also track changes and trends over time.
-**Current state:** System tracks ICT sector only (20 roles). Demand forecasts and trend tracking are working. No cross-sector data.
-**Status:** [ ] Decision pending — [ ] Implemented
+**Current state:** Expanded to 9 sectors with multi-platform job scrapers. Sector classifier improved. Multi-sector reports with PDF generation added. Education planner pages filtered to AUCA's 2 sectors (ICT & Technology, Finance & Business).
+**Status:** [x] Decision made — [x] Implemented (Phase 4D)
 
 ### PR1-3: Data Generalization vs Detail
 **Feedback:** Group similar data where necessary, but keep detailed data where it provides better insights. Use generalization for some areas, detail for others.
@@ -707,13 +813,15 @@ Phase 9             Testing & Deployment (tests, Docker, CI/CD, security)
 
 ### PR1-4: Career Advice — Keep or Remove?
 **Feedback:** Need to decide whether career advice should be in the system. If kept, define what information and methods will drive the advice. Review and remove unnecessary career pages.
-**Current state:** CareerGuidance page exists (UI shell, mock data). Accessible to career_training_advisor and admin roles.
-**Status:** [ ] Decision pending — [ ] Implemented
+**Decision:** KEEP — but with 6 completely unique pages (not clones of analyst pages). Career advisor works at the individual student level: skill assessment, job matching, pathway building, placement tracking. Old shared Career*.tsx pages to be deleted.
+**Current state:** Full developer spec written (`docs/Career_Training_Advisor_Developer_Spec.md`). 6 unique pages designed with backend models, API endpoints, and implementation order. Assigned to colleague for implementation.
+**Status:** [x] Decision made — [ ] Implemented (spec done, build not started)
 
 ### PR1-5: Education Alignment
 **Feedback:** System should clearly show the relationship between education and labour market demand — which qualifications, courses, skills, and training programs are demanded by employers.
-**Current state:** Education page exists (UI shell, mock data). No real curriculum-to-demand mapping data.
-**Status:** [ ] Decision pending — [ ] Implemented
+**Decision:** Implemented for AUCA. Education planner pages now show curriculum-to-demand alignment per department, Innovation Center course mappings, and skills gap analysis.
+**Current state:** Education.tsx (training management), EducationTaxonomy.tsx (role taxonomy by faculty with alignment cards), EducationReports.tsx (curriculum alignment report template) — all fully built with AUCA's 4 departments, 40 roles, and employer skill data.
+**Status:** [x] Decision made — [x] Implemented (Phase 4E)
 
 ### PR1-6: Institution & University Graduate Tracking
 **Feedback:** Track the number of students graduating from each institution and entering the labour market. Understand how many graduates each institution produces and how they perform.
@@ -727,8 +835,9 @@ Phase 9             Testing & Deployment (tests, Docker, CI/CD, security)
 
 ### PR1-8: Page Audit — Remove Unnecessary Pages
 **Feedback:** Review current prototype, remove pages without clear purpose. Final system should be simple, organized, and focused on main objectives.
-**Current state:** 13 dashboard pages exist. Some may overlap or lack clear purpose for their target role.
-**Status:** [ ] Decision pending — [ ] Implemented
+**Decision:** Page isolation rule — every role gets its own standalone pages, no sharing except Settings. Old Career*.tsx clones (5 files, ~1668 lines) to be deleted when advisor pages are built. Education planner pages fully customized for AUCA.
+**Current state:** Education planner pages audited and rebuilt. Career advisor pages specified (6 unique). Old clone pages identified for deletion.
+**Status:** [x] Decision made — [x] Partially implemented (education done, career advisor pending)
 
 ### PR1-9: System Redesign & Research
 **Feedback:** The group should sit down together and redesign/review the system before continuing. Clearly define: purpose, goals, users, data sources, how to measure demand, how to track employability, how to connect education and labour market, which features are necessary vs removable.
@@ -756,6 +865,10 @@ Phase 9             Testing & Deployment (tests, Docker, CI/CD, security)
 | Django backend | `backend/` |
 | Django settings | `backend/skillsense_backend/settings.py` |
 | Django apps | `backend/{core,accounts,taxonomy,predictions,uploads,analytics,reports}/` |
+| **Career advisor spec** | `docs/Career_Training_Advisor_Developer_Spec.md` |
+| **Education planner pages** | `frontend_pages/src/pages/dashboard/Education*.tsx` (6 files) |
+| **Career advisor pages (TODO)** | `frontend_pages/src/pages/dashboard/Advisor*.tsx` (6 files, not yet created) |
+| **Old career clones (to delete)** | `frontend_pages/src/pages/dashboard/Career*.tsx` (5 files) |
 | ML model integration | `backend/predictions/ml/` |
 | **Production model (Two-Stage)** | `ml/phase2d_final_model.py` |
 | ML training script (v1, superseded) | `ml/train_model.py` |
