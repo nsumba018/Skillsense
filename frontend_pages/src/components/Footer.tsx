@@ -1,62 +1,73 @@
 import { MapPin } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { PHOTO_CREDITS } from './RootedInRwanda'
+
+const link = 'text-sm text-gray-400 transition-colors hover:text-white'
 
 export default function Footer() {
   return (
-    <footer id="contact" className="bg-dark-navy text-white scroll-mt-24">
-      <div className="container-1200 pt-20 pb-16">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
-          <div className="sm:col-span-2 lg:col-span-1">
-            <div className="mb-5" />
-            <Link to="/" className="flex items-center gap-2 mb-3 w-fit">
-              <img src="/logo_icon.webp" alt="SkillSense logo" className="h-7 w-auto" />
-              <span className="text-lg font-extrabold text-white tracking-tight">SkillSense</span>
+    <footer id="contact" className="scroll-mt-24 bg-dark-navy text-white">
+      <div className="container-1200 pb-14 pt-16">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
+          <div className="col-span-2 lg:col-span-1">
+            <Link to="/" className="mb-4 flex w-fit items-center gap-2">
+              <img src="/logo_icon.webp" alt="" className="h-8 w-auto" />
+              <span className="text-lg font-extrabold tracking-tight">SkillSense</span>
             </Link>
-            <p className="text-xs text-gray-400 leading-relaxed mb-2">
-              AI-powered ICT workforce intelligence for Rwanda: role-level demand
-              forecasts built on labour survey data and real job postings.
+            <p className="max-w-xs text-sm leading-relaxed text-gray-400">
+              AI-powered workforce intelligence for Rwanda: role-level demand forecasts built on labour survey data and real job postings.
+            </p>
+            <p className="mt-4 flex items-center gap-2 text-sm text-gray-400">
+              <MapPin className="h-4 w-4 shrink-0" /> Kigali, Rwanda
             </p>
           </div>
 
           <div>
-            <div className="mb-5" />
-            <h4 className="text-sm font-semibold mb-4">Explore</h4>
+            <h4 className="mb-4 text-sm font-semibold">Product</h4>
             <ul className="space-y-2.5">
-              <li><Link to="/signin" className="text-xs text-gray-400 hover:text-white transition-colors">Sign in</Link></li>
-              <li><a href="#how-it-works" className="text-xs text-gray-400 hover:text-white transition-colors">How it works</a></li>
-              <li><a href="#stakeholders" className="text-xs text-gray-400 hover:text-white transition-colors">Who it's for</a></li>
+              <li><a href="#features" className={link}>Features</a></li>
+              <li><a href="#how-it-works" className={link}>How it works</a></li>
+              <li><a href="#insights" className={link}>Why it matters</a></li>
+              <li><Link to="/signin" className={link}>Sign in</Link></li>
             </ul>
           </div>
 
           <div>
-            <div className="mb-5" />
-            <h4 className="text-sm font-semibold mb-4">Data Sources</h4>
-            <ul className="space-y-2.5 text-xs text-gray-400">
+            <h4 className="mb-4 text-sm font-semibold">Who it&apos;s for</h4>
+            <ul className="space-y-2.5">
+              <li><a href="#stakeholders" className={link}>Career &amp; Training Advisors</a></li>
+              <li><a href="#stakeholders" className={link}>Curriculum Planners</a></li>
+              <li><a href="#stakeholders" className={link}>Labour Market Analysts</a></li>
+              <li><a href="#stakeholders" className={link}>Administrators</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="mb-4 text-sm font-semibold">Data sources</h4>
+            <ul className="space-y-2.5 text-sm text-gray-400">
               <li>NISR Labour Force Survey</li>
               <li>RwandaJob · JobWebRwanda</li>
               <li>GreatRwandaJobs · JobInRwanda</li>
-            </ul>
-          </div>
-
-          <div>
-            <div className="mb-5" />
-            <h4 className="text-sm font-semibold mb-4">Based in</h4>
-            <ul className="space-y-2.5">
-              <li className="flex items-center gap-2 text-xs text-gray-400">
-                <MapPin className="w-3.5 h-3.5 shrink-0" />
-                Kigali, Rwanda
-              </li>
             </ul>
           </div>
         </div>
       </div>
 
       <div className="border-t border-white/10">
-        <div className="container-1200 flex flex-col md:flex-row items-center justify-between py-5 gap-4">
-          <p className="text-xs text-gray-500">
-            &copy; 2026 SkillSense: ICT Workforce Intelligence for Rwanda
-          </p>
+        <div className="container-1200 flex flex-col items-center justify-between gap-3 py-5 md:flex-row">
+          <p className="text-xs text-gray-500">&copy; 2026 SkillSense: workforce intelligence for Rwanda</p>
+          <p className="text-xs text-gray-500">A final-year project of the Department of Software Engineering, AUCA</p>
         </div>
+        <p className="container-1200 pb-6 text-center text-[11px] leading-relaxed text-gray-600 md:text-left">
+          Photos via Wikimedia Commons:{' '}
+          {Object.values(PHOTO_CREDITS).map((p, i) => (
+            <span key={p.src}>
+              {i > 0 && ' · '}
+              <a href={p.href} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:text-gray-300 hover:underline">{p.author}</a>
+              {' '}(<a href={p.licenseHref} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:text-gray-300 hover:underline">{p.license}</a>)
+            </span>
+          ))}
+        </p>
       </div>
     </footer>
   )
