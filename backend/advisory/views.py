@@ -12,9 +12,9 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.permissions import IsCareerTrainingAdvisor
 
 from . import stats
+from .permissions import IsCareerAdvisorOrAdmin
 from .models import Assessment, Placement, SavedPathway, StudentProfile
 from .pdf import report_pdf
 from .serializers import (
@@ -35,7 +35,7 @@ class AdvisoryPagination(PageNumberPagination):
 
 class AdvisoryView:
     """Every advisory endpoint is for career advisors (and administrators)."""
-    permission_classes = [IsCareerTrainingAdvisor]
+    permission_classes = [IsCareerAdvisorOrAdmin]
     pagination_class = AdvisoryPagination
 
 
@@ -249,6 +249,9 @@ JOB_PARAMS = [
     OpenApiParameter('q', str, required=False),
     OpenApiParameter('location', str, required=False),
     OpenApiParameter('days', OpenApiTypes.INT, required=False, description='Posted within the last N days'),
+    OpenApiParameter('student_id', OpenApiTypes.INT, required=False, description='Score each posting against this student'),
+    OpenApiParameter('only_matches', bool, required=False, description='With student_id: hide postings sharing no skill'),
+    OpenApiParameter('sort', str, required=False, description='"match": best fit for the student first'),
 ]
 
 
@@ -262,10 +265,24 @@ class JobListView(AdvisoryView, APIView):
     pagination_class = JobPagination
 
     def get(self, request):
-        qs = stats.filter_postings(request.query_params).select_related('sector').order_by('-posted_date', '-id')
+        params = request.query_params
+        qs = stats.filter_postings(params).select_related('sector').order_by('-posted_date', '-id')
+        sid = params.get('student_id', '')
+        student = StudentProfile.objects.filter(pk=sid).first() if sid.isdigit() else None
+        skills = student.skills if student else None
+        only = params.get('only_matches') in ('1', 'true')
+        best_first = params.get('sort') == 'match'
         paginator = JobPagination()
+        if student and (only or best_first):
+            # filtering or ordering by fit needs every posting scored, so score them first and page the result
+            cards = [stats.posting_card(p, skills) for p in qs[:stats.MATCH_SCAN_LIMIT]]
+            if only:
+                cards = [c for c in cards if c['matched']]
+            if best_first:
+                cards.sort(key=lambda c: (-(c['matched'] / c['required'] if c['required'] else 0), -c['matched']))
+            return paginator.get_paginated_response(paginator.paginate_queryset(cards, request, view=self))
         page = paginator.paginate_queryset(qs, request, view=self)
-        return paginator.get_paginated_response([stats.posting_card(p) for p in page])
+        return paginator.get_paginated_response([stats.posting_card(p, skills) for p in page])
 
 
 @extend_schema(parameters=JOB_PARAMS, responses=OpenApiTypes.OBJECT)

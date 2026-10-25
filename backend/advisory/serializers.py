@@ -4,7 +4,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from . import scoring
+from . import scoring, stats
 from .models import Assessment, Placement, SavedPathway, StudentProfile
 from .skills_data import ROLE_BY_NAME
 
@@ -62,17 +62,22 @@ class StudentSerializer(serializers.ModelSerializer):
 
 class AssessmentSerializer(serializers.ModelSerializer):
     student = serializers.SerializerMethodField()
+    priority_skills = serializers.SerializerMethodField()
 
     class Meta:
         model = Assessment
         fields = [
             'id', 'student', 'target_role', 'readiness_score', 'matched_skills', 'missing_skills',
-            'recommendations', 'alternative_roles', 'created_at',
+            'recommendations', 'alternative_roles', 'priority_skills', 'created_at',
         ]
 
     @extend_schema_field(OpenApiTypes.OBJECT)
     def get_student(self, obj):
         return _brief(obj.student)
+
+    @extend_schema_field(OpenApiTypes.OBJECT)
+    def get_priority_skills(self, obj):
+        return stats.priority_skills(obj.missing_skills)
 
 
 class AssessmentCreateSerializer(serializers.Serializer):
@@ -86,7 +91,11 @@ class AssessmentCreateSerializer(serializers.Serializer):
 
     def create(self, validated):
         student = validated['student']
-        result = scoring.assess(student.skills, validated['target_role'])
+        role = validated['target_role']
+        result = scoring.assess(student.skills, role)
+        # name the gaps that matter most to employers first, the same order the priority list uses
+        focus = [p['skill'] for p in stats.priority_skills(result['missing_skills'], limit=2)]
+        result = scoring.assess(student.skills, role, focus=focus)
         return Assessment.objects.create(student=student, assessed_by=self.context['request'].user, **result)
 
 

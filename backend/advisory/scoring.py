@@ -3,6 +3,7 @@ Skill matching and readiness scoring for the advisory app.
 
 Mirrors the client-side logic in frontend_pages/src/data/auca-skills.ts so the API and the UI agree.
 """
+import math
 import re
 from functools import lru_cache
 
@@ -37,6 +38,17 @@ def score_role(student_skills, role_name):
     return round(len(matched) / len(role['skills']) * 100, 1), matched, missing
 
 
+SELF_STUDY_WEEKS = 3
+
+
+def skill_learning(skill):
+    """(source, weeks) to learn one skill: the Innovation Center course covering it, else self-study."""
+    for course, c in INNOVATION_COURSES.items():
+        if any(is_skill_taught(skill, [cs]) for cs in c['skills']):
+            return f'Innovation Center: {course}', max(1, math.ceil(c['duration_weeks'] / len(c['skills'])))
+    return 'Self-study / online certification', SELF_STUDY_WEEKS
+
+
 def best_course_for(skills):
     """The Innovation Center course covering the most of `skills`, or None."""
     best = None
@@ -47,8 +59,13 @@ def best_course_for(skills):
     return best
 
 
-def assess(student_skills, target_role):
-    """Score a student against `target_role`; returns the fields stored on an Assessment."""
+def assess(student_skills, target_role, focus=None):
+    """
+    Score a student against `target_role`; returns the fields stored on an Assessment.
+
+    `focus` is the list of gaps to name first in the recommendation (the caller ranks them by market demand);
+    without it the first gaps in catalogue order are used.
+    """
     score, matched, missing = score_role(student_skills, target_role)
 
     alternatives = sorted(
@@ -66,7 +83,7 @@ def assess(student_skills, target_role):
     else:
         recs.append(
             f'{round(score)}% ready for {target_role}. '
-            f'To get past 90%, focus on {" and ".join(missing[:2])}.'
+            f'To get past 90%, focus on {" and ".join((focus or missing)[:2])}.'
         )
         course = best_course_for(missing)
         if course:
@@ -90,24 +107,32 @@ def assess(student_skills, target_role):
 
 @lru_cache(maxsize=1)
 def _skill_patterns():
-    """One compiled pattern per catalogue skill, for reading skills out of posting text."""
+    """{skill: (lowercase variants, compiled whole-word pattern)} for reading skills out of posting text."""
     patterns = {}
     for r in ROLES:
         for s in r['skills']:
             if s in patterns:
                 continue
             variants = {s, *(v.strip() for v in re.split(r'[()/]', s))}
-            variants = [v for v in variants if len(v) > 2]
+            variants = sorted(v.lower() for v in variants if len(v) > 2)
             if variants:
-                alt = '|'.join(re.escape(v.lower()) for v in variants)
-                patterns[s] = re.compile(rf'(?<![a-z0-9])(?:{alt})(?![a-z0-9])')
+                alt = '|'.join(re.escape(v) for v in variants)
+                patterns[s] = (variants, re.compile(rf'(?<![a-z0-9])(?:{alt})(?![a-z0-9])'))
     return patterns
 
 
 def extract_skills(text):
-    """Catalogue skills whose names appear in free text (a posting's title / description)."""
+    """
+    Catalogue skills whose names appear in free text (a posting's title / description).
+
+    A plain substring test runs first: nearly every skill is absent from any one posting, and skipping the regex for
+    those is what keeps scoring hundreds of postings fast.
+    """
     hay = (text or '').lower()
-    return [s for s, p in _skill_patterns().items() if p.search(hay)]
+    return [
+        skill for skill, (variants, pattern) in _skill_patterns().items()
+        if any(v in hay for v in variants) and pattern.search(hay)
+    ]
 
 
 def role_for_title(title):

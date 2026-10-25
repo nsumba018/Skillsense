@@ -322,6 +322,16 @@ class DashboardAndJobsTests(AdvisoryBase):
         thin = next(j for j in self.client.get('/api/advisory/jobs/?q=Irembo').data['results'])
         self.assertEqual(thin['skills_source'], 'role')
 
+    def test_skills_are_read_from_raw_text_when_description_is_empty(self):
+        # postings loaded by load_scraped_jobs keep their text in raw_text, not description
+        JobPosting.objects.create(
+            source='t', title='Backend Developer', company='Raw Co', sector=self.ict, posted_date=timezone.localdate(),
+            location_raw='Kigali', description='', raw_text='Skills: Python, Docker, PostgreSQL and REST APIs', is_ict=True,
+        )
+        card = next(j for j in self.client.get('/api/advisory/jobs/?q=Raw Co').data['results'])
+        self.assertEqual(card['skills_source'], 'posting')
+        self.assertTrue({'Python', 'Docker'} <= set(card['skills']))
+
     def test_job_insights(self):
         data = self.client.get('/api/advisory/jobs/insights/?sector=ict-technology').data
         self.assertEqual(data['total'], 3)

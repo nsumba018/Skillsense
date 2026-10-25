@@ -183,6 +183,10 @@ class Command(BaseCommand):
                         progress_pct=round(done / len(steps) * 100, 1),
                     )
                     counts['pathways'] += 1
+                    # some unfinished pathways have gone quiet, so "stalled" shows up on the dashboard
+                    if done < len(steps) and rng.random() < 0.3:
+                        quiet = timezone.now() - timedelta(days=rng.randint(35, 90))
+                        SavedPathway.objects.filter(student=student).update(updated_at=quiet)
 
             # ~75% of graduates are placed, starting 3 to 14 weeks after graduating
             if graduated and rng.random() < 0.75:

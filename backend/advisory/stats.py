@@ -10,13 +10,16 @@ from django.utils import timezone
 from uploads.models import JobPosting
 
 from . import scoring
-from .models import Assessment, Placement, StudentProfile
+from .models import Assessment, Placement, SavedPathway, StudentProfile
 
 TRACKED_SECTORS = ('ict-technology', 'finance-business')
 DEPARTMENTS = [code for code, _ in StudentProfile.Department.choices]
 DEPT_LABELS = dict(StudentProfile.Department.choices)
 ATTENTION_BELOW = 50  # readiness % under which a student needs a conversation
+ATTENTION_LIMIT = 50  # the dashboard shows the first few and lets the advisor expand the rest
+STALLED_DAYS = 30  # a saved pathway untouched this long, and not finished, counts as stalled
 SKILL_SCAN_LIMIT = 1000  # postings read when counting skill demand
+MATCH_SCAN_LIMIT = 1500  # postings scored when matching a student to the market
 
 
 # ── helpers ──────────────────────────────────────────────────────────
@@ -76,7 +79,13 @@ def filter_postings(params):
     if q:
         qs = qs.filter(Q(title__icontains=q) | Q(company__icontains=q))
     location = (params.get('location') or '').strip()
-    if location:
+    if location.lower() == 'other':
+        # anywhere in Rwanda outside Kigali City, using the same place lookup as the Geography page
+        from analytics.geo import locate
+        places = qs.exclude(location_raw='').values_list('location_raw', flat=True).distinct()
+        keep = {loc for loc in places if locate(loc) and locate(loc)[0] != 'Kigali City' and 'kigali' not in loc.lower()}
+        qs = qs.filter(location_raw__in=keep)
+    elif location:
         qs = qs.filter(location_raw__icontains=location)
     days = params.get('days')
     if days and str(days).isdigit():
@@ -123,14 +132,38 @@ def top_demanded_skills(qs, limit=15, cache_key=None):
         if hit is not None:
             return hit[:limit]
     counts = Counter()
-    rows = qs.order_by('-posted_date', '-id').values_list('title', 'description')[:SKILL_SCAN_LIMIT]
-    for title, desc in rows:
-        for s in scoring.extract_skills(f'{title} {(desc or "")[:2500]}'):
+    rows = qs.order_by('-posted_date', '-id').values_list('title', 'description', 'raw_text')[:SKILL_SCAN_LIMIT]
+    for title, desc, raw in rows:
+        # scraped postings keep their text in raw_text; uploaded ones in description
+        for s in scoring.extract_skills(f'{title} {(desc or raw or "")[:2500]}'):
             counts[s] += 1
-    out = [{'skill': s, 'count': n} for s, n in counts.most_common(30)]
+    out = [{'skill': s, 'count': n} for s, n in counts.most_common()]
     if cache_key:
         cache.set(cache_key, out, 600)
     return out[:limit]
+
+
+def skill_demand_map():
+    """{catalogue skill: number of tracked postings that mention it} (cached for ten minutes)."""
+    rows = top_demanded_skills(tracked_postings(), limit=10**6, cache_key='advisory:top-skills')
+    return {r['skill']: r['count'] for r in rows}
+
+
+def priority_skills(missing, limit=5):
+    """
+    The few gaps worth closing first: ranked by how many postings ask for the skill and how quickly it can be
+    learned (postings per week of study), so a widely demanded, short course comes before a rare, long one.
+    """
+    demand = skill_demand_map()
+    ranked = []
+    for skill in missing:
+        source, weeks = scoring.skill_learning(skill)
+        postings = demand.get(skill, 0)
+        ranked.append({'skill': skill, 'postings': postings, 'weeks': weeks, 'source': source, '_score': postings / weeks})
+    ranked.sort(key=lambda r: (-r['_score'], r['weeks'], r['skill']))
+    for r in ranked:
+        del r['_score']
+    return ranked[:limit]
 
 
 def _monthly_counts(qs, months=6):
@@ -181,14 +214,15 @@ def job_insights(qs):
     }
 
 
-def posting_card(p):
-    """One posting as the Job Navigator shows it, with the skills it asks for."""
-    text = f'{p.title} {(p.description or "")[:2500]}'
+def posting_card(p, student_skills=None):
+    """One posting as the Job Navigator shows it, with the skills it asks for (and, for a student, how many they have)."""
+    text = f'{p.title} {(p.description or p.raw_text or "")[:2500]}'
     skills = scoring.extract_skills(text)
     role = scoring.role_for_title(p.title)
     source = 'posting'
     if len(skills) < 3 and role:
         skills, source = list(role['skills']), 'role'
+    matched = [s for s in skills if scoring.has_skill(student_skills, s)] if student_skills is not None else None
     return {
         'id': p.id,
         'title': p.title,
@@ -201,6 +235,8 @@ def posting_card(p):
         'role': role['name'] if role else None,
         'skills': skills,
         'skills_source': source,
+        'matched': len(matched) if matched is not None else None,
+        'required': len(skills),
     }
 
 
@@ -219,16 +255,29 @@ def dashboard():
         by_dept[row['department']] = row['n']
 
     scores = [latest[s.id].readiness_score for s in active if s.id in latest]
+    now = timezone.now()
+    stalled = {}
+    for pw in SavedPathway.objects.filter(progress_pct__lt=100, updated_at__lt=now - timedelta(days=STALLED_DAYS)):
+        stalled[pw.student_id] = max(stalled.get(pw.student_id, 0), (now - pw.updated_at).days)
     attention = []
     for s in active:
         a = latest.get(s.id)
-        if a is None or a.readiness_score < ATTENTION_BELOW:
+        reasons = []
+        if a is None:
+            reasons.append('Not assessed yet')
+        elif a.readiness_score < ATTENTION_BELOW:
+            reasons.append(f'Readiness {round(a.readiness_score)}%')
+        if s.id in stalled:
+            reasons.append(f'Pathway stalled for {stalled[s.id]} days')
+        if reasons:
             attention.append({
                 'id': s.id, 'name': s.full_name, 'department': s.department,
                 'readiness': a.readiness_score if a else None,
                 'last_assessed': a.created_at.date().isoformat() if a else None,
+                'reasons': reasons,
             })
-    attention.sort(key=lambda r: (r['readiness'] is not None, r['readiness'] or 0, r['name']))
+    # never assessed first, then the lowest readiness, then students whose only problem is a stalled pathway
+    attention.sort(key=lambda r: (r['readiness'] is not None, r['readiness'] if r['readiness'] is not None else 0, r['name']))
 
     placed_recent = [
         {
@@ -246,7 +295,8 @@ def dashboard():
         'placement_rate': placement_stats()['placement_rate'],
         'open_positions': open_qs.count(),
         'students_by_department': by_dept,
-        'students_needing_attention': attention[:10],
+        'students_needing_attention': attention[:ATTENTION_LIMIT],
+        'attention_total': len(attention),
         'hot_roles': hot_roles(tracked),
         'recent_placements': placed_recent,
         'top_demanded_skills': top_demanded_skills(tracked, 15, cache_key='advisory:top-skills'),
@@ -287,7 +337,14 @@ def placement_stats(filters=None):
     for d in DEPARTMENTS:
         group = [s for s in eligible if s.department == d]
         placed = sum(1 for s in group if s.id in placed_ids)
-        by_department.append({'department': d, 'placed': placed, 'total': len(group), 'rate': _rate(placed, len(group))})
+        dept_days = [
+            max(0, (first_start[s.id] - s.graduated_on).days)
+            for s in group if s.graduated_on and s.id in first_start
+        ]
+        by_department.append({
+            'department': d, 'placed': placed, 'total': len(group), 'rate': _rate(placed, len(group)),
+            'avg_days': round(sum(dept_days) / len(dept_days)) if dept_days else None,
+        })
 
     by_gender = {}
     for g, label in (('M', 'M'), ('F', 'F'), ('', 'unspecified')):
@@ -298,6 +355,20 @@ def placement_stats(filters=None):
 
     keys = _month_keys(12)
     per_month = Counter(p.start_date.strftime('%Y-%m') for p in placements)
+
+    # Placement rate over time: by the end of each month, what share of the graduates so far had started a job?
+    def graduated_by(s):
+        d = s.graduated_on or (date(s.graduation_year, 6, 30) if s.graduation_year else s.created_at.date())
+        return min(d, first_start[s.id]) if s.id in first_start else d  # a placement implies they had finished
+
+    grad_dates = {s.id: graduated_by(s) for s in eligible}
+    rate_series = []
+    for k in keys:
+        y, m = int(k[:4]), int(k[5:])
+        end = (date(y + (m == 12), m % 12 + 1, 1)) - timedelta(days=1)
+        grads = sum(1 for d in grad_dates.values() if d <= end)
+        placed_by = sum(1 for sid, d in first_start.items() if d <= end and sid in grad_dates)
+        rate_series.append({'month': k, 'graduates': grads, 'placed': placed_by, 'rate': _rate(placed_by, grads)})
 
     return {
         'total_placed': len(placed_ids),
@@ -310,6 +381,7 @@ def placement_stats(filters=None):
         'top_employers': [{'company': c, 'count': n} for c, n in Counter(p.company for p in placements).most_common(10)],
         'by_role': [{'role': r, 'count': n} for r, n in Counter(p.role_title for p in placements).most_common(10)],
         'by_month': [{'month': k, 'count': per_month.get(k, 0)} for k in keys],
+        'rate_series': rate_series,
         'this_month': per_month.get(keys[-1], 0),
         'by_contract': [{'contract': c, 'count': n} for c, n in Counter(p.contract_type for p in placements).most_common()],
         'by_method': [{'method': m or 'Not recorded', 'count': n} for m, n in Counter(p.placement_method for p in placements).most_common()],
@@ -333,6 +405,8 @@ def student_readiness_report(student):
         )[:3]
     ]
     assessments = [scoring.assess(student.skills, r) for r in roles]
+    for a in assessments:
+        a['priority_skills'] = priority_skills(a['missing_skills'])
     return {
         'type': 'student_readiness',
         'title': f'Student Readiness Report: {student.full_name}',
