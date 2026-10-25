@@ -43,6 +43,14 @@ export interface CreateStudentPayload {
   notes?: string
 }
 
+export interface PrioritySkill {
+  skill: string
+  /** Postings in the tracked sectors that mention it; null when the browser scored offline. */
+  postings: number | null
+  weeks: number
+  source: string
+}
+
 export interface AssessmentResult {
   id: number
   student: { id: number; name: string; department: DeptCode }
@@ -52,6 +60,7 @@ export interface AssessmentResult {
   missing_skills: string[]
   recommendations: string[]
   alternative_roles: { role: string; score: number }[]
+  priority_skills: PrioritySkill[]
   created_at: string
 }
 
@@ -108,12 +117,14 @@ export interface PlacementStats {
   total_graduated: number
   placement_rate: number
   avg_days_to_placement: number | null
-  by_department: { department: DeptCode; placed: number; total: number; rate: number }[]
+  by_department: { department: DeptCode; placed: number; total: number; rate: number; avg_days: number | null }[]
   by_gender: Record<string, { placed: number; total: number }>
   female_share_of_placed: number
   top_employers: { company: string; count: number }[]
   by_role: { role: string; count: number }[]
   by_month: { month: string; count: number }[]
+  /** Share of graduates so far who had started a job, at the end of each of the last 12 months. */
+  rate_series: { month: string; graduates: number; placed: number; rate: number }[]
   this_month: number
   by_contract: { contract: ContractType; count: number }[]
   by_method: { method: string; count: number }[]
@@ -128,12 +139,14 @@ export interface AdvisorDashboardData {
   placement_rate: number
   open_positions: number
   students_by_department: Record<DeptCode, number>
+  attention_total: number
   students_needing_attention: {
     id: number
     name: string
     department: DeptCode
     readiness: number | null
     last_assessed: string | null
+    reasons: string[]
   }[]
   hot_roles: { role: string; postings: number; trend: DemandTrend }[]
   recent_placements: { student: string; role: string; company: string; date: string }[]
@@ -152,6 +165,9 @@ export interface AdvisorJob {
   role: string | null
   skills: string[]
   skills_source: 'posting' | 'role'
+  /** How many of this posting's skills the linked student has (null when no student is linked). */
+  matched: number | null
+  required: number
 }
 
 export interface JobFilters {
@@ -161,6 +177,9 @@ export interface JobFilters {
   location?: string
   days?: number
   page?: number
+  student_id?: number
+  only_matches?: boolean
+  sort?: 'match'
 }
 
 export interface JobInsights {

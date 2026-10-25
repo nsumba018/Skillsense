@@ -31,7 +31,7 @@ import {
   assessStudent,
   type DeptCode,
 } from '../../data/auca-skills'
-import type { CreateStudentPayload } from '../../types/advisory'
+import type { CreateStudentPayload, PrioritySkill } from '../../types/advisory'
 
 const MAX_ROLES = 3
 
@@ -43,6 +43,7 @@ interface ResultView {
   other: string[]
   recommendations: string[]
   alternatives: { role: string; score: number }[]
+  priority: PrioritySkill[]
 }
 
 const sameList = (a: string[], b: string[]) => a.length === b.length && a.every((v, i) => v === b[i])
@@ -141,6 +142,7 @@ export default function AdvisorAssessment() {
               missing: a.missing_skills,
               recommendations: a.recommendations,
               alternatives: a.alternative_roles,
+              priority: a.priority_skills,
             }),
           ),
         }
@@ -158,6 +160,7 @@ export default function AdvisorAssessment() {
               missing: a.missing_skills,
               recommendations: a.recommendations,
               alternatives: a.alternative_roles,
+              priority: a.priority_skills,
             })
           }),
         }
@@ -362,6 +365,32 @@ export default function AdvisorAssessment() {
                 <div className="mt-5">
                   <h3 className="mb-2 text-sm font-bold text-gray-600">Skills the student has that this role does not prioritise</h3>
                   <div className="flex flex-wrap gap-2">{r.other.map((s) => <Pill key={s} tone="other">{s}</Pill>)}</div>
+                </div>
+              )}
+
+              {r.priority.length > 0 && (
+                <div className="mt-6" data-testid="priority-skills">
+                  <h3 className="mb-1 text-sm font-bold text-gray-800">Priority skills to acquire</h3>
+                  <p className="mb-3 text-xs text-gray-500">
+                    {r.priority.some((p) => p.postings !== null)
+                      ? 'Ranked by how many job postings ask for the skill and how quickly it can be learned.'
+                      : 'Ranked by how quickly each can be learned. Posting demand is unavailable while offline.'}
+                  </p>
+                  <ol className="space-y-2">
+                    {r.priority.map((p, i) => (
+                      <li key={p.skill} className="flex items-center gap-3 rounded-xl border border-gray-200 px-4 py-3">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-light text-xs font-extrabold text-primary">{i + 1}</span>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-bold text-gray-900">{p.skill}</div>
+                          <div className="truncate text-xs text-gray-500">{p.source}</div>
+                        </div>
+                        <div className="shrink-0 text-right text-xs text-gray-600">
+                          {p.postings !== null && <div className="font-semibold text-gray-800">{p.postings} posting{p.postings === 1 ? '' : 's'}</div>}
+                          <div>about {p.weeks} week{p.weeks === 1 ? '' : 's'}</div>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
                 </div>
               )}
 

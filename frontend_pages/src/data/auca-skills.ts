@@ -4,6 +4,8 @@
  * on them. `backend/advisory/skills_data.py` mirrors the role and course data; keep the two in step.
  */
 
+import type { PrioritySkill } from '../types/advisory'
+
 export type Sector = 'ict' | 'business'
 export type DeptCode = 'se' | 'net' | 'fin' | 'ba'
 
@@ -188,6 +190,11 @@ export const DEPT_CURRICULA: Record<DeptCode, Set<string>> = {
   ]),
 }
 
+/** The same curricula keyed by department name, for pages that work with the labels. */
+export const DEPT_CURRICULA_BY_LABEL: Record<string, Set<string>> = Object.fromEntries(
+  (Object.keys(DEPT_LABEL) as DeptCode[]).map((c) => [DEPT_LABEL[c], DEPT_CURRICULA[c]]),
+)
+
 /* ══════════ AUCA Innovation Center courses ══════════ */
 
 export interface InnovationCourse {
@@ -269,6 +276,7 @@ export interface ClientAssessment {
   other_skills: string[]
   recommendations: string[]
   alternative_roles: { role: string; score: number }[]
+  priority_skills: PrioritySkill[]
 }
 
 export function scoreRole(studentSkills: string[], roleName: string): { score: number; matched: string[]; missing: string[] } {
@@ -289,6 +297,26 @@ export function bestCourseFor(skills: string[]): { course: string; covers: strin
   return best
 }
 
+const SELF_STUDY_WEEKS = 3
+
+/** Where a skill is taught and about how many weeks it takes: the Innovation Center course, else self-study. */
+export function skillLearning(skill: string): { source: string; weeks: number } {
+  const found = Object.entries(INNOVATION_COURSES).find(([, c]) => c.skills.some((cs) => isSkillTaught(skill, new Set([cs]))))
+  if (!found) return { source: 'Self-study / online certification', weeks: SELF_STUDY_WEEKS }
+  return { source: `Innovation Center: ${found[0]}`, weeks: Math.max(1, Math.ceil(found[1].duration_weeks / found[1].skills.length)) }
+}
+
+/**
+ * Offline stand-in for the server's ranking. The server orders gaps by how many postings ask for them per week of study;
+ * without posting data the browser can only put the quickest-to-learn gaps first.
+ */
+export function priorityFallback(missing: string[], limit = 5): PrioritySkill[] {
+  return missing
+    .map((skill) => ({ skill, postings: null, ...skillLearning(skill) }))
+    .sort((a, b) => a.weeks - b.weeks || a.skill.localeCompare(b.skill))
+    .slice(0, limit)
+}
+
 export function assessStudent(studentSkills: string[], targetRole: string): ClientAssessment {
   const { score, matched, missing } = scoreRole(studentSkills, targetRole)
   const role = ROLE_BY_NAME[targetRole]
@@ -306,7 +334,7 @@ export function assessStudent(studentSkills: string[], targetRole: string): Clie
   } else if (!missing.length) {
     recommendations.push(`Fully matched for ${targetRole}. Focus on projects, a portfolio and applications.`)
   } else {
-    const next = missing.slice(0, 2)
+    const next = priorityFallback(missing, 2).map((p) => p.skill)
     recommendations.push(
       `${Math.round(score)}% ready for ${targetRole}. To get past 90%, focus on ${next.join(' and ')}.`,
     )
@@ -332,6 +360,7 @@ export function assessStudent(studentSkills: string[], targetRole: string): Clie
     other_skills: other,
     recommendations,
     alternative_roles: alternatives,
+    priority_skills: priorityFallback(missing),
   }
 }
 

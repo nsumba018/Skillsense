@@ -171,6 +171,11 @@ function StudentReadiness({ r }: { r: StudentReadinessReport }) {
             {a.matched_skills.map((k) => <Pill key={k} tone="match">{k}</Pill>)}
             {a.missing_skills.map((k) => <Pill key={k} tone="gap">{k}</Pill>)}
           </div>
+          {a.priority_skills?.length > 0 && (
+            <p className="mt-3 text-sm text-gray-700">
+              <strong>Learn first:</strong> {a.priority_skills.map((p) => `${p.skill} (${p.postings ?? 0} postings, about ${p.weeks} wk)`).join(', ')}
+            </p>
+          )}
           <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-gray-700">{a.recommendations.map((t, i) => <li key={i}>{t}</li>)}</ul>
         </div>
       ))}

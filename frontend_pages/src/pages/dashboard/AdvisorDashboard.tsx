@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowDown, ArrowRight, ArrowUp, Briefcase, GraduationCap, Minus, Target, TrendingUp, UserCheck, Users } from 'lucide-react'
 import DashboardLayout, { Card } from './DashboardLayout'
@@ -50,6 +51,9 @@ export function SkillHeatmap({ skills }: { skills: { skill: string; count: numbe
 
 function Body({ d }: { d: AdvisorDashboardData }) {
   const noStudents = d.active_students === 0 && d.recent_placements.length === 0
+  const [showAll, setShowAll] = useState(false)
+  const FEW = 8
+  const attention = showAll ? d.students_needing_attention : d.students_needing_attention.slice(0, FEW)
 
   return (
     <>
@@ -96,7 +100,7 @@ function Body({ d }: { d: AdvisorDashboardData }) {
       )}
 
       <Card className="mt-6 p-6">
-        <SectionTitle hint="Never assessed, or readiness below 50%. Start your meetings here.">Students needing attention</SectionTitle>
+        <SectionTitle hint="Never assessed, readiness below 50%, or a saved pathway with no progress for 30 days. Start your meetings here.">Students needing attention</SectionTitle>
         {d.students_needing_attention.length === 0 ? (
           <EmptyState title="Nobody needs attention right now" hint="Every active student has been assessed at 50% readiness or above." />
         ) : (
@@ -112,9 +116,23 @@ function Body({ d }: { d: AdvisorDashboardData }) {
                 </tr>
               </thead>
               <tbody>
-                {d.students_needing_attention.map((s) => (
+                {attention.map((s) => (
                   <tr key={s.id} className="border-b border-gray-100 last:border-0">
-                    <td className="py-3 pr-4 font-semibold text-gray-900">{s.name}</td>
+                    <td className="py-3 pr-4 font-semibold text-gray-900">
+                      {s.name}
+                      <div className="mt-1 flex flex-wrap gap-1.5">
+                        {s.reasons.map((r) => (
+                          <span
+                            key={r}
+                            className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                              r.startsWith('Readiness') ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-700'
+                            }`}
+                          >
+                            {r}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
                     <td className="py-3 pr-4 text-gray-600">{DEPT_LABEL[s.department]}</td>
                     <td className="w-48 py-3 pr-4">
                       {s.readiness == null ? (
@@ -137,6 +155,11 @@ function Body({ d }: { d: AdvisorDashboardData }) {
               </tbody>
             </table>
           </div>
+        )}
+        {d.students_needing_attention.length > FEW && (
+          <button type="button" onClick={() => setShowAll(!showAll)} className="mt-4 text-sm font-semibold text-primary hover:underline">
+            {showAll ? 'Show fewer' : `Show all ${d.attention_total} students`}
+          </button>
         )}
       </Card>
 

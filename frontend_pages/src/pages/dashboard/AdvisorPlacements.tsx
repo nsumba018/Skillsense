@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { BarChart4, CalendarClock, ChevronDown, ChevronUp, GraduationCap, Loader2, Plus, Search, Trash2, Upload, Users } from 'lucide-react'
+import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { ArrowDown, ArrowUp, BarChart4, CalendarClock, ChevronDown, ChevronsUpDown, ChevronUp, GraduationCap, Loader2, Plus, Search, Trash2, Upload, Users } from 'lucide-react'
 import DashboardLayout, { Card } from './DashboardLayout'
 import { Donut, DONUT_COLORS } from './charts'
 import {
@@ -25,7 +25,7 @@ import { advisoryApi } from '../../services/api'
 import { usePlacementStats, usePlacements } from '../../services/queries'
 import { DEPT_LABEL } from '../../data/auca-skills'
 import { fmtDate, fmtInt, fmtPct } from '../../lib/format'
-import type { ContractType, DeptCode, PlacementStats } from '../../types/advisory'
+import type { ContractType, DeptCode, PlacementRecord, PlacementStats } from '../../types/advisory'
 
 const CONTRACTS: { value: ContractType; label: string }[] = [
   { value: 'full_time', label: 'Full-time' },
@@ -151,19 +151,69 @@ function BulkImport() {
   )
 }
 
+const TARGET_KEY = 'ss_placement_target'
+const readTarget = (): string => {
+  try { return localStorage.getItem(TARGET_KEY) ?? '' } catch { return '' }
+}
+
+type Metric = 'rate' | 'count'
+type Grain = 'monthly' | 'quarterly'
+
+const quarterLabel = (key: string) => `Q${Math.ceil(Number(key.slice(5)) / 3)} ${key.slice(2, 4)}`
+
+/** The chart series for the chosen measure and granularity. */
+function chartSeries(s: PlacementStats, metric: Metric, grain: Grain): { label: string; value: number }[] {
+  if (metric === 'rate') {
+    const rows = grain === 'monthly' ? s.rate_series : s.rate_series.filter((r, i, all) => Number(r.month.slice(5)) % 3 === 0 || i === all.length - 1)
+    return rows.map((r) => ({ label: grain === 'monthly' ? monthLabel(r.month) : quarterLabel(r.month), value: r.rate }))
+  }
+  if (grain === 'monthly') return s.by_month.map((m) => ({ label: monthLabel(m.month), value: m.count }))
+  const byQuarter = new Map<string, number>()
+  for (const m of s.by_month) byQuarter.set(quarterLabel(m.month), (byQuarter.get(quarterLabel(m.month)) ?? 0) + m.count)
+  return [...byQuarter].map(([label, value]) => ({ label, value }))
+}
+
+function Segmented<T extends string>({ value, onChange, options, label }: { value: T; onChange: (v: T) => void; options: { v: T; label: string }[]; label: string }) {
+  return (
+    <div className="inline-flex rounded-lg bg-gray-100 p-1" role="tablist" aria-label={label}>
+      {options.map((o) => (
+        <button
+          key={o.v}
+          role="tab"
+          aria-selected={value === o.v}
+          onClick={() => onChange(o.v)}
+          className={`rounded-md px-3 py-1.5 text-xs font-bold transition-colors ${value === o.v ? 'bg-white text-navy shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 function Analytics({ s }: { s: PlacementStats }) {
+  const [metric, setMetric] = useState<Metric>('rate')
+  const [grain, setGrain] = useState<Grain>('monthly')
+  const [targetText, setTargetText] = useState(readTarget)
+  const target = targetText.trim() !== '' && Number.isFinite(Number(targetText)) && Number(targetText) >= 0 && Number(targetText) <= 100 ? Number(targetText) : null
+  const setTarget = (v: string) => {
+    setTargetText(v)
+    try { localStorage.setItem(TARGET_KEY, v) } catch { /* storage unavailable: the target just won't persist */ }
+  }
+  const series = useMemo(() => chartSeries(s, metric, grain), [s, metric, grain])
+
   const gender = ['F', 'M', 'unspecified']
     .map((k, i) => ({ name: k === 'F' ? 'Female' : k === 'M' ? 'Male' : 'Not stated', value: s.by_gender[k]?.placed ?? 0, color: DONUT_COLORS[i] }))
     .filter((g) => g.value > 0)
-  const chart = s.by_month.map((m) => ({ ...m, label: monthLabel(m.month) }))
   const maxEmp = Math.max(1, ...s.top_employers.map((e) => e.count))
   const maxRole = Math.max(1, ...s.by_role.map((e) => e.count))
+  const noGraduates = s.total_graduated === 0
 
   return (
     <>
       <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-4">
         <Kpi label="Placed" icon={Users} value={fmtInt(s.total_placed)} hint={`of ${fmtInt(s.total_graduated)} graduates`} />
-        <Kpi label="Placement rate" icon={GraduationCap} value={fmtPct(s.placement_rate, 0)} />
+        <Kpi label="Placement rate" icon={GraduationCap} value={fmtPct(s.placement_rate, 0)} hint={target !== null ? `Target ${target}%` : undefined} />
         <Kpi
           label="Days to placement"
           icon={CalendarClock}
@@ -174,29 +224,66 @@ function Analytics({ s }: { s: PlacementStats }) {
       </div>
 
       <Card className="mt-6 p-6">
-        <SectionTitle hint="By start date, last 12 months.">Placements over time</SectionTitle>
-        <div className="h-64" role="img" aria-label="Placements per month">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chart} margin={{ left: -20, right: 8, top: 8 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-              <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#94a3b8' }} />
-              <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
-              <Tooltip />
-              <Line type="monotone" dataKey="count" name="Placements" stroke="#1D4ED8" strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
-            </LineChart>
-          </ResponsiveContainer>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <SectionTitle hint={metric === 'rate' ? 'Share of graduates so far who had started a job, at the end of each period.' : 'Placements starting in each period.'}>
+            {metric === 'rate' ? 'Placement rate over time' : 'Placements over time'}
+          </SectionTitle>
+          <div className="flex flex-wrap items-center gap-3">
+            <Segmented label="Measure" value={metric} onChange={setMetric} options={[{ v: 'rate', label: 'Rate' }, { v: 'count', label: 'Count' }]} />
+            <Segmented label="Granularity" value={grain} onChange={setGrain} options={[{ v: 'monthly', label: 'Monthly' }, { v: 'quarterly', label: 'Quarterly' }]} />
+          </div>
         </div>
+        {noGraduates ? (
+          <p className="py-10 text-center text-sm text-gray-400">No graduates in this selection yet.</p>
+        ) : (
+          <div className="h-64" role="img" aria-label={metric === 'rate' ? 'Placement rate over time' : 'Placements over time'}>
+            <ResponsiveContainer width="100%" height={256}>
+              <LineChart data={series} margin={{ left: -14, right: 12, top: 12 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                <YAxis
+                  allowDecimals={false}
+                  domain={metric === 'rate' ? [0, 100] : [0, 'auto']}
+                  tickFormatter={(v) => (metric === 'rate' ? `${v}%` : String(v))}
+                  tick={{ fontSize: 10, fill: '#94a3b8' }}
+                />
+                <Tooltip formatter={(v) => [metric === 'rate' ? `${v}%` : v, metric === 'rate' ? 'Placement rate' : 'Placements']} />
+                {metric === 'rate' && target !== null && (
+                  <ReferenceLine y={target} stroke="#10b981" strokeDasharray="6 4" label={{ value: `Target ${target}%`, position: 'insideTopRight', fill: '#059669', fontSize: 11, fontWeight: 700 }} />
+                )}
+                <Line type="monotone" dataKey="value" stroke="#1D4ED8" strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+        {metric === 'rate' && (
+          <label className="mt-4 flex flex-wrap items-center gap-3 text-sm text-gray-600">
+            <span className="font-semibold text-gray-800">Placement target (%)</span>
+            <input
+              inputMode="decimal"
+              value={targetText}
+              onChange={(e) => setTarget(e.target.value)}
+              placeholder="e.g. your funder's KPI"
+              aria-label="Placement target percent"
+              className={`${inputClass} !w-44`}
+            />
+            <span className="text-xs text-gray-400">Optional. Draws a line on the chart. Saved in this browser only.</span>
+          </label>
+        )}
       </Card>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card className="p-6">
-          <SectionTitle hint="Placed graduates as a share of each department's graduates.">By department</SectionTitle>
+          <SectionTitle hint="Placed graduates as a share of each department's graduates, and how long they took.">By department</SectionTitle>
           <ul className="space-y-4">
             {s.by_department.map((d) => (
               <li key={d.department}>
-                <div className="flex justify-between text-sm">
+                <div className="flex flex-wrap justify-between gap-x-3 text-sm">
                   <span className="font-semibold text-gray-800">{DEPT_LABEL[d.department]}</span>
-                  <span className="text-gray-500">{d.total ? `${fmtPct(d.rate, 0)} · ${d.placed}/${d.total}` : 'No graduates'}</span>
+                  <span className="text-gray-500">
+                    {d.total ? `${fmtPct(d.rate, 0)} · ${d.placed}/${d.total}` : 'No graduates'}
+                    {d.avg_days != null && <span className="ml-2 text-gray-400">· {fmtInt(d.avg_days)} days to place</span>}
+                  </span>
                 </div>
                 <ReadinessBar score={d.total ? d.rate : null} className="mt-1.5" />
               </li>
@@ -256,9 +343,20 @@ function Analytics({ s }: { s: PlacementStats }) {
   )
 }
 
+type SortKey = 'student' | 'role' | 'company' | 'start' | 'contract' | 'method'
+const COLUMNS: { key: SortKey; label: string }[] = [
+  { key: 'student', label: 'Student' },
+  { key: 'role', label: 'Role' },
+  { key: 'company', label: 'Company' },
+  { key: 'start', label: 'Start' },
+  { key: 'contract', label: 'Contract' },
+  { key: 'method', label: 'Method' },
+]
+
 function PlacementTable() {
   const qc = useQueryClient()
   const [search, setSearch] = useState('')
+  const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: 'start', dir: -1 })
   const list = usePlacements(search)
   const del = useMutation({
     mutationFn: (id: number) => advisoryApi.deletePlacement(id),
@@ -266,6 +364,23 @@ function PlacementTable() {
       for (const k of ['placements', 'placement-stats', 'students', 'student', 'advisor-dashboard']) qc.invalidateQueries({ queryKey: [k] })
     },
   })
+
+  const rows = useMemo(() => {
+    const value = (p: PlacementRecord): string => {
+      switch (sort.key) {
+        case 'student': return p.student.name
+        case 'role': return p.role_title
+        case 'company': return p.company
+        case 'start': return p.start_date
+        case 'contract': return CONTRACT_LABEL[p.contract_type]
+        default: return p.placement_method
+      }
+    }
+    return [...(list.data?.results ?? [])].sort((x, y) => value(x).localeCompare(value(y), undefined, { sensitivity: 'base' }) * sort.dir)
+  }, [list.data, sort])
+
+  const toggle = (key: SortKey) => setSort((cur) => (cur.key === key ? { key, dir: cur.dir === 1 ? -1 : 1 } : { key, dir: key === 'start' ? -1 : 1 }))
+
   return (
     <Card className="mt-6 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -275,18 +390,29 @@ function PlacementTable() {
           <input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search student, company, role…" aria-label="Search placements" className={`${inputClass} pl-9`} />
         </div>
       </div>
-      {list.isLoading ? <Loading /> : !list.data || list.data.results.length === 0 ? (
+      {list.isLoading ? <Loading /> : rows.length === 0 ? (
         <EmptyState title={search ? 'No placements match your search' : 'No placements recorded yet'} hint={search ? undefined : 'Use "Record a placement" above.'} />
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-500">
-                {['Student', 'Role', 'Company', 'Start', 'Contract', 'Method', ''].map((h) => <th key={h} className="py-2 pr-4 font-bold">{h}</th>)}
+                {COLUMNS.map((c) => {
+                  const active = sort.key === c.key
+                  return (
+                    <th key={c.key} scope="col" aria-sort={active ? (sort.dir === 1 ? 'ascending' : 'descending') : 'none'} className="py-2 pr-4 font-bold">
+                      <button type="button" onClick={() => toggle(c.key)} className="inline-flex items-center gap-1 uppercase tracking-wide hover:text-gray-900">
+                        {c.label}
+                        {active ? (sort.dir === 1 ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ChevronsUpDown className="h-3 w-3 text-gray-300" />}
+                      </button>
+                    </th>
+                  )
+                })}
+                <th scope="col" aria-label="Actions" className="py-2" />
               </tr>
             </thead>
             <tbody>
-              {list.data.results.map((p) => (
+              {rows.map((p) => (
                 <tr key={p.id} className="border-b border-gray-100 last:border-0">
                   <td className="py-3 pr-4 font-semibold text-gray-900">{p.student.name}<span className="ml-2 text-xs font-normal text-gray-400">{DEPT_SHORT[p.student.department as DeptCode]}</span></td>
                   <td className="py-3 pr-4 text-gray-700">{p.role_title}</td>

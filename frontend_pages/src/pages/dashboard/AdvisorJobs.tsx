@@ -21,6 +21,13 @@ import { ROLES, hasSkill } from '../../data/auca-skills'
 import { fmtDate, fmtInt } from '../../lib/format'
 import type { AdvisorJob, JobFilters } from '../../types/advisory'
 
+const LOCATIONS = [
+  { value: '', label: 'Anywhere' },
+  { value: 'kigali', label: 'Kigali' },
+  { value: 'remote', label: 'Remote' },
+  { value: 'other', label: 'Other provinces' },
+]
+
 const RECENCY = [
   { label: 'Any time', days: 0 },
   { label: 'Last 30 days', days: 30 },
@@ -83,7 +90,7 @@ function JobCard({ job, studentSkills }: { job: AdvisorJob; studentSkills: strin
       <div className="mt-4 flex items-center justify-between gap-2 border-t border-gray-100 pt-3">
         {linked ? (
           <span className="text-sm font-bold text-gray-800" data-testid="match-score">
-            Matches {matched.length} of {job.skills.length} skills
+            Matches {job.matched ?? matched.length} of {job.required || job.skills.length} skills
           </span>
         ) : (
           <span className="text-xs text-gray-400">{job.source}</span>
@@ -108,23 +115,30 @@ export default function AdvisorJobs() {
   const [days, setDays] = useState(0)
   const [q, setQ] = useState('')
   const [location, setLocation] = useState('')
+  const [onlyMatches, setOnlyMatches] = useState(false)
+  const [bestFirst, setBestFirst] = useState(false)
   const [page, setPage] = useState(1)
   const dq = useDebounced(q)
-  const dloc = useDebounced(location)
 
+  // what the market looks like (also drives the company and trend panels)
   const filters = useMemo(
     () => ({
       sector: sector || undefined,
       role: role || undefined,
       q: dq || undefined,
-      location: dloc || undefined,
+      location: location || undefined,
       days: days || undefined,
     }),
-    [sector, role, dq, dloc, days],
+    [sector, role, dq, location, days],
   )
-  useEffect(() => setPage(1), [filters])
+  // how well each posting fits the linked student; only applies while a student is linked
+  const fit = useMemo(
+    () => (studentId === null ? {} : { student_id: studentId, only_matches: onlyMatches || undefined, sort: bestFirst ? ('match' as const) : undefined }),
+    [studentId, onlyMatches, bestFirst],
+  )
+  useEffect(() => setPage(1), [filters, fit])
 
-  const jobs = useAdvisorJobs({ ...filters, page } as JobFilters)
+  const jobs = useAdvisorJobs({ ...filters, ...fit, page } as JobFilters)
   const insights = useJobInsights(filters)
 
   const studentSkills = student.data ? student.data.skills : null
@@ -155,7 +169,9 @@ export default function AdvisorJobs() {
             </select>
           </Field>
           <Field label="Location">
-            <input className={inputClass} value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Kigali, Remote, Huye…" />
+            <select className={inputClass} value={location} onChange={(e) => setLocation(e.target.value)}>
+              {LOCATIONS.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
+            </select>
           </Field>
           <Field label="Posted">
             <select className={inputClass} value={days} onChange={(e) => setDays(Number(e.target.value))}>
@@ -181,6 +197,18 @@ export default function AdvisorJobs() {
             Matching against <strong>{student.data.name}</strong>'s {student.data.skills.length} skill{student.data.skills.length === 1 ? '' : 's'}.
             {student.data.skills.length === 0 && ' Add skills on the Skill Assessment page to see matches.'}
           </p>
+        )}
+        {studentId !== null && (
+          <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+            <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700">
+              <input type="checkbox" checked={onlyMatches} onChange={(e) => setOnlyMatches(e.target.checked)} className="h-4 w-4 accent-[#1D4ED8]" />
+              Only postings that ask for a skill this student has
+            </label>
+            <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700">
+              <input type="checkbox" checked={bestFirst} onChange={(e) => setBestFirst(e.target.checked)} className="h-4 w-4 accent-[#1D4ED8]" />
+              Best match first
+            </label>
+          </div>
         )}
       </Card>
 
