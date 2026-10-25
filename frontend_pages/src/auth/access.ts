@@ -6,18 +6,28 @@ import type { UserRole } from '../types/api'
  */
 export const ALL_ROLES: UserRole[] = ['admin', 'career_training_advisor', 'education_curriculum_planner', 'labor_market_analyst']
 
+const NOT_ADVISOR: UserRole[] = ['admin', 'education_curriculum_planner', 'labor_market_analyst']
+const ADVISOR_ONLY: UserRole[] = ['admin', 'career_training_advisor']
+
 export const ACCESS: Record<string, UserRole[]> = {
-  '/dashboard': ALL_ROLES,
-  '/dashboard/forecast': ['admin', 'career_training_advisor', 'education_curriculum_planner'],
-  '/dashboard/taxonomy': ALL_ROLES,
-  '/dashboard/reports': ALL_ROLES,
+  // The Career & Training Advisor has its own pages (/dashboard/advisor/*); only Settings is shared with them.
+  '/dashboard': NOT_ADVISOR,
+  '/dashboard/forecast': ['admin', 'education_curriculum_planner'],
+  '/dashboard/taxonomy': NOT_ADVISOR,
+  '/dashboard/reports': NOT_ADVISOR,
   '/dashboard/settings': ALL_ROLES,
-  '/dashboard/employability': ['admin', 'career_training_advisor', 'education_curriculum_planner'],
-  '/dashboard/career': ['admin', 'career_training_advisor', 'education_curriculum_planner'],
+  '/dashboard/employability': ['admin', 'education_curriculum_planner'],
+  '/dashboard/career': ['admin', 'education_curriculum_planner'],
   '/dashboard/education': ['admin', 'education_curriculum_planner'],
   '/dashboard/sectors': ['admin', 'labor_market_analyst'],
   '/dashboard/geography': ['admin', 'labor_market_analyst'],
   '/dashboard/planning': ['admin', 'labor_market_analyst'],
+  '/dashboard/advisor': ADVISOR_ONLY,
+  '/dashboard/advisor/assessment': ADVISOR_ONLY,
+  '/dashboard/advisor/jobs': ADVISOR_ONLY,
+  '/dashboard/advisor/pathways': ADVISOR_ONLY,
+  '/dashboard/advisor/placements': ADVISOR_ONLY,
+  '/dashboard/advisor/reports': ADVISOR_ONLY,
   '/dashboard/uploads': ['admin'],
   '/dashboard/users': ['admin'],
 }
@@ -37,12 +47,12 @@ export const ROLE_FOCUS: Record<UserRole, { tagline: string; links: { to: string
     ],
   },
   career_training_advisor: {
-    tagline: 'Help learners and job seekers choose ICT roles with strong forecast demand.',
+    tagline: 'Assess student readiness, match them to jobs, and track placement outcomes.',
     links: [
-      { to: '/dashboard/career', label: 'Career guidance' },
-      { to: '/dashboard/employability', label: 'Score a skill profile' },
-      { to: '/dashboard/forecast', label: 'Compare role forecasts' },
-      { to: '/dashboard/taxonomy', label: 'Browse ICT role taxonomy' },
+      { to: '/dashboard/advisor', label: 'Advisor dashboard' },
+      { to: '/dashboard/advisor/assessment', label: 'Assess a student' },
+      { to: '/dashboard/advisor/jobs', label: 'Browse job market' },
+      { to: '/dashboard/advisor/placements', label: 'Track placements' },
     ],
   },
   education_curriculum_planner: {

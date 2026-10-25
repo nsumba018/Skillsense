@@ -17,6 +17,14 @@ import {
   LogOut,
   Landmark,
   Users,
+  UserCheck,
+  Target,
+  BriefcaseBusiness,
+  Route,
+  BarChart4,
+  ClipboardList,
+  Menu,
+  X,
 } from 'lucide-react'
 import { canAccess } from '../../auth/access'
 import { ROLE_LABELS, useAuth } from '../../auth/AuthContext'
@@ -31,6 +39,12 @@ interface NavItem {
 /** Every page; each user sees only the ones their role can open (see auth/access.ts). */
 const navItems: NavItem[] = [
   { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
+  { label: 'Advisor Dashboard', icon: UserCheck, to: '/dashboard/advisor' },
+  { label: 'Skill Assessment', icon: Target, to: '/dashboard/advisor/assessment' },
+  { label: 'Job Navigator', icon: BriefcaseBusiness, to: '/dashboard/advisor/jobs' },
+  { label: 'Career Pathways', icon: Route, to: '/dashboard/advisor/pathways' },
+  { label: 'Placement Tracker', icon: BarChart4, to: '/dashboard/advisor/placements' },
+  { label: 'Advisor Reports', icon: ClipboardList, to: '/dashboard/advisor/reports' },
   { label: 'Sector Overview', icon: Layers, to: '/dashboard/sectors' },
   { label: 'Role Forecast', icon: TrendingUp, to: '/dashboard/forecast' },
   { label: 'Employability', icon: Briefcase, to: '/dashboard/employability' },
@@ -58,6 +72,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const navigate = useNavigate()
   const overview = useOverview()
   const [search, setSearch] = useState('')
+  const [menuOpen, setMenuOpen] = useState(false)
   const items = navItems.filter((n) => canAccess(user?.role, n.to))
   const fullName = user ? `${user.first_name} ${user.last_name}`.trim() || user.email : ''
   const lastRun = overview.data?.model_info.last_run
@@ -99,13 +114,63 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             ))}
           </nav>
 
-          <div className="px-4 py-6" />
+          {user && (
+            <div className="m-3 rounded-xl border border-gray-200 bg-gray-50 p-3">
+              <div className="text-xs font-bold text-gray-900">{fullName}</div>
+              <div className="mt-0.5 text-[11px] text-gray-500">{ROLE_LABELS[user.role]}</div>
+            </div>
+          )}
         </aside>
+
+        {/* ---------------- Mobile navigation drawer ---------------- */}
+        {menuOpen && (
+          <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Navigation">
+            <button type="button" aria-label="Close menu" className="absolute inset-0 bg-gray-900/40" onClick={() => setMenuOpen(false)} />
+            <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col bg-white shadow-2xl">
+              <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+                <Link to="/" className="flex items-center gap-2">
+                  <img src="/logo_icon.webp" alt="" className="h-7 w-auto" />
+                  <span className="text-lg font-extrabold tracking-tight text-navy">SkillSense</span>
+                </Link>
+                <button type="button" onClick={() => setMenuOpen(false)} aria-label="Close menu" className="rounded-lg p-2 text-gray-500 hover:bg-gray-100">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <nav className="flex-1 space-y-1 overflow-y-auto p-3" aria-label="Main">
+                {items.map((item) => (
+                  <NavLink key={item.label} to={item.to} end className={linkClass} onClick={() => setMenuOpen(false)}>
+                    <item.icon className="h-5 w-5" strokeWidth={2} />
+                    {item.label}
+                  </NavLink>
+                ))}
+              </nav>
+              {user && (
+                <div className="border-t border-gray-100 p-4">
+                  <div className="text-sm font-bold text-gray-900">{fullName}</div>
+                  <div className="text-xs text-gray-500">{ROLE_LABELS[user.role]}</div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* ---------------- Main column ---------------- */}
         <div className="min-w-0 flex-1">
           <header className="sticky top-0 z-20 border-b border-gray-200 bg-page/95 backdrop-blur-sm">
-            <div className="flex items-center gap-4 px-6 py-4 lg:px-8">
+            <div className="flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:px-8">
+              <button
+                type="button"
+                onClick={() => setMenuOpen(true)}
+                aria-label="Open navigation menu"
+                aria-expanded={menuOpen}
+                className="-ml-1 rounded-lg p-2 text-gray-600 hover:bg-white lg:hidden"
+              >
+                <Menu className="h-6 w-6" />
+              </button>
+              <Link to="/" className="flex items-center gap-2 lg:hidden" aria-label="SkillSense home">
+                <img src="/logo_icon.webp" alt="" className="h-7 w-auto" />
+                <span className="hidden text-base font-extrabold tracking-tight text-navy min-[420px]:inline">SkillSense</span>
+              </Link>
               <form onSubmit={onSearch} className="relative hidden max-w-md flex-1 sm:block" role="search">
                 <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                 <input
@@ -118,7 +183,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 />
               </form>
 
-              <div className="ml-auto flex items-center gap-4">
+              <div className="ml-auto flex items-center gap-3 sm:gap-4">
                 <span
                   data-testid="last-run"
                   className="hidden items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-gray-500 md:flex"
@@ -126,8 +191,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <span className={`h-1.5 w-1.5 rounded-full ${lastRun ? 'bg-emerald-500' : 'bg-gray-300'}`} />
                   {lastRun ? `Forecast run ${fmtDateTime(lastRun)}` : 'No forecast run yet'}
                 </span>
-                <div className="flex items-center gap-3 border-l border-gray-200 pl-4">
-                  <div className="text-right leading-tight">
+                <div className="flex items-center gap-3 sm:border-l sm:border-gray-200 sm:pl-4">
+                  <div className="hidden text-right leading-tight sm:block">
                     <div data-testid="user-name" className="text-sm font-bold text-gray-900">
                       {fullName}
                     </div>
@@ -153,18 +218,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
             </div>
 
-            {/* Compact navigation for small screens */}
-            <nav className="flex gap-1 overflow-x-auto border-t border-gray-100 px-4 py-2 lg:hidden" aria-label="Mobile">
-              {items.map((item) => (
-                <NavLink key={item.label} to={item.to} end className={linkClass}>
-                  <item.icon className="h-4 w-4" />
-                  <span className="whitespace-nowrap">{item.label}</span>
-                </NavLink>
-              ))}
-            </nav>
           </header>
 
-          <main className="px-6 py-8 lg:px-8">
+          <main className="px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
             {children}
           </main>
         </div>

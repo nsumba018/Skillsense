@@ -1,5 +1,23 @@
 import { request, download } from './http'
 import type {
+  AdvisorDashboardData,
+  AdvisorJob,
+  AdvisorReport,
+  AdvisorReportType,
+  AssessmentResult,
+  CreatePathwayPayload,
+  CreatePlacementPayload,
+  CreateStudentPayload,
+  JobFilters,
+  JobInsights,
+  PlacementRecord,
+  PlacementStats,
+  ReportFilters,
+  SavedPathway,
+  StudentProfile,
+  StudentProfileDetail,
+} from '../types/advisory'
+import type {
   CareerGuidance,
   AdminUser,
   CurriculumDetail,
@@ -181,4 +199,68 @@ export const uploadsApi = {
     form.append('file', file)
     return request<{ file: string }>('/api/uploads/', { method: 'POST', form })
   },
+}
+
+const reportQuery = (filters: ReportFilters = {}) =>
+  new URLSearchParams(
+    Object.entries(filters)
+      .filter(([, v]) => v !== undefined && v !== '')
+      .map(([k, v]) => [k, String(v)]),
+  ).toString()
+
+type Params = Record<string, string | number | undefined | null>
+
+export const advisoryApi = {
+  dashboard: () => request<AdvisorDashboardData>('/api/advisory/dashboard/'),
+
+  students: (params?: {
+    search?: string
+    department?: string
+    status?: string
+    graduation_year?: number
+    cohort?: string
+    page?: number
+    page_size?: number
+  }) => request<Paginated<StudentProfile>>('/api/advisory/students/', { params }),
+  createStudent: (data: CreateStudentPayload) =>
+    request<StudentProfile>('/api/advisory/students/', { method: 'POST', body: data }),
+  student: (id: number) => request<StudentProfileDetail>(`/api/advisory/students/${id}/`),
+  updateStudent: (id: number, data: Partial<CreateStudentPayload>) =>
+    request<StudentProfile>(`/api/advisory/students/${id}/`, { method: 'PATCH', body: data }),
+
+  assess: (studentId: number, targetRole: string) =>
+    request<AssessmentResult>('/api/advisory/assessments/', {
+      method: 'POST',
+      body: { student_id: studentId, target_role: targetRole },
+    }),
+  assessments: (params?: { student_id?: number; page?: number }) =>
+    request<Paginated<AssessmentResult>>('/api/advisory/assessments/', { params }),
+
+  pathways: (params?: { student_id?: number; page?: number }) =>
+    request<Paginated<SavedPathway>>('/api/advisory/pathways/', { params }),
+  createPathway: (data: CreatePathwayPayload) =>
+    request<SavedPathway>('/api/advisory/pathways/', { method: 'POST', body: data }),
+  updatePathway: (id: number, data: Partial<CreatePathwayPayload>) =>
+    request<SavedPathway>(`/api/advisory/pathways/${id}/`, { method: 'PATCH', body: data }),
+  deletePathway: (id: number) => request<void>(`/api/advisory/pathways/${id}/`, { method: 'DELETE' }),
+
+  placements: (params?: { search?: string; page?: number; page_size?: number }) =>
+    request<Paginated<PlacementRecord>>('/api/advisory/placements/', { params }),
+  createPlacement: (data: CreatePlacementPayload) =>
+    request<PlacementRecord>('/api/advisory/placements/', { method: 'POST', body: data }),
+  deletePlacement: (id: number) => request<void>(`/api/advisory/placements/${id}/`, { method: 'DELETE' }),
+  placementStats: (params?: { graduation_year?: number; cohort?: string; department?: string }) =>
+    request<PlacementStats>('/api/advisory/placements/stats/', { params }),
+  bulkPlacements: (form: FormData) =>
+    request<{ created: number; errors: string[] }>('/api/advisory/placements/bulk/', { method: 'POST', form }),
+
+  jobs: (filters?: JobFilters) =>
+    request<Paginated<AdvisorJob>>('/api/advisory/jobs/', { params: filters as Params }),
+  jobInsights: (filters?: Omit<JobFilters, 'page'>) =>
+    request<JobInsights>('/api/advisory/jobs/insights/', { params: filters as Params }),
+
+  report: (type: AdvisorReportType, filters?: ReportFilters) =>
+    request<AdvisorReport>(`/api/advisory/reports/${type}/`, { params: filters as Params }),
+  downloadReport: (type: AdvisorReportType, fmt: 'csv' | 'pdf', filters?: ReportFilters) =>
+    download(`/api/advisory/reports/${type}/${fmt}/?${reportQuery(filters)}`, `${type}.${fmt}`),
 }

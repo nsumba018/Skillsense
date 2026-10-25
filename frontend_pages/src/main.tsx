@@ -4,7 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import './index.css'
 import App from './App'
-import { AuthProvider } from './auth/AuthContext'
+import { AuthProvider, useAuth } from './auth/AuthContext'
 import ProtectedRoute from './auth/ProtectedRoute'
 import SignIn from './pages/SignIn'
 import AcceptInvite from './pages/AcceptInvite'
@@ -23,6 +23,12 @@ import PolicyPlanning from './pages/dashboard/PolicyPlanning'
 import DataUpload from './pages/dashboard/DataUpload'
 import UserManagement from './pages/dashboard/UserManagement'
 import Settings from './pages/dashboard/Settings'
+import AdvisorDashboard from './pages/dashboard/AdvisorDashboard'
+import AdvisorAssessment from './pages/dashboard/AdvisorAssessment'
+import AdvisorJobs from './pages/dashboard/AdvisorJobs'
+import AdvisorPathways from './pages/dashboard/AdvisorPathways'
+import AdvisorPlacements from './pages/dashboard/AdvisorPlacements'
+import AdvisorReports from './pages/dashboard/AdvisorReports'
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
@@ -30,6 +36,13 @@ const queryClient = new QueryClient({
 
 /** A dashboard page, only for the roles listed for that path in auth/access.ts. */
 const guard = (path: string, el: React.ReactNode) => <ProtectedRoute path={path}>{el}</ProtectedRoute>
+
+/** /dashboard is where sign-in lands; career advisors have their own home page instead of the shared one. */
+function DashboardEntry() {
+  const { user } = useAuth()
+  if (user?.role === 'career_training_advisor') return <Navigate to="/dashboard/advisor" replace />
+  return guard('/dashboard', <Dashboard />)
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -44,7 +57,13 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
 
-            <Route path="/dashboard" element={guard('/dashboard', <Dashboard />)} />
+            <Route path="/dashboard" element={<DashboardEntry />} />
+            <Route path="/dashboard/advisor" element={guard('/dashboard/advisor', <AdvisorDashboard />)} />
+            <Route path="/dashboard/advisor/assessment" element={guard('/dashboard/advisor/assessment', <AdvisorAssessment />)} />
+            <Route path="/dashboard/advisor/jobs" element={guard('/dashboard/advisor/jobs', <AdvisorJobs />)} />
+            <Route path="/dashboard/advisor/pathways" element={guard('/dashboard/advisor/pathways', <AdvisorPathways />)} />
+            <Route path="/dashboard/advisor/placements" element={guard('/dashboard/advisor/placements', <AdvisorPlacements />)} />
+            <Route path="/dashboard/advisor/reports" element={guard('/dashboard/advisor/reports', <AdvisorReports />)} />
             <Route path="/dashboard/forecast" element={guard('/dashboard/forecast', <RoleForecast />)} />
             <Route path="/dashboard/skills-forecast" element={<Navigate to="/dashboard/forecast" replace />} />
             <Route path="/dashboard/employability" element={guard('/dashboard/employability', <Employability />)} />

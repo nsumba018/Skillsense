@@ -521,3 +521,6 @@ export interface RoleDeepDiveReport {
     confidence_upper: number | null
   }[]
 }
+
+/* Career & Training Advisor types live in ./advisory; re-exported so they can be imported from here too. */
+export * from './advisory'

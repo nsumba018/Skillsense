@@ -1,15 +1,6 @@
-import { useAuth } from '../../auth/AuthContext'
 import EducationCareerGuidance from './EducationCareerGuidance'
-import CareerCareerGuidance from './CareerCareerGuidance'
 
+/** Shared by the education planner and admin; the career advisor has its own pages under /dashboard/advisor. */
 export default function CareerGuidance() {
-  const { user } = useAuth()
-
-  switch (user?.role) {
-    case 'education_curriculum_planner':
-      return <EducationCareerGuidance />
-    case 'career_training_advisor':
-    default:
-      return <CareerCareerGuidance />
-  }
+  return <EducationCareerGuidance />
 }

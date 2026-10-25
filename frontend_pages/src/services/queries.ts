@@ -1,5 +1,6 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import {
+  advisoryApi,
   analyticsApi,
   authApi,
   dashboardApi,
@@ -10,6 +11,7 @@ import {
   uploadsApi,
 } from './api'
 import type { Horizon } from '../types/api'
+import type { AdvisorReportType, JobFilters, ReportFilters } from '../types/advisory'
 
 const STALE = 60_000
 
@@ -143,4 +145,55 @@ export const useUploadPostings = (id: number | null) =>
     queryKey: ['upload-postings', id],
     queryFn: () => uploadsApi.postings(id as number),
     enabled: id !== null,
+  })
+
+/* ---------- advisory (Career & Training Advisor) ---------- */
+export const useAdvisorDashboard = () =>
+  useQuery({ queryKey: ['advisor-dashboard'], queryFn: advisoryApi.dashboard, staleTime: STALE })
+
+export const useStudents = (params?: Parameters<typeof advisoryApi.students>[0]) =>
+  useQuery({
+    queryKey: ['students', params ?? {}],
+    queryFn: () => advisoryApi.students({ page_size: 200, ...params }),
+    placeholderData: keepPreviousData,
+  })
+export const useStudent = (id: number | null) =>
+  useQuery({ queryKey: ['student', id], queryFn: () => advisoryApi.student(id as number), enabled: id !== null })
+export const useAssessments = (studentId?: number) =>
+  useQuery({
+    queryKey: ['assessments', studentId ?? 'all'],
+    queryFn: () => advisoryApi.assessments({ student_id: studentId }),
+  })
+export const usePathways = (studentId?: number) =>
+  useQuery({
+    queryKey: ['pathways', studentId ?? 'all'],
+    queryFn: () => advisoryApi.pathways({ student_id: studentId }),
+  })
+export const usePlacements = (search?: string) =>
+  useQuery({
+    queryKey: ['placements', search ?? ''],
+    queryFn: () => advisoryApi.placements({ search: search || undefined, page_size: 200 }),
+    placeholderData: keepPreviousData,
+  })
+export const usePlacementStats = (params?: Parameters<typeof advisoryApi.placementStats>[0]) =>
+  useQuery({ queryKey: ['placement-stats', params ?? {}], queryFn: () => advisoryApi.placementStats(params) })
+export const useAdvisorJobs = (filters: JobFilters) =>
+  useQuery({
+    queryKey: ['advisor-jobs', filters],
+    queryFn: () => advisoryApi.jobs(filters),
+    staleTime: STALE,
+    placeholderData: keepPreviousData,
+  })
+export const useJobInsights = (filters: Omit<JobFilters, 'page'>) =>
+  useQuery({
+    queryKey: ['advisor-job-insights', filters],
+    queryFn: () => advisoryApi.jobInsights(filters),
+    staleTime: STALE,
+    placeholderData: keepPreviousData,
+  })
+export const useAdvisorReport = (type: AdvisorReportType | null, filters: ReportFilters, enabled = true) =>
+  useQuery({
+    queryKey: ['advisor-report', type, filters],
+    queryFn: () => advisoryApi.report(type as AdvisorReportType, filters),
+    enabled: enabled && type !== null,
   })
