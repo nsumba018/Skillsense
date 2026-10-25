@@ -1,15 +1,6 @@
-import { useAuth } from '../../auth/AuthContext'
 import EducationForecast from './EducationForecast'
-import CareerForecast from './CareerForecast'
 
+/** Shared by the education planner and admin; the career advisor has its own pages under /dashboard/advisor. */
 export default function RoleForecast() {
-  const { user } = useAuth()
-
-  switch (user?.role) {
-    case 'education_curriculum_planner':
-      return <EducationForecast />
-    case 'career_training_advisor':
-    default:
-      return <CareerForecast />
-  }
+  return <EducationForecast />
 }
