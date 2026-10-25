@@ -11,6 +11,7 @@ import { useEmergingRoles, useForecasts, useRoleDetail, useSectorRoleDetail, use
 import { taxonomyApi } from '../../services/api'
 import { fmtNum, fmtPct, HORIZON_LABEL } from '../../lib/format'
 import type { RoleBrief } from '../../types/api'
+import { DEPT_CURRICULA_BY_LABEL as DEPT_CURRICULA, isSkillTaught } from '../../data/auca-skills'
 
 /* ══════════════════════════════════════════════════
    AUCA curriculum data for alignment indicators
@@ -19,50 +20,6 @@ import type { RoleBrief } from '../../types/api'
 const AUCA_SECTORS = new Set(['ict-technology', 'finance-business'])
 
 type Dept = 'Software Engineering' | 'Network & Info Management' | 'Finance' | 'Business Administration'
-
-const DEPT_CURRICULA: Record<Dept, Set<string>> = {
-  'Software Engineering': new Set([
-    'Java', 'Python', '.NET', 'C#', 'PL/SQL', 'SQL',
-    'HTML/CSS', 'JavaScript', 'React',
-    'Data Structures', 'Algorithms', 'Operating Systems',
-    'DBMS', 'Database Design',
-    'Software Engineering', 'Design Patterns', 'Software Testing', 'Project Management',
-    'Statistics', 'Probability', 'Computer Networks',
-    'Mathematics', 'Discrete Mathematics',
-    'Git', 'Agile/Scrum', 'Java/SpringBoot', 'REST APIs',
-  ]),
-  'Network & Info Management': new Set([
-    'TCP/IP', 'Networking', 'LAN/WAN', 'Network Administration',
-    'Windows Server', 'Linux',
-    'SQL', 'DBMS', 'Database Design',
-    'IT Support', 'Help Desk', 'Hardware Troubleshooting',
-    'Operating Systems', 'System Administration',
-    'HTML/CSS', 'Visual Basic',
-    'Information Systems', 'Computer Networks',
-    'Project Management', 'Statistics', 'Mathematics',
-    'Network Security', 'Penetration Testing',
-  ]),
-  'Finance': new Set([
-    'Financial Accounting', 'Principles of Accounting', 'Auditing', 'Tax',
-    'IFRS', 'Corporate Finance', 'Investment', 'Banking',
-    'Financial Analysis', 'Budgeting',
-    'Economics', 'Business Law', 'Business Ethics',
-    'Statistics', 'Mathematics',
-    'Communication', 'English', 'French',
-    'Entrepreneurship', 'Project Management',
-  ]),
-  'Business Administration': new Set([
-    'Principles of Management', 'Strategic Management', 'Operations',
-    'HR Management', 'Organizational Behavior', 'Leadership',
-    'Marketing Principles', 'Market Research',
-    'Principles of Accounting', 'Economics',
-    'Business Law', 'Business Ethics', 'Business Communication',
-    'Statistics', 'Mathematics',
-    'Entrepreneurship', 'Project Management',
-    'Communication', 'English', 'French',
-    'Negotiation',
-  ]),
-}
 
 const ICT_ROLE_SKILLS: Record<string, { dept: Dept; skills: string[] }> = {
   'Software Developer': { dept: 'Software Engineering', skills: ['Java', 'Python', 'JavaScript', 'TypeScript', 'React', 'Node.js', 'Git', 'REST APIs', 'SQL', 'Agile/Scrum', 'Docker', 'CI/CD', 'Testing (Jest)', 'Design Patterns'] },
@@ -108,19 +65,6 @@ const BIZ_ROLE_SKILLS: Record<string, { dept: Dept; skills: string[] }> = {
   'Entrepreneur / Startup Founder': { dept: 'Business Administration', skills: ['Entrepreneurship', 'Business Development', 'Market Research', 'Financial Acumen', 'Leadership', 'Design Thinking', 'Negotiation'] },
   'Management Consultant': { dept: 'Business Administration', skills: ['Strategic Management', 'Market Research', 'Financial Analysis', 'Leadership', 'Stakeholder Communication', 'Project Management', 'Design Thinking'] },
   'Digital Marketing Specialist': { dept: 'Business Administration', skills: ['Digital Marketing', 'SEO/SEM', 'Google Analytics', 'Social Media Marketing', 'Content Creation', 'Email Marketing', 'Marketing Automation', 'A/B Testing'] },
-}
-
-function isSkillTaught(skill: string, taughtSet: Set<string>): boolean {
-  const lower = skill.toLowerCase()
-  for (const t of taughtSet) {
-    const tl = t.toLowerCase()
-    if (tl === lower) return true
-    if (tl.length <= 2 || lower.length <= 2) continue
-    const wb = (hay: string, needle: string) =>
-      new RegExp(`\\b${needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(hay)
-    if (wb(lower, tl) || wb(tl, lower)) return true
-  }
-  return false
 }
 
 function findClosestRole(roleName: string, isIct: boolean): { dept: Dept; skills: string[] } | null {

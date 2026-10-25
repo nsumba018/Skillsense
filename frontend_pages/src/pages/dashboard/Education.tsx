@@ -24,73 +24,15 @@ import { useCurricula } from '../../services/queries'
 import { analyticsApi } from '../../services/api'
 import { ApiError } from '../../services/http'
 import { fmtDate } from '../../lib/format'
+import { DEPT_CURRICULA_BY_LABEL as DEPT_CURRICULA, INNOVATION_COURSES, isSkillTaught } from '../../data/auca-skills'
 
 /* ══════════════════════════════════════════════════
    Innovation Center course catalog with skill mappings
    ══════════════════════════════════════════════════ */
 
-const INNOVATION_COURSES: Record<string, { skills: string[]; desc: string }> = {
-  'Cloud Computing': { skills: ['AWS/Azure/GCP', 'Docker', 'Kubernetes', 'Terraform', 'CI/CD', 'Cost Optimization'], desc: 'Cloud platforms, containerization, and infrastructure as code' },
-  'Cybersecurity': { skills: ['SIEM', 'Firewall Management', 'Incident Response', 'Compliance (ISO 27001)', 'Cryptography', 'Ethical Hacking'], desc: 'Advanced security frameworks, SIEM tools, and incident response' },
-  'UI/UX Design': { skills: ['Figma', 'Adobe XD', 'User Research', 'Wireframing', 'Prototyping', 'Design Systems', 'Accessibility'], desc: 'User-centered design, prototyping, and design systems' },
-  'Data Science & AI': { skills: ['Machine Learning', 'TensorFlow/PyTorch', 'Deep Learning', 'NLP', 'Computer Vision', 'Data Visualization', 'MLOps'], desc: 'Machine learning, deep learning, and AI model deployment' },
-  'Web Development': { skills: ['TypeScript', 'Node.js', 'Tailwind/Bootstrap', 'Responsive Design', 'Testing (Jest)', 'Microservices'], desc: 'Modern full-stack development with TypeScript and Node.js' },
-  'Mobile Development': { skills: ['React Native', 'Flutter', 'Swift/Kotlin', 'Mobile UI/UX', 'Firebase', 'App Store Deployment'], desc: 'Cross-platform and native mobile app development' },
-  'DevOps & CI/CD': { skills: ['Docker', 'Kubernetes', 'CI/CD', 'Terraform', 'Monitoring', 'Scripting (Bash/PowerShell)'], desc: 'Deployment pipelines, container orchestration, and monitoring' },
-  'Entrepreneurship & Innovation': { skills: ['Business Development', 'Market Analysis', 'Proposal Writing', 'Strategic Partnerships', 'Financial Acumen', 'Design Thinking'], desc: 'Startup methodology, business model canvas, and venture building' },
-  'Database & Data Engineering': { skills: ['PostgreSQL/MySQL', 'MongoDB', 'Performance Tuning', 'Cloud Databases', 'Data Warehousing', 'ETL Pipelines'], desc: 'Advanced database management, NoSQL, and data pipelines' },
-  'Digital Marketing & Analytics': { skills: ['SEO/SEM', 'Google Analytics', 'Social Media Marketing', 'Content Creation', 'Email Marketing', 'Marketing Automation', 'A/B Testing'], desc: 'Data-driven marketing, SEO, and campaign analytics' },
-  'Financial Technology': { skills: ['ERP Systems', 'Financial Modeling', 'Power BI/Tableau', 'Advanced Excel', 'CAAT Tools', 'Bloomberg Terminal'], desc: 'FinTech tools, ERP systems, and financial data analytics' },
-  'Project Management (Advanced)': { skills: ['Jira', 'MS Project', 'Risk Management', 'Stakeholder Communication', 'Budgeting', 'Team Leadership'], desc: 'Agile certification prep, Jira mastery, and stakeholder management' },
-}
-
 /* ── Department curricula (baseline — same as Employability page) ── */
 
 type Dept = 'Software Engineering' | 'Network & Info Management' | 'Finance' | 'Business Administration'
-
-const DEPT_CURRICULA: Record<Dept, Set<string>> = {
-  'Software Engineering': new Set([
-    'Java', 'Python', '.NET', 'C#', 'PL/SQL', 'SQL',
-    'HTML/CSS', 'JavaScript', 'React',
-    'Data Structures', 'Algorithms', 'Operating Systems',
-    'DBMS', 'Database Design',
-    'Software Engineering', 'Design Patterns', 'Software Testing', 'Project Management',
-    'Statistics', 'Probability', 'Computer Networks',
-    'Mathematics', 'Discrete Mathematics',
-    'Git', 'Agile/Scrum', 'Java/SpringBoot', 'REST APIs',
-  ]),
-  'Network & Info Management': new Set([
-    'TCP/IP', 'Networking', 'LAN/WAN', 'Network Administration',
-    'Windows Server', 'Linux',
-    'SQL', 'DBMS', 'Database Design',
-    'IT Support', 'Help Desk', 'Hardware Troubleshooting',
-    'Operating Systems', 'System Administration',
-    'HTML/CSS', 'Visual Basic',
-    'Information Systems', 'Computer Networks',
-    'Project Management', 'Statistics', 'Mathematics',
-    'Network Security', 'Penetration Testing',
-  ]),
-  'Finance': new Set([
-    'Financial Accounting', 'Principles of Accounting', 'Auditing', 'Tax',
-    'IFRS', 'Corporate Finance', 'Investment', 'Banking',
-    'Financial Analysis', 'Budgeting',
-    'Economics', 'Business Law', 'Business Ethics',
-    'Statistics', 'Mathematics',
-    'Communication', 'English', 'French',
-    'Entrepreneurship', 'Project Management',
-  ]),
-  'Business Administration': new Set([
-    'Principles of Management', 'Strategic Management', 'Operations',
-    'HR Management', 'Organizational Behavior', 'Leadership',
-    'Marketing Principles', 'Market Research',
-    'Principles of Accounting', 'Economics',
-    'Business Law', 'Business Ethics', 'Business Communication',
-    'Statistics', 'Mathematics',
-    'Entrepreneurship', 'Project Management',
-    'Communication', 'English', 'French',
-    'Negotiation',
-  ]),
-}
 
 const MARKET_SKILLS: Record<Dept, string[]> = {
   'Software Engineering': [
@@ -126,19 +68,6 @@ const MARKET_SKILLS: Record<Dept, string[]> = {
 const ALL_DEPTS: Dept[] = ['Software Engineering', 'Network & Info Management', 'Finance', 'Business Administration']
 const IT_DEPTS: Dept[] = ['Software Engineering', 'Network & Info Management']
 const BIZ_DEPTS: Dept[] = ['Finance', 'Business Administration']
-
-function isSkillTaught(skill: string, taughtSet: Set<string>): boolean {
-  const lower = skill.toLowerCase()
-  for (const t of taughtSet) {
-    const tl = t.toLowerCase()
-    if (tl === lower) return true
-    if (tl.length <= 2 || lower.length <= 2) continue
-    const wb = (hay: string, needle: string) =>
-      new RegExp(`\\b${needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(hay)
-    if (wb(lower, tl) || wb(tl, lower)) return true
-  }
-  return false
-}
 
 /* ── Types ── */
 interface CourseData { skills: string[]; desc: string }

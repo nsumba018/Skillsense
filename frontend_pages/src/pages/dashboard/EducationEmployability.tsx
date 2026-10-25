@@ -8,6 +8,7 @@ import { useEmployabilityOverview, useForecasts, useSectorPositions } from '../.
 import { analyticsApi } from '../../services/api'
 import { ApiError } from '../../services/http'
 import { fmtInt } from '../../lib/format'
+import { DEPT_CURRICULA, isSkillTaught } from '../../data/auca-skills'
 
 type Faculty = 'it' | 'business'
 
@@ -41,30 +42,6 @@ const ICT_ROLE_SKILLS: Record<string, string[]> = {
 
 /* ── AUCA IT Faculty department curricula ── */
 
-const AUCA_SE_SKILLS = new Set([
-  'Java', 'Python', '.NET', 'C#', 'PL/SQL', 'SQL',
-  'HTML/CSS', 'JavaScript', 'React',
-  'Data Structures', 'Algorithms', 'Operating Systems',
-  'DBMS', 'Database Design',
-  'Software Engineering', 'Design Patterns', 'Software Testing', 'Project Management',
-  'Statistics', 'Probability',
-  'Computer Networks',
-  'Mathematics', 'Discrete Mathematics',
-  'Git', 'Agile/Scrum', 'Java/SpringBoot', 'REST APIs',
-])
-
-const AUCA_NET_SKILLS = new Set([
-  'TCP/IP', 'Networking', 'LAN/WAN', 'Network Administration',
-  'Windows Server', 'Linux',
-  'SQL', 'DBMS', 'Database Design',
-  'IT Support', 'Help Desk', 'Hardware Troubleshooting',
-  'Operating Systems', 'System Administration',
-  'HTML/CSS', 'Visual Basic',
-  'Information Systems', 'Computer Networks',
-  'Project Management', 'Statistics', 'Mathematics',
-  'Network Security', 'Penetration Testing',
-])
-
 type IctDept = 'Software Engineering' | 'Network & Info Management'
 
 const ICT_ROLE_DEPT: Record<string, IctDept> = {
@@ -91,6 +68,11 @@ const ICT_ROLE_DEPT: Record<string, IctDept> = {
   'project': 'Software Engineering',
 }
 
+const AUCA_SE_SKILLS = DEPT_CURRICULA.se
+const AUCA_NET_SKILLS = DEPT_CURRICULA.net
+const AUCA_FIN_SKILLS = DEPT_CURRICULA.fin
+const AUCA_BA_SKILLS = DEPT_CURRICULA.ba
+
 function getIctDeptForRole(roleName: string): { dept: IctDept; skills: Set<string> } {
   const lower = roleName.toLowerCase()
   for (const [key, dept] of Object.entries(ICT_ROLE_DEPT)) {
@@ -107,19 +89,6 @@ function getIctSkillsForRole(roleName: string): string[] {
     if (lower.includes(key)) return skills
   }
   return ['Problem Solving', 'Communication', 'Technical Documentation', 'Teamwork', 'English Proficiency']
-}
-
-function isSkillTaught(skill: string, taughtSet: Set<string>): boolean {
-  const lower = skill.toLowerCase()
-  for (const t of taughtSet) {
-    const tl = t.toLowerCase()
-    if (tl === lower) return true
-    if (tl.length <= 2 || lower.length <= 2) continue
-    const wb = (hay: string, needle: string) =>
-      new RegExp(`\\b${needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(hay)
-    if (wb(lower, tl) || wb(tl, lower)) return true
-  }
-  return false
 }
 
 /* ── Business role skills (employer requirements) ── */
@@ -146,28 +115,6 @@ const BIZ_ROLE_SKILLS: Record<string, string[]> = {
 }
 
 /* ── AUCA Business Faculty department curricula ── */
-
-const AUCA_FIN_SKILLS = new Set([
-  'Financial Accounting', 'Principles of Accounting', 'Auditing', 'Tax',
-  'IFRS', 'Corporate Finance', 'Investment', 'Banking',
-  'Financial Analysis', 'Budgeting',
-  'Economics', 'Business Law', 'Business Ethics',
-  'Statistics', 'Mathematics',
-  'Communication', 'English', 'French',
-  'Entrepreneurship', 'Project Management',
-])
-
-const AUCA_BA_SKILLS = new Set([
-  'Principles of Management', 'Strategic Management', 'Operations',
-  'HR Management', 'Organizational Behavior', 'Leadership',
-  'Marketing Principles', 'Market Research',
-  'Principles of Accounting', 'Economics',
-  'Business Law', 'Business Ethics', 'Business Communication',
-  'Statistics', 'Mathematics',
-  'Entrepreneurship', 'Project Management',
-  'Communication', 'English', 'French',
-  'Negotiation',
-])
 
 type BizDept = 'Finance' | 'Business Administration'
 
