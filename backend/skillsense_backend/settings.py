@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'uploads',
     'analytics',
     'reports',
+    'advisory',
 ]
 
 MIDDLEWARE = [
