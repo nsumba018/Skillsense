@@ -42,6 +42,7 @@ class SectorForecastSerializer(serializers.ModelSerializer):
     sector_name = serializers.CharField(source='sector.name', read_only=True)
     sector_slug = serializers.CharField(source='sector.slug', read_only=True)
     sector_color = serializers.CharField(source='sector.color', read_only=True)
+    posting_count = serializers.SerializerMethodField()
 
     class Meta:
         model = SectorForecast
@@ -52,6 +53,10 @@ class SectorForecastSerializer(serializers.ModelSerializer):
             'share_trend', 'employment_trend',
             'posting_count',
         ]
+
+    def get_posting_count(self, obj):
+        from uploads.models import JobPosting
+        return JobPosting.objects.filter(sector=obj.sector).count()
 
 
 class SectorForecastRunSerializer(serializers.ModelSerializer):

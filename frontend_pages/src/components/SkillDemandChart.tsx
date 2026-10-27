@@ -5,7 +5,7 @@ import { SNAPSHOT } from '../lib/snapshot'
 export default function SkillDemandChart({ height = 190 }: { height?: number }) {
   return (
     <div>
-      <h4 className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-gray-500">ICT Share of Employment</h4>
+      <h4 className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-gray-500">Employment Trends</h4>
       <ResponsiveContainer width="100%" height={height}>
         <LineChart data={[...SNAPSHOT.ictShareByYear]} margin={{ top: 5, right: 8, bottom: 0, left: -20 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />

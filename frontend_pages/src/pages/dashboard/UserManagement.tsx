@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Loader2, Search, UserPlus } from 'lucide-react'
-import DashboardLayout, { Card } from './DashboardLayout'
+import { Loader2, Search, Users, UserPlus } from 'lucide-react'
+import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { EmptyState, QueryGate } from '../../components/ui/State'
 import { ROLE_LABELS, useAuth } from '../../auth/AuthContext'
 import { ALL_ROLES } from '../../auth/access'
@@ -59,15 +59,16 @@ export default function UserManagement() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-navy">User Management</h1>
-          <p className="mt-2 text-sm text-gray-500">Manage who can use SkillSense and what they can access.</p>
-        </div>
-        <button onClick={() => setShowCreate((v) => !v)} className="flex items-center gap-2 rounded-lg bg-navy px-5 py-3 text-sm font-bold text-white shadow-sm hover:bg-dark-navy">
-          <UserPlus className="h-4 w-4" /> {showCreate ? 'Cancel' : 'Invite user'}
-        </button>
-      </div>
+      <PageHeader
+        icon={Users}
+        title="User Management"
+        subtitle="Manage who can use SkillSense and what they can access."
+        actions={
+          <button onClick={() => setShowCreate((v) => !v)} className="flex items-center gap-2 rounded-lg bg-navy px-5 py-3 text-sm font-bold text-white shadow-sm hover:bg-dark-navy">
+            <UserPlus className="h-4 w-4" /> {showCreate ? 'Cancel' : 'Invite user'}
+          </button>
+        }
+      />
 
       {showCreate && (
         <Card className="mt-6 p-6" data-testid="create-user">

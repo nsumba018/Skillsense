@@ -4,6 +4,8 @@ import { DEPT_LABEL } from '../../data/auca-skills'
 import { useStudents } from '../../services/queries'
 import type { DeptCode, StudentProfile } from '../../types/advisory'
 
+export { PageHeader } from './DashboardLayout'
+
 /** Shared building blocks of the Career & Training Advisor pages. */
 
 export const SECTOR_OPTIONS = [
@@ -21,33 +23,6 @@ export const buttonPrimary =
 
 export const buttonGhost =
   'inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50'
-
-export function PageHeader({
-  icon: Icon,
-  title,
-  subtitle,
-  actions,
-}: {
-  icon: React.ComponentType<{ className?: string }>
-  title: string
-  subtitle: string
-  actions?: React.ReactNode
-}) {
-  return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-      <div className="flex items-center gap-3">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-light">
-          <Icon className="h-6 w-6 text-primary" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900">{title}</h1>
-          <p className="max-w-2xl text-sm text-gray-500">{subtitle}</p>
-        </div>
-      </div>
-      {actions && <div className="flex flex-wrap items-center gap-3">{actions}</div>}
-    </div>
-  )
-}
 
 export function Kpi({
   label,

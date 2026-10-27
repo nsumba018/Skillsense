@@ -4,17 +4,17 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 
 const navItems = [
+  { label: 'The Challenge', href: '#challenge' },
+  { label: 'Data', href: '#data' },
+  { label: 'Method', href: '#how-it-works' },
   { label: 'Features', href: '#features' },
   { label: 'Roles', href: '#stakeholders' },
-  { label: 'Why it matters', href: '#insights' },
-  { label: 'How it works', href: '#how-it-works' },
-  { label: 'Contact', href: '#contact' },
 ]
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const { user } = useAuth()
-  const cta = user ? { to: '/dashboard', label: 'Open dashboard' } : { to: '/signin', label: 'Sign in' }
+  const cta = user ? { to: '/dashboard', label: 'Open dashboard' } : { to: '/signin', label: 'Try the demo' }
 
   return (
     <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/90 backdrop-blur-md">

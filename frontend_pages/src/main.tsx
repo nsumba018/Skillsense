@@ -11,6 +11,8 @@ import AcceptInvite from './pages/AcceptInvite'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import Dashboard from './pages/dashboard/Dashboard'
+import EducationDashboard from './pages/dashboard/EducationDashboard'
+import LaborDashboard from './pages/dashboard/LaborDashboard'
 import RoleForecast from './pages/dashboard/RoleForecast'
 import Employability from './pages/dashboard/Employability'
 import Sectors from './pages/dashboard/Sectors'
@@ -37,11 +39,17 @@ const queryClient = new QueryClient({
 /** A dashboard page, only for the roles listed for that path in auth/access.ts. */
 const guard = (path: string, el: React.ReactNode) => <ProtectedRoute path={path}>{el}</ProtectedRoute>
 
-/** /dashboard is where sign-in lands; career advisors have their own home page instead of the shared one. */
+/** /dashboard is where sign-in lands; each role is redirected to its own home page. */
 function DashboardEntry() {
   const { user } = useAuth()
-  if (user?.role === 'career_training_advisor') return <Navigate to="/dashboard/advisor" replace />
-  return guard('/dashboard', <Dashboard />)
+  switch (user?.role) {
+    case 'career_training_advisor':        return <Navigate to="/dashboard/advisor" replace />
+    case 'education_curriculum_planner':    return <Navigate to="/dashboard/education-home" replace />
+    case 'labor_market_analyst':           return <Navigate to="/dashboard/labor" replace />
+    case 'admin':
+    default:
+      return guard('/dashboard', <Dashboard />)
+  }
 }
 
 createRoot(document.getElementById('root')!).render(
@@ -58,6 +66,8 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/reset-password" element={<ResetPassword />} />
 
             <Route path="/dashboard" element={<DashboardEntry />} />
+            <Route path="/dashboard/labor" element={guard('/dashboard/labor', <LaborDashboard />)} />
+            <Route path="/dashboard/education-home" element={guard('/dashboard/education-home', <EducationDashboard />)} />
             <Route path="/dashboard/advisor" element={guard('/dashboard/advisor', <AdvisorDashboard />)} />
             <Route path="/dashboard/advisor/assessment" element={guard('/dashboard/advisor/assessment', <AdvisorAssessment />)} />
             <Route path="/dashboard/advisor/jobs" element={guard('/dashboard/advisor/jobs', <AdvisorJobs />)} />

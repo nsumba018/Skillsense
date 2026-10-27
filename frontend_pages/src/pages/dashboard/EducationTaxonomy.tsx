@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Building2, ChevronRight, GraduationCap, MapPin, Search, Sparkles } from 'lucide-react'
-import DashboardLayout, { Card } from './DashboardLayout'
+import { Building2, ChevronRight, GraduationCap, MapPin, Network, Search, Sparkles } from 'lucide-react'
+import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { useSectorParam } from '../../components/ui/SectorSelector'
 import { useSectorList } from '../../services/queries'
 import { RoleForecastChart, type RoleChartPoint } from './charts'
@@ -480,10 +480,11 @@ export default function EducationTaxonomy() {
 
   return (
     <DashboardLayout>
-      <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-navy">Role Taxonomy</h1>
-        <p className="mt-2 text-sm text-gray-500">Explore roles across AUCA's tracked faculties — IT and Business — with curriculum alignment insights.</p>
-      </div>
+      <PageHeader
+        icon={Network}
+        title="Role Taxonomy"
+        subtitle="Explore roles across AUCA's tracked faculties — IT and Business — with curriculum alignment insights."
+      />
 
       <div className="mt-6 flex flex-wrap items-center gap-2" role="tablist" data-testid="taxonomy-sector-selector">
         <span className="mr-1 text-[11px] font-bold uppercase tracking-wider text-gray-400">Faculty</span>

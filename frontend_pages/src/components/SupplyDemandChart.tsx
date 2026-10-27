@@ -5,10 +5,10 @@ export default function SupplyDemandChart() {
   return (
     <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-6">
       <div className="flex items-start justify-between mb-1">
-        <h3 className="text-base font-semibold text-gray-900">ICT's Share of Rwandan Employment</h3>
+        <h3 className="text-base font-semibold text-gray-900">Workforce Growth Across Sectors</h3>
         <span className="text-[11px] text-gray-400 whitespace-nowrap">Snapshot: {SNAPSHOT.asOf}</span>
       </div>
-      <p className="text-xs text-gray-500 mb-5">Percentage of all employed people working in ICT, 2017–2026</p>
+      <p className="text-xs text-gray-500 mb-5">ICT employment as a share of all jobs in Rwanda, 2017–2026 (NISR data)</p>
       <ResponsiveContainer width="100%" height={280}>
         <BarChart data={[...SNAPSHOT.ictShareByYear]} barCategoryGap="25%" margin={{ top: 20, right: 5, left: 5, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />

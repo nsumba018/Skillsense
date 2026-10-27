@@ -12,7 +12,7 @@ import {
   Percent,
   BarChart3,
 } from 'lucide-react'
-import DashboardLayout, { Card } from './DashboardLayout'
+import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { Sparkline, EmploymentBars, type BarPoint } from './charts'
 import { EmptyState, QueryGate } from '../../components/ui/State'
 import { useSectorList, useSectorForecasts, useSectorEmployment, useKpis } from '../../services/queries'
@@ -34,9 +34,9 @@ function TrendBadge({ trend, label }: { trend: Trend; label: string }) {
 
 function AllSectorsView({ horizon, forecasts }: { horizon: Horizon; forecasts: SectorForecastEntry[] }) {
   const sectorEmployment = useSectorEmployment()
+  const kpis = useKpis()
   const filtered = forecasts.filter((f) => f.horizon === horizon)
   const totalEmp = filtered.reduce((s, f) => s + f.employment_count, 0)
-  const totalPostings = filtered.reduce((s, f) => s + f.posting_count, 0)
   const growing = filtered.filter((f) => f.employment_trend === 'growing')
   const maxShare = Math.max(1, ...filtered.map((f) => f.employment_share_pct))
 
@@ -90,7 +90,7 @@ function AllSectorsView({ horizon, forecasts }: { horizon: Horizon; forecasts: S
             <span className="text-sm font-medium text-gray-500">Job Postings</span>
             <Briefcase className="h-5 w-5 text-primary" />
           </div>
-          <div className="mt-3 text-4xl font-extrabold tracking-tight text-gray-900">{fmtInt(totalPostings)}</div>
+          <div className="mt-3 text-4xl font-extrabold tracking-tight text-gray-900">{fmtInt(kpis.data?.total_postings ?? 0)}</div>
           <p className="mt-2 text-xs text-gray-500">across all sectors</p>
         </Card>
       </div>
@@ -420,12 +420,11 @@ export default function Sectors() {
 
   return (
     <DashboardLayout>
-      <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-navy">Sector Workforce Overview</h1>
-        <p className="mt-2 text-sm leading-relaxed text-gray-500">
-          Employment forecasts, trends and job postings across all {sectors.length || 9} sectors of Rwanda's economy.
-        </p>
-      </div>
+      <PageHeader
+        icon={Layers}
+        title="Sector Workforce Overview"
+        subtitle="Employment forecasts, trends and job postings across all sectors of Rwanda's economy."
+      />
 
       {/* Sector selector */}
       <Card className="mt-6 p-4">

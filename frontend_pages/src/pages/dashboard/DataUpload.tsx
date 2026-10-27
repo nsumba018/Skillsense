@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CheckCircle2, CircleAlert, FileUp, Loader2, UploadCloud, Clock } from 'lucide-react'
-import DashboardLayout, { Card } from './DashboardLayout'
+import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { EmptyState, QueryGate } from '../../components/ui/State'
 import { useUploadPostings, useUploads } from '../../services/queries'
 import { uploadsApi } from '../../services/api'
@@ -52,13 +52,11 @@ export default function DataUpload() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-3xl">
-        <h1 className="text-3xl font-extrabold tracking-tight text-navy">Job Postings Upload</h1>
-        <p className="mt-2 text-sm leading-relaxed text-gray-500">
-          Upload a CSV of job postings. SkillSense classifies each row as ICT or not, maps ICT rows to the role
-          taxonomy, and stores them. Data enters the platform only through this upload.
-        </p>
-      </div>
+      <PageHeader
+        icon={UploadCloud}
+        title="Job Postings Upload"
+        subtitle="Upload a CSV of job postings. SkillSense classifies each row, maps it to the role taxonomy, and stores it."
+      />
 
       <Card className="mt-8 p-6">
         <div

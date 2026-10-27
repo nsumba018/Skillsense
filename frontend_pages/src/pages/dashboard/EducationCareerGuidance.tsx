@@ -12,7 +12,7 @@ import {
   Zap,
   Target,
 } from 'lucide-react'
-import DashboardLayout, { Card } from './DashboardLayout'
+import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { QueryGate } from '../../components/ui/State'
 import { useCareer, useTrends, useSectorPositions } from '../../services/queries'
 import { fmtNum, fmtPct } from '../../lib/format'
@@ -199,27 +199,17 @@ export default function EducationCareerGuidance() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-        <div className="max-w-2xl">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100">
-              <Lightbulb className="h-5 w-5 text-amber-700" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-extrabold tracking-tight text-navy">Training Recommendations</h1>
-              <p className="text-sm text-gray-500">AUCA Innovation Center</p>
-            </div>
-          </div>
-          <p className="mt-3 text-base leading-relaxed text-gray-600">
-            AI-generated course recommendations based on real market data. These insights help the Innovation Center decide
-            which short courses and training programmes to offer next.
-          </p>
-        </div>
-        <Link to="/dashboard/forecast" className="flex shrink-0 items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
-          <TrendingUp className="h-4 w-4" />
-          View full forecast
-        </Link>
-      </div>
+      <PageHeader
+        icon={Lightbulb}
+        title="Training Recommendations"
+        subtitle="AI-generated course recommendations based on real market data to help the Innovation Center plan its next programmes."
+        actions={
+          <Link to="/dashboard/forecast" className="flex shrink-0 items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+            <TrendingUp className="h-4 w-4" />
+            View full forecast
+          </Link>
+        }
+      />
 
       {/* AI Insight banner */}
       <QueryGate query={career} className="mt-8">

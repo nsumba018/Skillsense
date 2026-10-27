@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { AlertTriangle, ArrowDownRight, ArrowUpRight, Briefcase, Landmark, Lightbulb, MapPin, Shield, Sparkles, TrendingUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import DashboardLayout, { Card } from './DashboardLayout'
+import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import SectorSelector, { useSectorParam } from '../../components/ui/SectorSelector'
 import { QueryGate } from '../../components/ui/State'
 import { useForecasts, useHistoricalSince, useKpis, useTaxonomy, useSectorForecasts, useSectorEmployment, useSectorPositions, usePolicyInsights } from '../../services/queries'
@@ -115,31 +115,54 @@ function SectorInvestmentBrief({ sectorSlug }: { sectorSlug: string | null }) {
         </>
       )}
 
-      {sectorSlug && oneYear[0] && (() => {
-        const f = oneYear[0]
-        const current = empBySlug.get(f.sector_slug)
-        const growth = current && current > 0 ? (f.employment_count - current) / current * 100 : null
+      {sectorSlug && (() => {
+        const current1y = oneYear.find(f => f.sector_slug === sectorSlug)
+        const fc6m = horizonData.get('6m')?.find(f => f.sector_slug === sectorSlug)
+        const fc2y = horizonData.get('2y')?.find(f => f.sector_slug === sectorSlug)
+        const currentEmp = empBySlug.get(sectorSlug) ?? 0
+        const latestYr = sectorEmployment.data
+          ? [...sectorEmployment.data].filter(r => r.sector_slug === sectorSlug).sort((a, b) => b.year - a.year)[0]?.year
+          : null
+        if (!current1y) return null
         return (
           <div className="mt-5">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-              <div className="rounded-xl bg-gray-50 p-4">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Projected employment</div>
-                <div className="mt-2 text-2xl font-extrabold text-navy">{fmtInt(f.employment_count)}</div>
-              </div>
-              <div className="rounded-xl bg-gray-50 p-4">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Employment share</div>
-                <div className="mt-2 text-2xl font-extrabold text-navy">{fmtPct(f.employment_share_pct)}</div>
-              </div>
-              <div className="rounded-xl bg-gray-50 p-4">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Forecast growth</div>
-                <div className={`mt-2 text-2xl font-extrabold ${growth !== null && growth >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                  {growth !== null ? `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%` : '—'}
-                </div>
-              </div>
-              <div className="rounded-xl bg-gray-50 p-4">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Job postings</div>
-                <div className="mt-2 text-2xl font-extrabold text-navy">{fmtInt(f.posting_count)}</div>
-              </div>
+              <Card className="p-4">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Today{latestYr ? ` (${latestYr})` : ''}</div>
+                <div className="mt-2 text-2xl font-extrabold text-navy">{fmtInt(currentEmp)}</div>
+                <div className="mt-1 text-xs text-gray-500">jobs</div>
+              </Card>
+              {fc6m && (
+                <Card className="p-4">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">In 6 months</div>
+                  <div className="mt-2 text-2xl font-extrabold text-navy">{fmtInt(fc6m.employment_count)}</div>
+                  {currentEmp > 0 && (
+                    <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-emerald-600">
+                      <ArrowUpRight className="h-3.5 w-3.5" />+{fmtInt(fc6m.employment_count - currentEmp)} vs today
+                    </div>
+                  )}
+                </Card>
+              )}
+              <Card className="p-4">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">In 1 year</div>
+                <div className="mt-2 text-2xl font-extrabold text-navy">{fmtInt(current1y.employment_count)}</div>
+                {currentEmp > 0 && (
+                  <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-emerald-600">
+                    <ArrowUpRight className="h-3.5 w-3.5" />+{fmtInt(current1y.employment_count - currentEmp)} vs today
+                  </div>
+                )}
+              </Card>
+              {fc2y && (
+                <Card className="p-4">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">In 2 years</div>
+                  <div className="mt-2 text-2xl font-extrabold text-navy">{fmtInt(fc2y.employment_count)}</div>
+                  {currentEmp > 0 && (
+                    <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-emerald-600">
+                      <ArrowUpRight className="h-3.5 w-3.5" />+{fmtInt(fc2y.employment_count - currentEmp)} vs today
+                    </div>
+                  )}
+                </Card>
+              )}
             </div>
           </div>
         )
@@ -288,12 +311,11 @@ export default function PolicyPlanning() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-3xl">
-        <h1 className="flex items-center gap-3 text-3xl font-extrabold tracking-tight text-navy"><Landmark className="h-8 w-8" /> Policy & Planning Brief</h1>
-        <p className="mt-2 text-sm leading-relaxed text-gray-500">
-          Where Rwanda's workforce is heading and where to focus training investment, derived from the latest forecast run.
-        </p>
-      </div>
+      <PageHeader
+        icon={Landmark}
+        title="Policy & Planning Brief"
+        subtitle="Where Rwanda's workforce is heading and where to focus training investment, derived from the latest forecast run."
+      />
 
       <div className="mt-6">
         <SectorSelector selected={sectorSlug} onSelect={setSectorSlug} />
@@ -319,7 +341,8 @@ export default function PolicyPlanning() {
             const top = p.needMore[0]
             return (
               <div className="mt-2 space-y-6">
-                <h2 className="text-xl font-extrabold tracking-tight text-navy">ICT Role-Level Detail</h2>
+                <h2 className="text-xl font-extrabold tracking-tight text-navy">ICT Role-Level Training Plan</h2>
+                <p className="text-sm text-gray-500">Detailed role-level forecasts are available for ICT because SkillSense tracks normalized ICT roles.</p>
 
                 {top && (
                   <Card className="flex items-start gap-4 border-primary/30 p-6 ring-1 ring-primary/10">

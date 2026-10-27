@@ -5,7 +5,7 @@ const colors = ['#1E4ED8', '#3B82F6', '#60A5FA']
 export default function TopSkills() {
   return (
     <div>
-      <h4 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Top ICT Roles · 1-Year Forecast</h4>
+      <h4 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Top Roles · 1-Year Forecast</h4>
       <div className="space-y-2.5">
         {SNAPSHOT.topRoles1y.map((r, i) => (
           <div key={r.name}>

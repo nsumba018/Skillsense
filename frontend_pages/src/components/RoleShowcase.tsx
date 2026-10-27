@@ -30,7 +30,7 @@ const ROLES: Role[] = [
     headline: 'Turn the job market into advice for one student',
     text: 'See how ready each student is for the roles they want, what to learn next, and whether your graduates are actually getting hired.',
     points: [
-      'Score a student against any ICT or Business role',
+      'Score a student against any role across all sectors',
       'Match them to live postings by the skills employers ask for',
       'Build a pathway using Innovation Center courses',
       'Track placements and report outcomes to funders',
@@ -75,16 +75,16 @@ const ROLES: Role[] = [
     icon: LineChart,
     label: 'Labour Market Analysts',
     headline: 'See demand by role, sector and region',
-    text: 'Forecasts with confidence ranges, sector comparisons and planning briefs, ready to drop into a report.',
+    text: 'Forecasts with confidence ranges, sector comparisons and planning briefs — ready to drop into a report.',
     points: [
-      'Role demand forecasts at six, twelve and twenty-four months',
+      'Role and sector demand forecasts at 6m, 1y and 2y horizons',
       'Nine sectors compared side by side',
       'Regional demand from posting locations',
       'Planning briefs and exportable reports',
     ],
     preview: (
       <>
-        <div className="text-sm font-bold text-gray-900">ICT demand outlook</div>
+        <div className="text-sm font-bold text-gray-900">Demand outlook</div>
         <div className="mt-4 flex h-32 items-end gap-2" aria-hidden>
           {[28, 34, 31, 42, 49, 58, 66, 74].map((h, i) => (
             <div key={i} className={`flex-1 rounded-t ${i >= 5 ? 'bg-primary/40 ring-1 ring-primary/50' : 'bg-primary'}`} style={{ height: `${h}%` }} />

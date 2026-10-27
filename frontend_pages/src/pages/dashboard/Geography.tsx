@@ -1,5 +1,5 @@
 import { MapPin, Info } from 'lucide-react'
-import DashboardLayout, { Card } from './DashboardLayout'
+import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import SectorSelector, { useSectorParam } from '../../components/ui/SectorSelector'
 import { EmptyState, QueryGate } from '../../components/ui/State'
 import { useGeographicSummary } from '../../services/queries'
@@ -11,10 +11,11 @@ export default function Geography() {
 
   return (
     <DashboardLayout>
-      <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-navy">Geographic Demand</h1>
-        <p className="mt-2 text-sm text-gray-500">Where in Rwanda employers are hiring, from current job postings.</p>
-      </div>
+      <PageHeader
+        icon={MapPin}
+        title="Geographic Demand"
+        subtitle="Where in Rwanda employers are hiring, from current job postings."
+      />
 
       <div className="mt-6">
         <SectorSelector selected={sectorSlug} onSelect={setSectorSlug} />

@@ -7,10 +7,10 @@ import { SNAPSHOT } from '../lib/snapshot'
 const SkillDemandChart = lazy(() => import('./SkillDemandChart'))
 
 const kpis = [
-  { value: String(SNAPSHOT.roles), label: 'ICT roles tracked' },
-  { value: String(SNAPSHOT.postings), label: 'Job postings analysed' },
+  { value: String(SNAPSHOT.roles), label: 'Roles tracked' },
+  { value: String(SNAPSHOT.totalPostings), label: 'Job postings analysed' },
+  { value: String(SNAPSHOT.sectors), label: 'Economic sectors' },
   { value: SNAPSHOT.rankCorrelation.toFixed(2), label: 'Rank correlation' },
-  { value: '6m · 1y · 2y', label: 'Forecast horizons' },
 ]
 
 const sidebar = [
@@ -60,7 +60,7 @@ export default function HeroDashboard() {
         <div className="min-w-0 flex-1 bg-page p-3 sm:p-5">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className="text-sm font-extrabold text-gray-900">ICT Demand Overview</p>
+              <p className="text-sm font-extrabold text-gray-900">Workforce Demand Overview</p>
               <p className="text-[11px] text-gray-500">Rwanda · snapshot {SNAPSHOT.asOf}</p>
             </div>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-gray-500">

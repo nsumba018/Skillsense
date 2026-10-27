@@ -9,6 +9,7 @@ import {
   sectorPredictionsApi,
   taxonomyApi,
   uploadsApi,
+  bulletinApi,
 } from './api'
 import type { Horizon } from '../types/api'
 import type { AdvisorReportType, JobFilters, ReportFilters } from '../types/advisory'
@@ -18,6 +19,8 @@ const STALE = 60_000
 export const useKpis = () => useQuery({ queryKey: ['kpis'], queryFn: dashboardApi.kpis, staleTime: STALE })
 export const useOverview = () =>
   useQuery({ queryKey: ['overview'], queryFn: dashboardApi.overview, staleTime: STALE })
+export const useAdminStats = () =>
+  useQuery({ queryKey: ['admin-stats'], queryFn: dashboardApi.adminStats, staleTime: STALE })
 
 export const useForecasts = (horizon?: Horizon) =>
   useQuery({
@@ -196,4 +199,16 @@ export const useAdvisorReport = (type: AdvisorReportType | null, filters: Report
     queryKey: ['advisor-report', type, filters],
     queryFn: () => advisoryApi.report(type as AdvisorReportType, filters),
     enabled: enabled && type !== null,
+  })
+
+export const useBulletinAll = () =>
+  useQuery({ queryKey: ['bulletin-all'], queryFn: bulletinApi.all, staleTime: STALE })
+export const useBulletinList = () =>
+  useQuery({ queryKey: ['bulletins'], queryFn: bulletinApi.list, staleTime: STALE })
+export const useBulletinDetail = (deptCode: string | null) =>
+  useQuery({
+    queryKey: ['bulletin', deptCode],
+    queryFn: () => bulletinApi.detail(deptCode!),
+    enabled: !!deptCode,
+    staleTime: STALE,
   })

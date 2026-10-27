@@ -285,14 +285,7 @@ export default function Settings() {
               }
             </QueryGate>
 
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-6">
-              <div className="flex flex-wrap gap-2" data-testid="settings-unavailable">
-                {['Two-factor authentication', 'Notification preferences'].map((u) => (
-                  <span key={u} data-mock="true" className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">
-                    {u}<span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600">Coming soon</span>
-                  </span>
-                ))}
-              </div>
+            <div className="mt-6 flex flex-wrap items-center justify-end gap-3 border-t border-gray-100 pt-6">
               <div className="flex gap-2">
                 {others.length > 0 && (
                   <button onClick={() => others.forEach((s) => revoke.mutate(s.id))} disabled={revoke.isPending} className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-gray-50">

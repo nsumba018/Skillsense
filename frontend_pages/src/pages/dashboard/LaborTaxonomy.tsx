@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Briefcase, Building2, ChevronRight, MapPin, Search, Sparkles } from 'lucide-react'
-import DashboardLayout, { Card } from './DashboardLayout'
+import { Briefcase, Building2, ChevronRight, MapPin, Network, Search, Sparkles } from 'lucide-react'
+import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { useSectorParam } from '../../components/ui/SectorSelector'
 import { useSectorList } from '../../services/queries'
 import { RoleForecastChart, type RoleChartPoint } from './charts'
@@ -340,9 +340,11 @@ export default function LaborTaxonomy() {
 
   return (
     <DashboardLayout>
-      <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-navy">Role Taxonomy</h1>
-      </div>
+      <PageHeader
+        icon={Network}
+        title="Role Taxonomy"
+        subtitle="Explore roles, skills and career paths across all sectors of Rwanda's economy."
+      />
 
       <div className="mt-6 flex flex-wrap items-center gap-2" role="tablist" data-testid="taxonomy-sector-selector">
         <span className="mr-1 text-[11px] font-bold uppercase tracking-wider text-gray-400">Sector</span>

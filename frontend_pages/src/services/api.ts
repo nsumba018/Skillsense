@@ -61,6 +61,9 @@ import type {
   TokenPair,
   TrendsResponse,
   User,
+  BulletinSummary,
+  BulletinDetail,
+  CurriculumAllData,
 } from '../types/api'
 
 export const authApi = {
@@ -143,6 +146,7 @@ export const predictionsApi = {
 export const dashboardApi = {
   kpis: () => request<Kpis>('/api/dashboard/kpis/'),
   overview: () => request<Overview>('/api/dashboard/overview/'),
+  adminStats: () => request<import('../types/api').AdminStats>('/api/dashboard/admin-stats/'),
 }
 
 export const analyticsApi = {
@@ -168,6 +172,15 @@ export const analyticsApi = {
   submitCurriculum: (form: FormData) =>
     request<CurriculumDetail>('/api/analytics/education/curricula/', { method: 'POST', form }),
   deleteCurriculum: (id: number) => request<void>(`/api/analytics/education/curricula/${id}/`, { method: 'DELETE' }),
+}
+
+export const bulletinApi = {
+  all: () => request<CurriculumAllData>('/api/curriculum/all/'),
+  list: () => request<BulletinSummary[]>('/api/curriculum/'),
+  detail: (deptCode: string) => request<BulletinDetail>(`/api/curriculum/${deptCode}/`),
+  skills: () => request<Record<string, { department_name: string; faculty: string; skills: string[] }>>('/api/curriculum/skills/'),
+  upload: (form: FormData) =>
+    request<{ detail: string; bulletins: BulletinSummary[] }>('/api/curriculum/upload/', { method: 'POST', form }),
 }
 
 export const reportsApi = {
@@ -227,6 +240,8 @@ export const advisoryApi = {
   student: (id: number) => request<StudentProfileDetail>(`/api/advisory/students/${id}/`),
   updateStudent: (id: number, data: Partial<CreateStudentPayload>) =>
     request<StudentProfile>(`/api/advisory/students/${id}/`, { method: 'PATCH', body: data }),
+  deleteStudent: (id: number) =>
+    request<void>(`/api/advisory/students/${id}/`, { method: 'DELETE' }),
 
   assess: (studentId: number, targetRole: string) =>
     request<AssessmentResult>('/api/advisory/assessments/', {

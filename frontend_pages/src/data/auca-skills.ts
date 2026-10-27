@@ -7,11 +7,12 @@
 import type { PrioritySkill } from '../types/advisory'
 
 export type Sector = 'ict' | 'business'
-export type DeptCode = 'se' | 'net' | 'fin' | 'ba'
+export type DeptCode = 'se' | 'net' | 'im' | 'fin' | 'ba'
 
 export const DEPT_LABEL: Record<DeptCode, string> = {
   se: 'Software Engineering',
-  net: 'Network & Info Management',
+  net: 'Networks & Communication',
+  im: 'Information Management',
   fin: 'Finance',
   ba: 'Business Administration',
 }
@@ -171,9 +172,25 @@ export const DEPT_CURRICULA: Record<DeptCode, Set<string>> = {
   net: new Set([
     'TCP/IP', 'Networking', 'LAN/WAN', 'Network Administration', 'Windows Server', 'Linux',
     'SQL', 'DBMS', 'Database Design', 'IT Support', 'Help Desk', 'Hardware Troubleshooting',
-    'Operating Systems', 'System Administration', 'HTML/CSS', 'Visual Basic',
+    'Operating Systems', 'System Administration', 'HTML/CSS',
     'Information Systems', 'Computer Networks', 'Project Management', 'Statistics', 'Mathematics',
-    'Network Security', 'Penetration Testing',
+    'Network Security', 'Penetration Testing', 'Cisco', 'Routing', 'Switching', 'CCNA',
+    'Firewall', 'Cybersecurity', 'Active Directory', 'Socket Programming', 'Network Programming',
+    'Wireless Networking', 'Java', 'C', 'OOP', 'Data Structures', 'Algorithms',
+    'JavaScript', 'React', 'REST APIs', 'Web Development', 'Mobile Development',
+    'Emerging Technologies', 'IoT', 'System Analysis', 'UML',
+  ]),
+  im: new Set([
+    'DBMS', 'SQL', 'Database Design', 'PL/SQL', 'Java', 'C', 'OOP', '.NET', 'C#',
+    'Python', 'Big Data', 'Data Analysis', 'Machine Learning',
+    'HTML/CSS', 'JavaScript', 'React', 'REST APIs', 'Web Development', 'Mobile Development',
+    'Software Engineering', 'System Analysis', 'System Design', 'UML',
+    'Operating Systems', 'Linux', 'Information Security', 'Cybersecurity', 'Risk Management',
+    'MIS', 'Information Systems', 'Business Analysis',
+    'Principles of Accounting', 'Financial Accounting', 'Auditing', 'IFRS', 'Cost Accounting',
+    'Budgeting', 'Financial Analysis', 'Corporate Finance', 'Advanced Accounting',
+    'Statistics', 'Mathematics', 'Data Structures', 'Algorithms',
+    'Emerging Technologies', 'IoT', 'E-Commerce',
   ]),
   fin: new Set([
     'Financial Accounting', 'Principles of Accounting', 'Auditing', 'Tax', 'IFRS', 'Corporate Finance',
@@ -213,9 +230,7 @@ export const INNOVATION_COURSES: Record<string, InnovationCourse> = {
   'DevOps & CI/CD': { skills: ['Docker', 'Kubernetes', 'CI/CD', 'Terraform', 'Monitoring', 'Scripting (Bash/PowerShell)'], desc: 'Deployment pipelines, container orchestration, and monitoring', duration_weeks: 6 },
   'Entrepreneurship & Innovation': { skills: ['Business Development', 'Market Analysis', 'Proposal Writing', 'Strategic Partnerships', 'Financial Acumen', 'Design Thinking'], desc: 'Startup methodology, business model canvas, and venture building', duration_weeks: 6 },
   'Database & Data Engineering': { skills: ['PostgreSQL/MySQL', 'MongoDB', 'Performance Tuning', 'Cloud Databases', 'Data Warehousing', 'ETL Pipelines'], desc: 'Advanced database management, NoSQL, and data pipelines', duration_weeks: 8 },
-  'Digital Marketing & Analytics': { skills: ['SEO/SEM', 'Google Analytics', 'Social Media Marketing', 'Content Creation', 'Email Marketing', 'Marketing Automation', 'A/B Testing'], desc: 'Data-driven marketing, SEO, and campaign analytics', duration_weeks: 6 },
-  'Financial Technology': { skills: ['ERP Systems', 'Financial Modeling', 'Power BI/Tableau', 'Advanced Excel', 'CAAT Tools', 'Bloomberg Terminal'], desc: 'FinTech tools, ERP systems, and financial data analytics', duration_weeks: 6 },
-  'Project Management (Advanced)': { skills: ['Jira', 'MS Project', 'Risk Management', 'Stakeholder Communication', 'Budgeting', 'Team Leadership'], desc: 'Agile certification prep, Jira mastery, and stakeholder management', duration_weeks: 6 },
+  'IoT & Embedded Systems': { skills: ['IoT', 'Embedded Systems', 'Arduino/Raspberry Pi', 'Sensor Networks', 'MQTT', 'Edge Computing'], desc: 'Internet of Things, embedded programming, sensor integration, and edge computing', duration_weeks: 8 },
 }
 
 /* ══════════ Matching ══════════ */

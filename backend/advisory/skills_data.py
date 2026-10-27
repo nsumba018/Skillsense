@@ -875,42 +875,17 @@ INNOVATION_COURSES = {
         "desc": "Advanced database management, NoSQL, and data pipelines",
         "duration_weeks": 8,
     },
-    "Digital Marketing & Analytics": {
+    "IoT & Embedded Systems": {
         "skills": [
-            "SEO/SEM",
-            "Google Analytics",
-            "Social Media Marketing",
-            "Content Creation",
-            "Email Marketing",
-            "Marketing Automation",
-            "A/B Testing",
+            "IoT",
+            "Embedded Systems",
+            "Arduino/Raspberry Pi",
+            "Sensor Networks",
+            "MQTT",
+            "Edge Computing",
         ],
-        "desc": "Data-driven marketing, SEO, and campaign analytics",
-        "duration_weeks": 6,
-    },
-    "Financial Technology": {
-        "skills": [
-            "ERP Systems",
-            "Financial Modeling",
-            "Power BI/Tableau",
-            "Advanced Excel",
-            "CAAT Tools",
-            "Bloomberg Terminal",
-        ],
-        "desc": "FinTech tools, ERP systems, and financial data analytics",
-        "duration_weeks": 6,
-    },
-    "Project Management (Advanced)": {
-        "skills": [
-            "Jira",
-            "MS Project",
-            "Risk Management",
-            "Stakeholder Communication",
-            "Budgeting",
-            "Team Leadership",
-        ],
-        "desc": "Agile certification prep, Jira mastery, and stakeholder management",
-        "duration_weeks": 6,
+        "desc": "Internet of Things, embedded programming, sensor integration, and edge computing",
+        "duration_weeks": 8,
     },
 }
 

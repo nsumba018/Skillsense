@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { BookOpen, Briefcase, Calculator, Check, GraduationCap, Lightbulb, Loader2, ShieldCheck, Sparkles, TrendingUp } from 'lucide-react'
-import DashboardLayout, { Card } from './DashboardLayout'
+import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { ProfileRadar } from './charts'
 import { QueryGate } from '../../components/ui/State'
 import { useEmployabilityOverview, useForecasts, useSectorPositions } from '../../services/queries'
@@ -626,19 +626,13 @@ export default function EducationEmployability() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-3xl">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100">
-            <GraduationCap className="h-5 w-5 text-indigo-700" />
-          </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-navy">Graduate Employability</h1>
-        </div>
-        <p className="mt-3 text-sm leading-relaxed text-gray-500">
-          {faculty === 'it'
-            ? 'Assess how well AUCA IT graduates\' skills align with market demand. Select the roles an AUCA programme covers, then see how employable those graduates are and where skill gaps exist.'
-            : 'Assess how well AUCA Business graduates\' skills align with Finance & Business sector demand. Select the roles a programme covers, then see employer alignment and skill gaps.'}
-        </p>
-      </div>
+      <PageHeader
+        icon={Briefcase}
+        title="Graduate Employability"
+        subtitle={faculty === 'it'
+          ? "Assess how well AUCA IT graduates' skills align with market demand and where skill gaps exist."
+          : "Assess how well AUCA Business graduates' skills align with Finance & Business sector demand."}
+      />
 
       {/* Faculty tabs */}
       <div className="mt-8 flex rounded-xl border border-gray-200 bg-gray-50 p-1.5" role="tablist">

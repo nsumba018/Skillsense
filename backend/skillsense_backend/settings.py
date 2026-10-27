@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'analytics',
     'reports',
     'advisory',
+    'curriculum',
 ]
 
 MIDDLEWARE = [

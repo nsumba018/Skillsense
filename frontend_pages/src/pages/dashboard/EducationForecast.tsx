@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { TrendingUp, TrendingDown, Sparkles, Gauge, GraduationCap, Minus, Briefcase } from 'lucide-react'
-import DashboardLayout, { Card } from './DashboardLayout'
+import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { RoleForecastChart, type RoleChartPoint, EmploymentTrendChart, type EmploymentPoint } from './charts'
 import { EmptyState, QueryGate } from '../../components/ui/State'
 import {
@@ -692,27 +692,19 @@ export default function EducationForecast() {
   return (
     <DashboardLayout>
       {/* Header */}
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-        <div className="max-w-2xl">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100">
-              <GraduationCap className="h-5 w-5 text-indigo-700" />
-            </div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-navy">Role Demand Forecast</h1>
-          </div>
-          <p className="mt-3 text-base leading-relaxed text-gray-600">
-            {faculty === 'it'
-              ? 'See which ICT roles are growing or declining. Use this to align AUCA IT programmes with where employer demand is heading.'
-              : 'Track Finance & Business hiring trends. See which roles employers need and how AUCA Business programmes align.'}
-          </p>
-        </div>
-        {run && (
+      <PageHeader
+        icon={TrendingUp}
+        title="Role Demand Forecast"
+        subtitle={faculty === 'it'
+          ? 'See which ICT roles are growing or declining. Use this to align AUCA IT programmes with where employer demand is heading.'
+          : 'Track Finance & Business hiring trends. See which roles employers need and how AUCA Business programmes align.'}
+        actions={run ? (
           <span className="flex shrink-0 items-center gap-2.5 rounded-full bg-emerald-50 px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-emerald-800">
             <span className="h-2 w-2 rounded-full bg-emerald-500" />
             Model {run.model_version}
           </span>
-        )}
-      </div>
+        ) : undefined}
+      />
 
       {/* Faculty tabs */}
       <div className="mt-8 flex rounded-xl border border-gray-200 bg-gray-50 p-1.5" role="tablist">

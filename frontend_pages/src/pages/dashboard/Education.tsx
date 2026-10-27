@@ -1,30 +1,35 @@
-import { useMemo, useState } from 'react'
+import { useRef, useMemo, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   ArrowRight,
   BookOpen,
   Check,
+  CheckCircle2,
   ChevronDown,
   ChevronUp,
+  FileText,
   FileUp,
   GraduationCap,
   Lightbulb,
   Loader2,
   Plus,
+  RefreshCw,
   Sparkles,
   Trash2,
   TrendingUp,
+  UploadCloud,
   X,
   Zap,
 } from 'lucide-react'
-import DashboardLayout, { Card } from './DashboardLayout'
+import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { EmptyState, QueryGate } from '../../components/ui/State'
 import { useAuth } from '../../auth/AuthContext'
-import { useCurricula } from '../../services/queries'
-import { analyticsApi } from '../../services/api'
+import { useCurricula, useBulletinAll, useBulletinList } from '../../services/queries'
+import { analyticsApi, bulletinApi } from '../../services/api'
 import { ApiError } from '../../services/http'
 import { fmtDate } from '../../lib/format'
-import { DEPT_CURRICULA_BY_LABEL as DEPT_CURRICULA, INNOVATION_COURSES, isSkillTaught } from '../../data/auca-skills'
+import { DEPT_CURRICULA as RAW_DEPT_CURRICULA, INNOVATION_COURSES, isSkillTaught } from '../../data/auca-skills'
+import type { DeptCode } from '../../data/auca-skills'
 
 /* ══════════════════════════════════════════════════
    Innovation Center course catalog with skill mappings
@@ -33,6 +38,17 @@ import { DEPT_CURRICULA_BY_LABEL as DEPT_CURRICULA, INNOVATION_COURSES, isSkillT
 /* ── Department curricula (baseline — same as Employability page) ── */
 
 type Dept = 'Software Engineering' | 'Network & Info Management' | 'Finance' | 'Business Administration'
+
+const DEPT_CODE: Record<Dept, DeptCode> = {
+  'Software Engineering': 'se',
+  'Network & Info Management': 'net',
+  'Finance': 'fin',
+  'Business Administration': 'ba',
+}
+
+const DEPT_CURRICULA: Record<Dept, Set<string>> = Object.fromEntries(
+  (Object.keys(DEPT_CODE) as Dept[]).map(d => [d, RAW_DEPT_CURRICULA[DEPT_CODE[d]]]),
+) as Record<Dept, Set<string>>
 
 const MARKET_SKILLS: Record<Dept, string[]> = {
   'Software Engineering': [
@@ -255,6 +271,43 @@ export default function Education() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
   const list = useCurricula()
+  const bulletin = useBulletinAll()
+  const bulletinList = useBulletinList()
+  const bulFileRef = useRef<HTMLInputElement>(null)
+  const [bulFile, setBulFile] = useState<File | null>(null)
+  const [bulDragOver, setBulDragOver] = useState(false)
+  const [showCurrMgmt, setShowCurrMgmt] = useState(false)
+  const [bulUploadError, setBulUploadError] = useState<string | null>(null)
+  const uploadBulletin = useMutation({
+    mutationFn: (f: File) => {
+      const form = new FormData()
+      form.append('file', f)
+      return bulletinApi.upload(form)
+    },
+    onSuccess: () => {
+      setBulFile(null)
+      if (bulFileRef.current) bulFileRef.current.value = ''
+      setBulUploadError(null)
+      queryClient.invalidateQueries({ queryKey: ['bulletin-all'] })
+      queryClient.invalidateQueries({ queryKey: ['bulletins'] })
+    },
+    onError: (err) => {
+      setBulUploadError(err instanceof ApiError ? err.message : 'Upload failed. Please try again.')
+    },
+  })
+
+  const pickBulletin = (f: File | undefined) => {
+    setBulUploadError(null)
+    uploadBulletin.reset()
+    if (!f) return
+    const ext = f.name.split('.').pop()?.toLowerCase()
+    if (ext !== 'xlsx' && ext !== 'xls') {
+      setBulUploadError('Only .xlsx or .xls files are supported.')
+      return
+    }
+    setBulFile(f)
+    uploadBulletin.mutate(f)
+  }
 
   /* ── Cohort state ── */
   const [cohorts, setCohorts] = useState<Cohort[]>([])
@@ -316,24 +369,21 @@ export default function Education() {
 
   /* ── Curriculum update state ── */
   const [showCurrUpdate, setShowCurrUpdate] = useState(false)
+  const [currSkillsOpen, setCurrSkillsOpen] = useState(false)
   const [currDept, setCurrDept] = useState<Dept>('Software Engineering')
   const [currName, setCurrName] = useState('')
-  const [currLevel, setCurrLevel] = useState('bachelor')
-  const [currFile, setCurrFile] = useState<File | null>(null)
   const [currText, setCurrText] = useState('')
 
   const submitCurr = useMutation({
     mutationFn: () => {
       const form = new FormData()
       form.append('name', `${currDept} — ${currName.trim()}`)
-      form.append('level', currLevel)
-      if (currFile) form.append('file', currFile)
+      form.append('level', 'bachelor')
       if (currText.trim()) form.append('text', currText)
       return analyticsApi.submitCurriculum(form)
     },
     onSuccess: () => {
       setCurrName('')
-      setCurrFile(null)
       setCurrText('')
       queryClient.invalidateQueries({ queryKey: ['curricula'] })
     },
@@ -354,19 +404,11 @@ export default function Education() {
 
   return (
     <DashboardLayout>
-      {/* ── Header ── */}
-      <div className="max-w-3xl">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100">
-            <GraduationCap className="h-5 w-5 text-indigo-700" />
-          </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-navy">Education Alignment</h1>
-        </div>
-        <p className="mt-3 text-sm leading-relaxed text-gray-500">
-          Track how AUCA Innovation Center training transforms graduates from formal curriculum to market-ready professionals.
-          Add training cohorts, see real-time transformation insights, and get AI recommendations.
-        </p>
-      </div>
+      <PageHeader
+        icon={GraduationCap}
+        title="Education Alignment"
+        subtitle="Track how AUCA Innovation Center training transforms graduates from formal curriculum to market-ready professionals."
+      />
 
       {/* ══════ Innovation Center Banner ══════ */}
       <Card className="mt-8 flex flex-col gap-4 border-primary/30 p-6 ring-1 ring-primary/10 md:flex-row md:items-center">
@@ -542,127 +584,188 @@ export default function Education() {
         </div>
       )}
 
-      {/* ══════ Department Curriculum Update (collapsible) ══════ */}
-      <div className="mt-12">
-        <button
-          onClick={() => setShowCurrUpdate(!showCurrUpdate)}
-          className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-6 py-4 text-left transition-colors hover:bg-gray-100"
-        >
+      {/* ══════ Curriculum Management (combined) ══════ */}
+      <Card className="mt-12 p-6">
+        <button onClick={() => setShowCurrMgmt(p => !p)} className="flex w-full items-center justify-between text-left">
           <div className="flex items-center gap-3">
-            <FileUp className="h-5 w-5 text-gray-500" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50">
+              <FileUp className="h-5 w-5 text-indigo-700" />
+            </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Update Department Curriculum</h2>
-              <p className="text-sm text-gray-500">Upload a new curriculum when the university updates course offerings</p>
+              <h2 className="text-lg font-bold text-gray-900">Curriculum Management</h2>
+              <p className="mt-0.5 text-sm text-gray-500">Upload or update department curricula — bulletins are parsed automatically into courses, credits, and skill mappings</p>
             </div>
           </div>
-          {showCurrUpdate ? <ChevronUp className="h-5 w-5 text-gray-400" /> : <ChevronDown className="h-5 w-5 text-gray-400" />}
+          <ChevronDown className={`h-5 w-5 shrink-0 text-gray-400 transition-transform ${showCurrMgmt ? 'rotate-180' : ''}`} />
         </button>
 
-        {showCurrUpdate && (
-          <Card className="mt-4 p-6">
-            {/* Department selector */}
-            <div className="flex flex-wrap gap-2">
-              {ALL_DEPTS.map(d => (
-                <button
-                  key={d}
-                  onClick={() => setCurrDept(d)}
-                  className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${currDept === d ? 'bg-navy text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-                >
-                  {d}
-                </button>
+        {showCurrMgmt && (<>
+        {/* ── Active bulletins ── */}
+        {(bulletinList.data?.length ?? 0) > 0 && (
+          <div className="mt-6">
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Active Bulletins</h3>
+            <div className="mt-2 divide-y divide-gray-100 rounded-lg border border-gray-200">
+              {bulletinList.data!.map(b => (
+                <div key={b.id} className="flex items-center justify-between px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-700">
+                      <FileText className="h-4 w-4" />
+                    </span>
+                    <div>
+                      <span className="text-sm font-semibold text-gray-800">{b.department_name}</span>
+                      <div className="text-[11px] text-gray-400">{b.total_courses} courses · {b.total_credits} credits · {b.total_semesters} semesters</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                      <CheckCircle2 className="h-3 w-3" /> Active
+                    </span>
+                    <div className="mt-0.5 text-[10px] text-gray-400">Uploaded {fmtDate(b.created_at)}</div>
+                  </div>
+                </div>
               ))}
             </div>
+          </div>
+        )}
 
-            {/* Current curriculum display */}
-            <div className="mt-6">
-              <h3 className="text-sm font-bold text-gray-700">Current {currDept} curriculum skills</h3>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {[...DEPT_CURRICULA[currDept]].map(s => (
-                  <span key={s} className="rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-medium text-indigo-700">{s}</span>
+        {/* ── Upload Excel bulletin (auto-processes on file select) ── */}
+        <div className="mt-6">
+          <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Upload or Replace Bulletin</h3>
+          <p className="mt-1 text-xs text-gray-500">Drop an Excel file to automatically parse and update all department curricula. Existing bulletins for the same department are replaced.</p>
+          <div
+            onDragOver={e => { e.preventDefault(); setBulDragOver(true) }}
+            onDragLeave={() => setBulDragOver(false)}
+            onDrop={e => { e.preventDefault(); setBulDragOver(false); pickBulletin(e.dataTransfer.files[0]) }}
+            className={`mt-2 flex flex-col items-center gap-2 rounded-xl border-2 border-dashed px-6 py-8 text-center transition-colors ${bulDragOver ? 'border-primary bg-primary-light/40' : 'border-gray-200 bg-gray-50/60'}`}
+          >
+            <UploadCloud className="h-8 w-8 text-primary" />
+            <p className="text-sm font-semibold text-gray-700">
+              {uploadBulletin.isPending ? 'Processing bulletin…' : 'Drag an Excel bulletin here, or'}
+            </p>
+            {uploadBulletin.isPending ? (
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            ) : (
+              <>
+                <input ref={bulFileRef} id="bulletin-input" type="file" accept=".xlsx,.xls" onChange={e => pickBulletin(e.target.files?.[0])} className="sr-only" />
+                <label htmlFor="bulletin-input" className="cursor-pointer rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-navy shadow-sm hover:bg-gray-50">Choose file</label>
+              </>
+            )}
+            <p className="text-xs text-gray-400">Supported: .xlsx or .xls with department sheets (e.g. Software Engineering, Networks, Info Management)</p>
+          </div>
+        </div>
+
+        {uploadBulletin.isSuccess && (
+          <div className="mt-3 flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+            <CheckCircle2 className="h-4 w-4" />
+            Bulletin processed successfully. All education pages have been updated.
+          </div>
+        )}
+
+        {bulUploadError && (
+          <div className="mt-3 rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{bulUploadError}</div>
+        )}
+
+        {/* ── Manual update (collapsible) ── */}
+        <div className="mt-6 border-t border-gray-100 pt-6">
+          <button
+            onClick={() => setShowCurrUpdate(!showCurrUpdate)}
+            className="flex w-full items-center justify-between text-left"
+          >
+            <div>
+              <h3 className="text-sm font-bold text-gray-700">Manual Curriculum Update</h3>
+              <p className="text-xs text-gray-400">Paste course lists for a single department</p>
+            </div>
+            {showCurrUpdate ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+          </button>
+
+          {showCurrUpdate && (
+            <div className="mt-5 space-y-5">
+              {/* Department selector */}
+              <div className="flex flex-wrap gap-2">
+                {ALL_DEPTS.map(d => (
+                  <button
+                    key={d}
+                    onClick={() => setCurrDept(d)}
+                    className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${currDept === d ? 'bg-navy text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                  >
+                    {d}
+                  </button>
                 ))}
               </div>
-            </div>
 
-            {/* Upload form */}
-            <form className="mt-6 space-y-5" onSubmit={e => { e.preventDefault(); submitCurr.mutate() }}>
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              {/* Current curriculum display */}
+              <div>
+                <button onClick={() => setCurrSkillsOpen(p => !p)} className="flex w-full items-center justify-between text-left">
+                  <h3 className="text-sm font-bold text-gray-700">Current {currDept} curriculum skills <span className="ml-1 font-normal text-gray-400">({DEPT_CURRICULA[currDept].size})</span></h3>
+                  <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${currSkillsOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {currSkillsOpen && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {[...DEPT_CURRICULA[currDept]].map(s => (
+                      <span key={s} className="rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-medium text-indigo-700">{s}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Upload form */}
+              <form className="space-y-5" onSubmit={e => { e.preventDefault(); submitCurr.mutate() }}>
                 <label className="block">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-navy">Programme name</span>
                   <input value={currName} onChange={e => setCurrName(e.target.value)} placeholder={`${currDept} (Updated)`} className={inputClass} />
                 </label>
-                <label className="block">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-navy">Level</span>
-                  <select value={currLevel} onChange={e => setCurrLevel(e.target.value)} className={inputClass}>
-                    <option value="bachelor">Bachelor's degree</option>
-                    <option value="master">Master's degree</option>
-                    <option value="diploma">Diploma</option>
-                    <option value="certificate">Certificate</option>
-                    <option value="short_course">Short course</option>
-                  </select>
-                </label>
-              </div>
 
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-navy">Option A: CSV file</span>
-                  <label htmlFor="curr-file" className="mt-2 flex cursor-pointer items-center gap-3 rounded-lg border-2 border-dashed border-gray-200 bg-gray-50/60 px-4 py-6 text-sm text-gray-600 hover:border-primary/40">
-                    <FileUp className="h-5 w-5 text-primary" />
-                    <span>{currFile ? currFile.name : 'Choose a .csv with a "course" column'}</span>
-                  </label>
-                  <input id="curr-file" type="file" accept=".csv,text/csv" className="sr-only" onChange={e => setCurrFile(e.target.files?.[0] ?? null)} />
-                </div>
                 <label className="block">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-navy">Option B: paste courses (one per line)</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-navy">Paste courses (one per line)</span>
                   <textarea value={currText} onChange={e => setCurrText(e.target.value)} rows={4} placeholder="Cloud Computing Fundamentals&#10;Advanced Cybersecurity&#10;Docker & Kubernetes" className={`${inputClass} font-mono text-xs`} />
                 </label>
-              </div>
 
-              {submitCurr.isError && (
-                <p className="text-sm font-medium text-red-600">
-                  {submitCurr.error instanceof ApiError ? submitCurr.error.message : 'Could not submit the curriculum.'}
-                </p>
-              )}
-              <button
-                type="submit"
-                disabled={!currName.trim() || (!currFile && !currText.trim()) || submitCurr.isPending}
-                className="flex items-center gap-2 rounded-lg bg-navy px-6 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-dark-navy disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {submitCurr.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <GraduationCap className="h-4 w-4" />}
-                Update curriculum
-              </button>
-            </form>
-
-            {/* Previously uploaded curricula */}
-            <div className="mt-8">
-              <h3 className="text-sm font-bold text-gray-700">Previously uploaded curricula</h3>
-              <QueryGate query={list} className="mt-3">
-                {l =>
-                  l.results.length === 0 ? (
-                    <EmptyState title="No curricula uploaded yet" hint="Upload a curriculum above to track changes over time." className="py-6" />
-                  ) : (
-                    <div className="mt-3 space-y-2">
-                      {l.results.map(c => (
-                        <div key={c.id} className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3">
-                          <div>
-                            <span className="text-sm font-bold text-gray-900">{c.name}</span>
-                            <span className="ml-3 text-xs text-gray-500">{c.level_label} · {c.course_count} courses · {fmtDate(c.created_at)}</span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span className="text-sm font-bold text-navy">{Math.round(c.alignment_score)}%</span>
-                            <button onClick={() => removeCurr.mutate(c.id)} className="text-gray-300 hover:text-red-500">
-                              <X className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )
-                }
-              </QueryGate>
+                {submitCurr.isError && (
+                  <p className="text-sm font-medium text-red-600">
+                    {submitCurr.error instanceof ApiError ? submitCurr.error.message : 'Could not submit the curriculum.'}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={!currName.trim() || !currText.trim() || submitCurr.isPending}
+                  className="flex items-center gap-2 rounded-lg bg-navy px-6 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-dark-navy disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {submitCurr.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <GraduationCap className="h-4 w-4" />}
+                  Update curriculum
+                </button>
+              </form>
             </div>
-          </Card>
-        )}
-      </div>
+          )}
+        </div>
+
+        {/* ── Previously uploaded curricula ── */}
+        <QueryGate query={list} className="mt-6 border-t border-gray-100 pt-6">
+          {l =>
+            l.results.length === 0 ? null : (
+              <div>
+                <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Upload History</h3>
+                <div className="mt-2 space-y-2">
+                  {l.results.map(c => (
+                    <div key={c.id} className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3">
+                      <div>
+                        <span className="text-sm font-bold text-gray-900">{c.name}</span>
+                        <span className="ml-3 text-xs text-gray-500">{c.level_label} · {c.course_count} courses · {fmtDate(c.created_at)}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-bold text-navy">{Math.round(c.alignment_score)}%</span>
+                        <button onClick={() => removeCurr.mutate(c.id)} className="text-gray-300 hover:text-red-500">
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+        </QueryGate>
+        </>)}
+      </Card>
     </DashboardLayout>
   )
 }

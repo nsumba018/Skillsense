@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard,
@@ -36,26 +36,85 @@ interface NavItem {
   to: string
 }
 
+const SEARCH_HINTS = [
+  'Search sectors…',
+  'Search roles…',
+  'Try "Software Developer"…',
+  'Try "Finance"…',
+  'Try "ICT"…',
+]
+
+function AnimatedPlaceholder({ hints, active }: { hints: string[]; active: boolean }) {
+  const [idx, setIdx] = useState(0)
+  const [displayed, setDisplayed] = useState('')
+  const [typing, setTyping] = useState(true)
+  const timer = useRef<ReturnType<typeof setTimeout>>()
+
+  useEffect(() => {
+    if (active) return
+    const hint = hints[idx]
+    if (typing) {
+      if (displayed.length < hint.length) {
+        timer.current = setTimeout(() => setDisplayed(hint.slice(0, displayed.length + 1)), 70)
+      } else {
+        timer.current = setTimeout(() => setTyping(false), 1800)
+      }
+    } else {
+      if (displayed.length > 0) {
+        timer.current = setTimeout(() => setDisplayed(displayed.slice(0, -1)), 40)
+      } else {
+        setIdx((i) => (i + 1) % hints.length)
+        setTyping(true)
+      }
+    }
+    return () => clearTimeout(timer.current)
+  }, [displayed, typing, idx, hints, active])
+
+  useEffect(() => {
+    if (active) { setDisplayed(''); setTyping(true) }
+  }, [active])
+
+  return (
+    <span className="pointer-events-none absolute inset-y-0 left-10 flex items-center text-sm text-gray-400" aria-hidden>
+      {active ? '' : displayed}
+      {!active && <span className="ml-px inline-block h-4 w-px animate-pulse bg-gray-300" />}
+    </span>
+  )
+}
+
 /** Every page; each user sees only the ones their role can open (see auth/access.ts). */
 const navItems: NavItem[] = [
+  // Admin
   { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
+  { label: 'Data Upload', icon: UploadCloud, to: '/dashboard/uploads' },
+  { label: 'User Management', icon: Users, to: '/dashboard/users' },
+
+  // Labour market analyst
+  { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard/labor' },
+  { label: 'Sector Overview', icon: Layers, to: '/dashboard/sectors' },
+  { label: 'Geography', icon: MapPin, to: '/dashboard/geography' },
+  { label: 'Policy & Planning', icon: Landmark, to: '/dashboard/planning' },
+
+  // Education curriculum planner
+  { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard/education-home' },
+  { label: 'Role Forecast', icon: TrendingUp, to: '/dashboard/forecast' },
+  { label: 'Employability', icon: Briefcase, to: '/dashboard/employability' },
+  { label: 'Career Guidance', icon: Compass, to: '/dashboard/career' },
+  { label: 'Education Alignment', icon: GraduationCap, to: '/dashboard/education' },
+
+  // Shared between analyst and education planner
+  { label: 'Role Taxonomy', icon: Network, to: '/dashboard/taxonomy' },
+  { label: 'Reports', icon: FileText, to: '/dashboard/reports' },
+
+  // Career & training advisor
   { label: 'Advisor Dashboard', icon: UserCheck, to: '/dashboard/advisor' },
   { label: 'Skill Assessment', icon: Target, to: '/dashboard/advisor/assessment' },
   { label: 'Job Navigator', icon: BriefcaseBusiness, to: '/dashboard/advisor/jobs' },
   { label: 'Career Pathways', icon: Route, to: '/dashboard/advisor/pathways' },
   { label: 'Placement Tracker', icon: BarChart4, to: '/dashboard/advisor/placements' },
   { label: 'Advisor Reports', icon: ClipboardList, to: '/dashboard/advisor/reports' },
-  { label: 'Sector Overview', icon: Layers, to: '/dashboard/sectors' },
-  { label: 'Role Forecast', icon: TrendingUp, to: '/dashboard/forecast' },
-  { label: 'Employability', icon: Briefcase, to: '/dashboard/employability' },
-  { label: 'Career Guidance', icon: Compass, to: '/dashboard/career' },
-  { label: 'Education Alignment', icon: GraduationCap, to: '/dashboard/education' },
-  { label: 'Geography', icon: MapPin, to: '/dashboard/geography' },
-  { label: 'Policy & Planning', icon: Landmark, to: '/dashboard/planning' },
-  { label: 'Role Taxonomy', icon: Network, to: '/dashboard/taxonomy' },
-  { label: 'Reports', icon: FileText, to: '/dashboard/reports' },
-  { label: 'Data Upload', icon: UploadCloud, to: '/dashboard/uploads' },
-  { label: 'User Management', icon: Users, to: '/dashboard/users' },
+
+  // Shared
   { label: 'Settings', icon: Settings, to: '/dashboard/settings' },
 ]
 
@@ -67,11 +126,39 @@ export function Card({ children, className = '', ...rest }: React.HTMLAttributes
   )
 }
 
+export function PageHeader({
+  icon: Icon,
+  title,
+  subtitle,
+  actions,
+}: {
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+  subtitle: string
+  actions?: React.ReactNode
+}) {
+  return (
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex items-center gap-3">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-light">
+          <Icon className="h-6 w-6 text-primary" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900">{title}</h1>
+          <p className="max-w-2xl text-sm text-gray-500">{subtitle}</p>
+        </div>
+      </div>
+      {actions && <div className="flex flex-wrap items-center gap-3">{actions}</div>}
+    </div>
+  )
+}
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const overview = useOverview()
   const [search, setSearch] = useState('')
+  const [searchFocused, setSearchFocused] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const items = navItems.filter((n) => canAccess(user?.role, n.to))
   const fullName = user ? `${user.first_name} ${user.last_name}`.trim() || user.email : ''
@@ -173,13 +260,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Link>
               <form onSubmit={onSearch} className="relative hidden max-w-md flex-1 sm:block" role="search">
                 <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                {!search && <AnimatedPlaceholder hints={SEARCH_HINTS} active={searchFocused} />}
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search sectors & roles…"
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setSearchFocused(false)}
                   aria-label="Search roles"
-                  className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
               </form>
 

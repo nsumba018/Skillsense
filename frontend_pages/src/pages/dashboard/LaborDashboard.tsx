@@ -8,41 +8,27 @@ import {
   Zap,
   Users,
   Briefcase,
-  FileText,
-  UploadCloud,
-  Network,
   Download,
   Loader2,
   ArrowUpRight,
   ArrowDownRight,
+  LayoutDashboard,
   Layers,
   Minus,
+  Sparkles,
 } from 'lucide-react'
-import DashboardLayout, { Card } from './DashboardLayout'
+import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { Sparkline, EmploymentTrendChart, Donut, DONUT_COLORS, SectorEmploymentChart } from './charts'
 import { QueryGate } from '../../components/ui/State'
 import { ROLE_LABELS, useAuth } from '../../auth/AuthContext'
 import { ROLE_FOCUS } from '../../auth/access'
-import { useKpis, useMacro, useOverview, useSectors, useSectorEmployment, useTrends } from '../../services/queries'
+import { useKpis, useMacro, useOverview, usePolicyInsights, useSectors, useSectorEmployment, useTrends } from '../../services/queries'
 import { predictionsApi, reportsApi } from '../../services/api'
 import { employmentChartData, employmentSeries, TREND_LABEL, TREND_TONE } from '../../lib/derive'
 import { fmtInt, fmtPct } from '../../lib/format'
 import { ApiError } from '../../services/http'
 import type { SectorForecastKpi, Trend } from '../../types/api'
 
-const LINK_ICONS: Record<string, typeof FileText> = {
-  '/dashboard/uploads': UploadCloud,
-  '/dashboard/users': Users,
-  '/dashboard/taxonomy': Network,
-  '/dashboard/reports': FileText,
-  '/dashboard/career': Briefcase,
-  '/dashboard/employability': Briefcase,
-  '/dashboard/forecast': TrendingUp,
-  '/dashboard/education': FileText,
-  '/dashboard/planning': FileText,
-  '/dashboard/geography': FileText,
-  '/dashboard/sectors': Layers,
-}
 
 function Delta({ value, unit = '' }: { value: number | null; unit?: string }) {
   if (value === null) return null
@@ -110,6 +96,7 @@ export default function LaborDashboard() {
   const trends = useTrends()
   const sectors = useSectors()
   const sectorEmployment = useSectorEmployment()
+  const policyInsights = usePolicyInsights()
   const [confirmRun, setConfirmRun] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
 
@@ -169,62 +156,49 @@ export default function LaborDashboard() {
 
   return (
     <DashboardLayout>
-      {/* Welcome header */}
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <h1 data-testid="welcome" className="text-3xl font-extrabold tracking-tight text-gray-900">
-            Welcome, {user?.first_name || user?.email}
-          </h1>
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-            <span className="flex items-center gap-2 font-semibold text-gray-700">
-              <BadgeCheck className="h-4 w-4 text-primary" />
-              {user ? ROLE_LABELS[user.role] : ''}
-            </span>
-            <span className="hidden h-4 w-px bg-gray-300 sm:block" />
-            <span className="text-gray-500">
-              Rwanda workforce{kpis.data?.total_sectors ? ` · ${kpis.data.total_sectors} sectors` : ''}
-            </span>
+      <PageHeader
+        icon={LayoutDashboard}
+        title={`Welcome, ${user?.first_name || user?.email}`}
+        subtitle={user ? ROLE_FOCUS[user.role].tagline : 'Rwanda workforce intelligence'}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
+            <Link to="/dashboard/sectors" className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+              <TrendingUp className="h-4 w-4" />
+              Sector forecast
+            </Link>
+            {isAdmin &&
+              (confirmRun ? (
+                <button
+                  onClick={() => runForecast.mutate()}
+                  disabled={runForecast.isPending}
+                  className="flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-amber-600 disabled:opacity-60"
+                >
+                  {runForecast.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+                  {runForecast.isPending ? 'Running model…' : 'Confirm: create new forecast run'}
+                </button>
+              ) : (
+                <button onClick={() => setConfirmRun(true)} className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+                  <Zap className="h-4 w-4" />
+                  Run Forecast
+                </button>
+              ))}
+            <button
+              onClick={async () => {
+                setExportError(null)
+                try {
+                  await reportsApi.downloadDemandOutlookCsv()
+                } catch {
+                  setExportError('Export failed')
+                }
+              }}
+              className="flex items-center gap-2 rounded-lg bg-navy px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-dark-navy"
+            >
+              <Download className="h-4 w-4" />
+              Export CSV
+            </button>
           </div>
-          {user && <p data-testid="role-tagline" className="mt-2 max-w-xl text-sm text-gray-500">{ROLE_FOCUS[user.role].tagline}</p>}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <Link to="/dashboard/sectors" className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
-            <TrendingUp className="h-4 w-4" />
-            Sector forecast
-          </Link>
-          {isAdmin &&
-            (confirmRun ? (
-              <button
-                onClick={() => runForecast.mutate()}
-                disabled={runForecast.isPending}
-                className="flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-amber-600 disabled:opacity-60"
-              >
-                {runForecast.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
-                {runForecast.isPending ? 'Running model…' : 'Confirm: create new forecast run'}
-              </button>
-            ) : (
-              <button onClick={() => setConfirmRun(true)} className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
-                <Zap className="h-4 w-4" />
-                Run Forecast
-              </button>
-            ))}
-          <button
-            onClick={async () => {
-              setExportError(null)
-              try {
-                await reportsApi.downloadDemandOutlookCsv()
-              } catch {
-                setExportError('Export failed')
-              }
-            }}
-            className="flex items-center gap-2 rounded-lg bg-navy px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-dark-navy"
-          >
-            <Download className="h-4 w-4" />
-            Export CSV
-          </button>
-        </div>
-      </div>
+        }
+      />
       {runForecast.isError && (
         <p role="alert" className="mt-3 text-sm font-medium text-red-600">
           {runForecast.error instanceof ApiError ? runForecast.error.message : 'Forecast run failed.'}
@@ -287,7 +261,7 @@ export default function LaborDashboard() {
                   <Briefcase className="h-5 w-5 text-primary" />
                 </div>
                 <div className="mt-3 flex items-baseline gap-2">
-                  <span data-testid="kpi-postings" className="text-4xl font-extrabold tracking-tight text-gray-900">{fmtInt(totalSectorPostings || k.total_postings)}+</span>
+                  <span data-testid="kpi-postings" className="text-4xl font-extrabold tracking-tight text-gray-900">{fmtInt(k.total_postings)}+</span>
                 </div>
                 <p className="mt-3 text-xs text-gray-500">
                   From job posting platforms · {sectorForecasts.filter(s => s.posting_count > 0).length} of {sectorForecasts.length} sectors
@@ -407,45 +381,70 @@ export default function LaborDashboard() {
         </Card>
 
         <Card className="p-6">
-          <h2 className="text-lg font-bold text-gray-900">Sector Outlook</h2>
-          <p className="mt-1 text-xs text-gray-500">Forecast share and employment growth per sector</p>
-          <div className="mt-6 space-y-3">
-            {[...sectorForecasts]
-              .map(sf => ({ ...sf, growth: sectorGrowth.get(sf.sector_slug) ?? 0 }))
-              .sort((a, b) => b.growth - a.growth)
-              .map((sf) => (
-              <div key={sf.sector_slug} className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-2 text-sm min-w-0">
-                  <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: sf.sector_color }} />
-                  <span className="font-medium text-gray-800 truncate">{sf.sector_name}</span>
-                </span>
-                <div className="flex items-center gap-3 shrink-0 text-sm">
-                  <span className="text-gray-500">{fmtPct(sf.employment_share_pct)}</span>
-                  <span className={`min-w-[60px] text-right font-bold ${sf.growth >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                    {sf.growth >= 0 ? '+' : ''}{sf.growth.toFixed(1)}%
-                  </span>
-                </div>
-              </div>
-            ))}
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-amber-500" />
+            <h2 className="text-lg font-bold text-gray-900">AI Policy Insights</h2>
           </div>
+          <p className="mt-1 text-xs text-gray-500">AI-generated recommendations from labour market data</p>
+          {(() => {
+            const list = policyInsights.data?.insights ?? []
+            const priorityDot: Record<string, string> = { high: 'bg-gray-900', medium: 'bg-gray-400', low: 'bg-gray-300' }
+            const priorityLabel: Record<string, string> = { high: 'High', medium: 'Medium', low: 'Low' }
+            if (policyInsights.isLoading) return <p className="mt-4 text-sm text-gray-400">Loading insights…</p>
+            if (!list.length) return <p className="mt-4 text-sm text-gray-400">Run a forecast to generate policy insights.</p>
+            return (
+              <div className="mt-4 space-y-2.5 max-h-72 overflow-y-auto">
+                {list.slice(0, 5).map((ins, i) => (
+                  <div key={i} className="rounded-lg border border-gray-200 bg-gray-50/60 px-3.5 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className={`h-2 w-2 shrink-0 rounded-full ${priorityDot[ins.priority]}`} />
+                      <span className="text-sm font-bold text-gray-900">{ins.title}</span>
+                      <span className="ml-auto shrink-0 text-[10px] font-bold uppercase tracking-wider text-gray-400">{priorityLabel[ins.priority]}</span>
+                    </div>
+                    <p className="mt-1.5 pl-4 text-xs leading-relaxed text-gray-600">{ins.description}</p>
+                  </div>
+                ))}
+              </div>
+            )
+          })()}
         </Card>
       </div>
 
-      {/* Quick links */}
-      <Card className="mt-6 p-6">
-        <h2 className="text-lg font-bold text-gray-900">Quick Links</h2>
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {(user ? ROLE_FOCUS[user.role].links : []).map((q) => {
-            const Icon = LINK_ICONS[q.to] ?? FileText
-            return (
-              <Link key={q.to} to={q.to} className="flex items-center gap-3 rounded-xl border border-gray-200 p-3.5 text-sm font-semibold text-gray-800 transition-colors hover:border-primary/40 hover:bg-gray-50">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-light text-primary"><Icon className="h-4 w-4" /></span>
-                {q.label}
-              </Link>
-            )
-          })}
-        </div>
-      </Card>
+      {/* Sector heat map */}
+      {sectorForecasts.length > 0 && (() => {
+        const maxEmp = Math.max(1, ...sectorForecasts.map(sf => sf.employment_count))
+        const sorted = [...sectorForecasts]
+          .map(sf => ({ ...sf, growth: sectorGrowth.get(sf.sector_slug) ?? 0 }))
+          .sort((a, b) => b.employment_count - a.employment_count)
+        return (
+          <Card className="mt-6 p-6">
+            <h2 className="text-lg font-bold text-gray-900">Sector Demand Heat Map</h2>
+            <p className="mt-1 text-xs text-gray-500">Tile intensity reflects employment volume — darker tiles = higher demand. Click any sector for details.</p>
+            <ul className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5" data-testid="sector-heatmap">
+              {sorted.map((sf) => {
+                const strength = sf.employment_count / maxEmp
+                const dark = strength > 0.55
+                return (
+                  <li key={sf.sector_slug}>
+                    <Link
+                      to={`/dashboard/sectors?sector=${sf.sector_slug}`}
+                      className="block rounded-lg border border-primary/10 px-3 py-2.5 transition-shadow hover:shadow-md"
+                      style={{ backgroundColor: `rgba(29, 78, 216, ${(0.06 + strength * 0.5).toFixed(2)})` }}
+                      title={`${sf.sector_name}: ${fmtInt(sf.employment_count)} jobs`}
+                    >
+                      <div className={`truncate text-sm font-bold ${dark ? 'text-white' : 'text-navy'}`}>{sf.sector_name}</div>
+                      <div className={`text-xs font-medium ${dark ? 'text-white/80' : 'text-gray-500'}`}>{fmtInt(sf.employment_count)} jobs</div>
+                      <div className={`mt-1 text-xs font-bold ${dark ? (sf.growth >= 0 ? 'text-emerald-300' : 'text-red-300') : (sf.growth >= 0 ? 'text-emerald-600' : 'text-red-500')}`}>
+                        {sf.growth >= 0 ? '+' : ''}{sf.growth.toFixed(1)}% growth
+                      </div>
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          </Card>
+        )
+      })()}
     </DashboardLayout>
   )
 }

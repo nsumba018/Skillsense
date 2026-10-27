@@ -4,6 +4,12 @@ import { AtSign, Lock, Eye, EyeOff, ArrowRight, Loader2, AlertCircle } from 'luc
 import { useAuth } from '../auth/AuthContext'
 import { ApiError } from '../services/http'
 
+const DEMO_ACCOUNTS = [
+  { role: 'Labour Market Analyst', email: 'analyst@skillsense.rw', password: 'analyst123' },
+  { role: 'Education Planner', email: 'planner@skillsense.rw', password: 'planner123' },
+  { role: 'Career Advisor', email: 'advisor@skillsense.rw', password: 'advisor123' },
+] as const
+
 export default function SignIn() {
   const { user, loading, login } = useAuth()
   const navigate = useNavigate()
@@ -16,6 +22,11 @@ export default function SignIn() {
   const [remember, setRemember] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  function fillCredentials(demo: typeof DEMO_ACCOUNTS[number]) {
+    setEmail(demo.email)
+    setPassword(demo.password)
+    setError(null)
+  }
 
   if (!loading && user) return <Navigate to={from} replace />
 
@@ -61,35 +72,43 @@ export default function SignIn() {
 
         <div className="relative mt-8 max-w-lg lg:mt-10">
           <h1 className="text-[42px] font-extrabold leading-[1.08] tracking-tight lg:text-[56px]">
-            Predictive Intelligence for Rwanda's <span className="text-[#5EEAD4]">ICT Workforce.</span>
+            Predictive Intelligence for Rwanda's <span className="text-[#5EEAD4]">Workforce.</span>
           </h1>
           <p className="mt-6 max-w-md text-base leading-relaxed text-blue-100/75">
-            Forecast which ICT roles employers will need over the next 6 months, 1 year and 2 years,
-            built on 22+ years of labour data and current job postings.
+            Forecast which roles employers will need across 9 sectors over the next 6 months, 1 year and 2 years —
+            built on 22+ years of labour data and 919 real job postings.
           </p>
 
-          <div className="mt-6 flex gap-14">
+          <div className="mt-6 flex gap-10">
             <div>
-              <div className="text-4xl font-extrabold text-white">22+</div>
+              <div className="text-4xl font-extrabold text-white">9</div>
               <div className="mt-2 text-xs font-semibold uppercase tracking-wider text-blue-200/50">
-                ICT roles
+                Economic
                 <br />
-                tracked
+                sectors
+              </div>
+            </div>
+            <div>
+              <div className="text-4xl font-extrabold text-white">919</div>
+              <div className="mt-2 text-xs font-semibold uppercase tracking-wider text-blue-200/50">
+                Job postings
+                <br />
+                analysed
               </div>
             </div>
             <div>
               <div className="text-4xl font-extrabold text-white">0.99</div>
               <div className="mt-2 text-xs font-semibold uppercase tracking-wider text-blue-200/50">
-                Rank correlation
+                Rank
                 <br />
-                on validation
+                correlation
               </div>
             </div>
           </div>
         </div>
 
         <p className="relative mt-auto pt-6 text-sm text-blue-200/40">
-          © 2026 SkillSense: ICT Workforce Intelligence for Rwanda
+          © 2026 SkillSense: Workforce Intelligence for Rwanda
         </p>
       </aside>
 
@@ -187,9 +206,27 @@ export default function SignIn() {
             </button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-gray-400">
-            Access is by invitation only. Contact your administrator if you need an account.
-          </p>
+          {/* Demo credentials for judges / reviewers */}
+          <div className="mt-5 rounded-lg border border-blue-200 bg-blue-50/70 px-3 py-2.5">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-blue-700">Demo accounts</p>
+            <div className="space-y-1.5">
+              {DEMO_ACCOUNTS.map((d) => (
+                <button
+                  key={d.role}
+                  type="button"
+                  onClick={() => fillCredentials(d)}
+                  className={`flex w-full items-center justify-between rounded-md border px-2.5 py-1.5 text-left text-xs transition-colors ${
+                    email === d.email
+                      ? 'border-blue-400 bg-blue-100 text-blue-900'
+                      : 'border-blue-200 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50'
+                  }`}
+                >
+                  <span className="font-semibold">{d.role}</span>
+                  <span className="text-[11px] text-gray-400">{d.email}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </main>
     </div>

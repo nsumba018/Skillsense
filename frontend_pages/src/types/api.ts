@@ -522,5 +522,90 @@ export interface RoleDeepDiveReport {
   }[]
 }
 
+/* ── Curriculum Bulletin types ── */
+
+export interface BulletinCourse {
+  id: number
+  semester: number
+  name: string
+  credits: number
+  skills: string[]
+}
+
+export interface AdminStats {
+  users: {
+    total: number
+    by_role: Record<string, number>
+    pending_invites: number
+    recent: {
+      id: number
+      email: string
+      first_name: string
+      last_name: string
+      role: UserRole
+      last_login: string | null
+    }[]
+  }
+  data: {
+    total_postings: number
+    total_roles: number
+    total_sectors: number
+    active_bulletins: number
+    uploads_by_status: Record<string, number>
+    recent_uploads: {
+      id: number
+      original_filename: string
+      status: string
+      total_records: number
+      ict_records: number
+      created_at: string
+    }[]
+  }
+  forecasts: {
+    last_role_forecast: string | null
+    last_sector_forecast: string | null
+    model_version: string | null
+    accuracy: number | null
+  }
+}
+
+export interface BulletinSummary {
+  id: number
+  department_code: string
+  department_name: string
+  faculty: string
+  original_filename: string
+  total_credits: number
+  total_semesters: number
+  total_courses: number
+  is_active: boolean
+  created_at: string
+  uploaded_by_name: string | null
+}
+
+export interface BulletinDetail extends BulletinSummary {
+  courses: BulletinCourse[]
+}
+
+export interface BulletinDepartment {
+  code: string
+  name: string
+  faculty: string
+  total_credits: number
+  total_semesters: number
+  total_courses: number
+  skills: string[]
+  semesters: Record<string, { name: string; credits: number; skills: string[] }[]>
+  uploaded_at: string
+  filename: string
+}
+
+export interface CurriculumAllData {
+  departments: BulletinDepartment[]
+  programs_by_faculty: Record<string, string[]>
+  skills_by_dept: Record<string, string[]>
+  total_programs: number
+}
+
 /* Career & Training Advisor types live in ./advisory; re-exported so they can be imported from here too. */
 export * from './advisory'

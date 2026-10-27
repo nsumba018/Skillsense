@@ -1,30 +1,30 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   TrendingUp,
   TrendingDown,
-  BadgeCheck,
   Users,
   Briefcase,
   GraduationCap,
-  FileText,
-  Network,
   Minus,
   ArrowUpRight,
   ArrowDownRight,
   BookOpen,
   Lightbulb,
   Building2,
+  ChevronDown,
 } from 'lucide-react'
-import DashboardLayout, { Card } from './DashboardLayout'
+import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { Donut, SectorEmploymentChart } from './charts'
 import { QueryGate } from '../../components/ui/State'
-import { ROLE_LABELS, useAuth } from '../../auth/AuthContext'
+import { useAuth } from '../../auth/AuthContext'
 import {
   useSectorForecasts,
   useSectorPositions,
   useSectorEmployment,
   useSectorList,
   useTrends,
+  useBulletinAll,
 } from '../../services/queries'
 import { TREND_LABEL, TREND_TONE } from '../../lib/derive'
 import { fmtInt, fmtPct } from '../../lib/format'
@@ -40,15 +40,31 @@ const FACULTY_PROGRAMS: Record<string, string[]> = {
   'finance-business': ['Accounting', 'Management', 'Finance', 'Marketing', 'MBA'],
 }
 
-const SE_CURRICULUM = {
-  languages: ['C', 'Java', '.NET', 'PL/SQL', 'Python', 'React'],
-  core: ['Data Structures & Algorithms', 'OOP', 'Operating Systems', 'Theory of Computation', 'Software Engineering'],
-  webMobile: ['Web Design', 'Web Technology & Internet (React)', 'Mobile Programming'],
-  engineering: ['Requirements Engineering', 'Software Modeling & Design', 'Software Testing', 'QA', 'Project Management', 'Design Patterns'],
-  data: ['DBMS', 'Introduction to Big Data (Python)', 'Statistics', 'MIS'],
-  security: ['Software Security', 'Linux'],
-  totalCredits: 137,
-  semesters: 8,
+const SKILL_CATEGORIES: { label: string; color: string; keywords: string[] }[] = [
+  { label: 'Programming Languages', color: 'bg-blue-50 text-blue-700', keywords: ['C', 'C#', 'Java', 'JavaScript', '.NET', 'PL/SQL', 'Python', 'React', 'SQL', 'HTML/CSS', 'Programming', 'Shell Scripting', 'Java/SpringBoot'] },
+  { label: 'Web & Mobile', color: 'bg-purple-50 text-purple-700', keywords: ['Web Design', 'Web Development', 'Mobile Development', 'Android', 'iOS', 'REST APIs', 'UI/UX', 'Content Creation', 'Multimedia'] },
+  { label: 'Software Engineering', color: 'bg-indigo-50 text-indigo-700', keywords: ['Software Engineering', 'Requirements Engineering', 'Software Modeling', 'Software Testing', 'Software Quality Assurance', 'QA', 'Test Automation', 'Testing', 'Project Management', 'Design Patterns', 'Clean Code', 'Agile/Scrum', 'SDLC', 'UML', 'Jira', 'Architecture', 'OWASP', 'Process Management'] },
+  { label: 'Networking & Infrastructure', color: 'bg-teal-50 text-teal-700', keywords: ['Computer Networks', 'Networking', 'Network Administration', 'Network Architecture', 'Network Programming', 'Network Security', 'Advanced Networking', 'CCNA', 'Cisco', 'Routing', 'Switching', 'TCP/IP', 'Socket Programming', 'Firewall', 'Wi-Fi', 'Wireless Networking', 'RF', 'Active Directory', 'Windows Server', 'IoT'] },
+  { label: 'Data & Databases', color: 'bg-emerald-50 text-emerald-700', keywords: ['DBMS', 'Database Design', 'Big Data', 'Data Analysis', 'Data Structures', 'Statistics', 'Probability', 'MIS', 'Machine Learning', 'AI/ML', 'Algorithms', 'Information Systems'] },
+  { label: 'Security & Systems', color: 'bg-red-50 text-red-700', keywords: ['Cybersecurity', 'Software Security', 'Information Security', 'Penetration Testing', 'Linux', 'Operating Systems', 'System Administration', 'System Design', 'System Analysis', 'Computer Architecture', 'Digital Logic', 'Hardware Troubleshooting', 'IT Support', 'Emerging Technologies'] },
+  { label: 'Business & Communication', color: 'bg-amber-50 text-amber-700', keywords: ['Financial Accounting', 'Principles of Accounting', 'Advanced Accounting', 'Cost Accounting', 'Auditing', 'IFRS', 'Corporate Finance', 'Financial Analysis', 'Budgeting', 'Risk Management', 'Management', 'Organizational Behavior', 'Business Analysis', 'Leadership', 'Communication', 'Academic Writing', 'Technical Writing', 'English', 'Research Methods'] },
+]
+
+function categorizeSkills(skills: string[]): { label: string; skills: string[]; color: string }[] {
+  const placed = new Set<string>()
+  const groups: { label: string; skills: string[]; color: string }[] = []
+  for (const cat of SKILL_CATEGORIES) {
+    const matched = skills.filter(s => !placed.has(s) && cat.keywords.includes(s))
+    if (matched.length > 0) {
+      matched.forEach(s => placed.add(s))
+      groups.push({ label: cat.label, skills: matched, color: cat.color })
+    }
+  }
+  const remaining = skills.filter(s => !placed.has(s))
+  if (remaining.length > 0) {
+    groups.push({ label: 'Other', skills: remaining, color: 'bg-gray-50 text-gray-700' })
+  }
+  return groups
 }
 
 function TrendBadge({ trend, label }: { trend: Trend; label: string }) {
@@ -96,7 +112,7 @@ function SectorKpiCard({ fc, empCurrent }: { fc: SectorForecastEntry; empCurrent
 }
 
 export default function EducationDashboard() {
-  const { user } = useAuth()
+  useAuth()
 
   const ictForecasts = useSectorForecasts('1y', 'ict-technology')
   const bizForecasts = useSectorForecasts('1y', 'finance-business')
@@ -105,6 +121,14 @@ export default function EducationDashboard() {
   const sectorEmployment = useSectorEmployment()
   const sectorList = useSectorList()
   const trends = useTrends()
+  const bulletin = useBulletinAll()
+
+  const FACULTY_TO_SECTOR: Record<string, string> = { it: 'ict-technology', business: 'finance-business' }
+  const apiFacultyPrograms: Record<string, string[]> = bulletin.data
+    ? Object.fromEntries(Object.entries(bulletin.data.programs_by_faculty).map(([k, v]) => [FACULTY_TO_SECTOR[k] ?? k, v]))
+    : {}
+  const facultyPrograms: Record<string, string[]> = { ...FACULTY_PROGRAMS, ...apiFacultyPrograms }
+  const programCount = Object.values(facultyPrograms).flat().length
 
   const aucaForecasts: SectorForecastEntry[] = []
   if (ictForecasts.data?.forecasts) aucaForecasts.push(...ictForecasts.data.forecasts)
@@ -146,55 +170,34 @@ export default function EducationDashboard() {
       color: f.sector_color,
     }))
 
+  const [expandedDepts, setExpandedDepts] = useState<Set<string>>(new Set())
+
   const ictGrowing = trends.data?.growing.slice(0, 5) ?? []
   const ictDeclining = trends.data?.declining.slice(0, 3) ?? []
 
   return (
     <DashboardLayout>
-      {/* Welcome header — AUCA branded */}
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100">
-              <GraduationCap className="h-6 w-6 text-indigo-700" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-extrabold tracking-tight text-gray-900">
-                AUCA Education Planner
-              </h1>
-              <p className="text-sm text-gray-500">Adventist University of Central Africa</p>
-            </div>
+      <PageHeader
+        icon={GraduationCap}
+        title="AUCA Education Planner"
+        subtitle="Align AUCA programmes with Rwanda's labour market demand. See which roles employers need and where your graduates fit."
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
+            <Link to="/dashboard/forecast" className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+              <TrendingUp className="h-4 w-4" />
+              Role Forecast
+            </Link>
+            <Link to="/dashboard/education" className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+              <BookOpen className="h-4 w-4" />
+              Curriculum Analysis
+            </Link>
+            <Link to="/dashboard/career" className="flex items-center gap-2 rounded-lg bg-navy px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-dark-navy">
+              <Lightbulb className="h-4 w-4" />
+              Training Insights
+            </Link>
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-            <span className="flex items-center gap-2 font-semibold text-gray-700">
-              <BadgeCheck className="h-4 w-4 text-primary" />
-              {user ? ROLE_LABELS[user.role] : ''}
-            </span>
-            <span className="hidden h-4 w-px bg-gray-300 sm:block" />
-            <span className="text-gray-500">
-              Tracking: IT &amp; Business faculties
-            </span>
-          </div>
-          <p className="mt-2 max-w-xl text-sm text-gray-500">
-            Align AUCA programmes with Rwanda's labour market demand. See which roles employers need and where your graduates fit.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <Link to="/dashboard/forecast" className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
-            <TrendingUp className="h-4 w-4" />
-            Role Forecast
-          </Link>
-          <Link to="/dashboard/education" className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
-            <BookOpen className="h-4 w-4" />
-            Curriculum Analysis
-          </Link>
-          <Link to="/dashboard/career" className="flex items-center gap-2 rounded-lg bg-navy px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-dark-navy">
-            <Lightbulb className="h-4 w-4" />
-            Training Insights
-          </Link>
-        </div>
-      </div>
+        }
+      />
 
       {/* KPI row */}
       <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -235,7 +238,7 @@ export default function EducationDashboard() {
           </div>
           <div className="mt-3">
             <span className="text-4xl font-extrabold tracking-tight text-gray-900">
-              {Object.values(FACULTY_PROGRAMS).flat().length}
+              {programCount}
             </span>
           </div>
           <p className="mt-3 text-xs text-gray-500">Degree programs across both faculties</p>
@@ -255,35 +258,57 @@ export default function EducationDashboard() {
         </div>
       )}
 
-      {/* Software Engineering Curriculum Snapshot */}
-      <Card className="mt-6 p-6">
-        <div className="flex items-center justify-between">
+      {/* Department Curriculum Snapshots — from bulletin API */}
+      {(bulletin.data?.departments ?? []).length > 0 && (
+        <div className="mt-6 space-y-5">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Software Engineering Curriculum</h2>
-            <p className="mt-1 text-sm text-gray-500">4-year programme · {SE_CURRICULUM.totalCredits} credits · {SE_CURRICULUM.semesters} semesters</p>
+            <h2 className="text-lg font-bold text-gray-900">Department Curricula</h2>
+            <p className="mt-1 text-sm text-gray-500">Skills extracted from uploaded bulletins — parsed automatically per department</p>
           </div>
-          <Link to="/dashboard/career" className="text-sm font-semibold text-primary hover:underline">See skill gaps &rarr;</Link>
+          {bulletin.data!.departments.map(dept => {
+            const open = expandedDepts.has(dept.code)
+            const groups = categorizeSkills(dept.skills)
+            const toggle = () => setExpandedDepts(prev => {
+              const next = new Set(prev)
+              next.has(dept.code) ? next.delete(dept.code) : next.add(dept.code)
+              return next
+            })
+            return (
+              <Card key={dept.code} className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-lg font-bold text-gray-900">{dept.name} Curriculum</h2>
+                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-gray-500">{dept.skills.length} skills</span>
+                    </div>
+                    <p className="mt-1 text-sm text-gray-500">4-year programme · {dept.total_credits} credits · {dept.total_semesters} semesters · {dept.total_courses} courses</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Link to="/dashboard/career" className="text-sm font-semibold text-primary hover:underline">See skill gaps &rarr;</Link>
+                    <button onClick={toggle} className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
+                      <ChevronDown className={`h-5 w-5 transition-transform ${open ? 'rotate-180' : ''}`} />
+                    </button>
+                  </div>
+                </div>
+                {open && (
+                  <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {groups.map(g => (
+                      <div key={g.label}>
+                        <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400">{g.label}</h3>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {g.skills.map(s => (
+                            <span key={s} className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${g.color}`}>{s}</span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Card>
+            )
+          })}
         </div>
-        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            { label: 'Programming Languages', skills: SE_CURRICULUM.languages, color: 'bg-blue-50 text-blue-700' },
-            { label: 'Web & Mobile', skills: SE_CURRICULUM.webMobile, color: 'bg-purple-50 text-purple-700' },
-            { label: 'Software Engineering', skills: SE_CURRICULUM.engineering, color: 'bg-indigo-50 text-indigo-700' },
-            { label: 'Data & Databases', skills: SE_CURRICULUM.data, color: 'bg-emerald-50 text-emerald-700' },
-            { label: 'Core CS', skills: SE_CURRICULUM.core, color: 'bg-amber-50 text-amber-700' },
-            { label: 'Security & Systems', skills: SE_CURRICULUM.security, color: 'bg-red-50 text-red-700' },
-          ].map(g => (
-            <div key={g.label}>
-              <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400">{g.label}</h3>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {g.skills.map(s => (
-                  <span key={s} className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${g.color}`}>{s}</span>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
+      )}
 
       {/* Employment forecast chart + donut */}
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -354,7 +379,7 @@ export default function EducationDashboard() {
           <div className="mt-5 rounded-lg bg-blue-50 p-3">
             <p className="text-xs font-semibold text-blue-800">AUCA Programs Preparing for These Roles</p>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
-              {FACULTY_PROGRAMS['ict-technology'].map(p => (
+              {(facultyPrograms['ict-technology'] ?? []).map(p => (
                 <span key={p} className="rounded-full bg-white px-2.5 py-0.5 text-[11px] font-medium text-blue-700 shadow-sm">{p}</span>
               ))}
             </div>
@@ -394,7 +419,7 @@ export default function EducationDashboard() {
           <div className="mt-5 rounded-lg bg-emerald-50 p-3">
             <p className="text-xs font-semibold text-emerald-800">AUCA Programs Preparing for These Roles</p>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
-              {FACULTY_PROGRAMS['finance-business'].map(p => (
+              {(facultyPrograms['finance-business'] ?? []).map(p => (
                 <span key={p} className="rounded-full bg-white px-2.5 py-0.5 text-[11px] font-medium text-emerald-700 shadow-sm">{p}</span>
               ))}
             </div>
@@ -456,25 +481,6 @@ export default function EducationDashboard() {
         )}
       </QueryGate>
 
-      {/* Quick links */}
-      <Card className="mt-6 p-6">
-        <h2 className="text-lg font-bold text-gray-900">Quick Links</h2>
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            { to: '/dashboard/education', label: 'Curriculum Analysis', Icon: BookOpen },
-            { to: '/dashboard/forecast', label: 'Role Forecast', Icon: TrendingUp },
-            { to: '/dashboard/employability', label: 'Employability Score', Icon: Briefcase },
-            { to: '/dashboard/career', label: 'Training Insights', Icon: Lightbulb },
-            { to: '/dashboard/taxonomy', label: 'Role Taxonomy', Icon: Network },
-            { to: '/dashboard/reports', label: 'Reports & Exports', Icon: FileText },
-          ].map(q => (
-            <Link key={q.to} to={q.to} className="flex items-center gap-3 rounded-xl border border-gray-200 p-3.5 text-sm font-semibold text-gray-800 transition-colors hover:border-primary/40 hover:bg-gray-50">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-700"><q.Icon className="h-4 w-4" /></span>
-              {q.label}
-            </Link>
-          ))}
-        </div>
-      </Card>
     </DashboardLayout>
   )
 }

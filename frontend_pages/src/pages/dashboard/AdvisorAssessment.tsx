@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Lightbulb, Loader2, Save, Target, UserPlus, X } from 'lucide-react'
+import { Lightbulb, Loader2, Pencil, Save, Target, Trash2, UserPlus, X } from 'lucide-react'
 import DashboardLayout, { Card } from './DashboardLayout'
 import { ProfileRadar } from './charts'
 import {
@@ -57,6 +57,9 @@ export default function AdvisorAssessment() {
   const student = useStudent(studentId)
 
   const [creating, setCreating] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [editForm, setEditForm] = useState(BLANK)
   const [form, setForm] = useState(BLANK)
   const [skills, setSkills] = useState<string[]>([])
   const [targets, setTargets] = useState<string[]>([])
@@ -110,6 +113,43 @@ export default function AdvisorAssessment() {
       select(s.id)
     },
     onError: (e) => setMessage({ tone: 'error', text: errorText(e) }),
+  })
+
+  const editMut = useMutation({
+    mutationFn: () => {
+      const payload: Partial<CreateStudentPayload> = {
+        first_name: editForm.first_name.trim(),
+        last_name: editForm.last_name.trim(),
+        email: editForm.email.trim(),
+        department: editForm.department,
+        graduation_year: editForm.graduation_year ? Number(editForm.graduation_year) : null,
+        gender: editForm.gender || undefined,
+      }
+      return advisoryApi.updateStudent(studentId!, payload)
+    },
+    onSuccess: (s) => {
+      qc.invalidateQueries({ queryKey: ['student', studentId] })
+      qc.invalidateQueries({ queryKey: ['students'] })
+      qc.invalidateQueries({ queryKey: ['advisor-dashboard'] })
+      setEditing(false)
+      setMessage({ tone: 'ok', text: `${s.name} updated.` })
+    },
+    onError: (e) => setMessage({ tone: 'error', text: errorText(e) }),
+  })
+
+  const deleteMut = useMutation({
+    mutationFn: () => advisoryApi.deleteStudent(studentId!),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['students'] })
+      qc.invalidateQueries({ queryKey: ['advisor-dashboard'] })
+      setConfirmDelete(false)
+      setMessage({ tone: 'ok', text: 'Student removed.' })
+      select(null)
+    },
+    onError: (e) => {
+      setConfirmDelete(false)
+      setMessage({ tone: 'error', text: errorText(e) })
+    },
   })
 
   const saveMut = useMutation({
@@ -203,12 +243,98 @@ export default function AdvisorAssessment() {
 
         {!creating && <StudentPicker value={studentId} onChange={(s) => select(s?.id ?? null)} />}
         {!creating && studentId !== null && student.isLoading && <Loading label="Loading student…" className="py-4" />}
-        {!creating && loaded && (
-          <p className="mt-3 text-sm text-gray-500">
-            {DEPT_LABEL[loaded.department]}
-            {loaded.graduation_year ? ` · class of ${loaded.graduation_year}` : ''} · status {loaded.status}
-            {loaded.latest_assessment && ` · last assessed ${loaded.latest_assessment.target_role} ${Math.round(loaded.latest_assessment.readiness_score)}%`}
-          </p>
+        {!creating && loaded && !editing && (
+          <div className="mt-3 flex items-center gap-2">
+            <p className="flex-1 text-sm text-gray-500">
+              {DEPT_LABEL[loaded.department]}
+              {loaded.graduation_year ? ` · class of ${loaded.graduation_year}` : ''} · status {loaded.status}
+              {loaded.latest_assessment && ` · last assessed ${loaded.latest_assessment.target_role} ${Math.round(loaded.latest_assessment.readiness_score)}%`}
+            </p>
+            <button
+              type="button"
+              aria-label="Edit student"
+              onClick={() => {
+                setEditForm({
+                  first_name: loaded.first_name,
+                  last_name: loaded.last_name,
+                  email: loaded.email ?? '',
+                  department: loaded.department,
+                  graduation_year: loaded.graduation_year ? String(loaded.graduation_year) : '',
+                  gender: (loaded.gender ?? '') as '' | 'M' | 'F',
+                })
+                setEditing(true)
+                setConfirmDelete(false)
+                setMessage(null)
+              }}
+              className="rounded-lg p-2 text-gray-400 hover:bg-blue-50 hover:text-blue-600"
+            >
+              <Pencil className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              aria-label="Delete student"
+              onClick={() => { setConfirmDelete(true); setMessage(null) }}
+              className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-600"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+        {!creating && loaded && confirmDelete && !editing && (
+          <div className="mt-3 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+            <p className="flex-1 text-sm font-semibold text-red-800">
+              Delete {loaded.first_name} {loaded.last_name}? This cannot be undone.
+            </p>
+            <button type="button" className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-700 disabled:opacity-50" disabled={deleteMut.isPending} onClick={() => deleteMut.mutate()}>
+              {deleteMut.isPending ? 'Deleting…' : 'Yes, delete'}
+            </button>
+            <button type="button" className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-50" onClick={() => setConfirmDelete(false)}>
+              Cancel
+            </button>
+          </div>
+        )}
+
+        {!creating && loaded && editing && (
+          <div className="mt-4 space-y-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <Field label="First name">
+                <input className={inputClass} value={editForm.first_name} onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })} />
+              </Field>
+              <Field label="Last name">
+                <input className={inputClass} value={editForm.last_name} onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })} />
+              </Field>
+              <Field label="Email">
+                <input type="email" className={inputClass} value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} />
+              </Field>
+              <Field label="Department">
+                <select className={inputClass} value={editForm.department} onChange={(e) => setEditForm({ ...editForm, department: e.target.value as DeptCode })}>
+                  {(Object.keys(DEPT_LABEL) as DeptCode[]).map((c) => (
+                    <option key={c} value={c}>{DEPT_LABEL[c]}</option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Graduation year">
+                <input type="number" min={2000} max={2100} className={inputClass} value={editForm.graduation_year} onChange={(e) => setEditForm({ ...editForm, graduation_year: e.target.value })} />
+              </Field>
+              <Field label="Gender">
+                <select className={inputClass} value={editForm.gender} onChange={(e) => setEditForm({ ...editForm, gender: e.target.value as '' | 'M' | 'F' })}>
+                  <option value="">Prefer not to say</option>
+                  <option value="F">Female</option>
+                  <option value="M">Male</option>
+                </select>
+              </Field>
+            </div>
+            <div className="flex items-center gap-3">
+              <button type="button" className={buttonPrimary} disabled={editMut.isPending || !editForm.first_name.trim() || !editForm.last_name.trim()} onClick={() => editMut.mutate()}>
+                {editMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                Save changes
+              </button>
+              <button type="button" className={buttonGhost} onClick={() => setEditing(false)}>
+                <X className="h-4 w-4" /> Cancel
+              </button>
+            </div>
+          </div>
         )}
 
         {creating && (

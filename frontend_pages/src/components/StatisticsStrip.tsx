@@ -1,12 +1,12 @@
 import { SNAPSHOT } from '../lib/snapshot'
 
 const stats = [
-  { value: String(SNAPSHOT.roles), label: 'ICT roles tracked' },
-  { value: '9', label: 'Economic sectors' },
+  { value: String(SNAPSHOT.roles), label: 'Roles tracked' },
+  { value: String(SNAPSHOT.sectors), label: 'Economic sectors' },
   { value: '3', label: 'Forecast horizons' },
   { value: SNAPSHOT.rankCorrelation.toFixed(2), label: 'Rank correlation on validation' },
   { value: SNAPSHOT.historyYears.replace('–20', '–'), label: 'Years of labour data' },
-  { value: String(SNAPSHOT.postings), label: 'Real ICT postings analysed' },
+  { value: String(SNAPSHOT.totalPostings), label: 'Real job postings analysed' },
 ]
 
 /** Figures are the static snapshot in lib/snapshot.ts. */

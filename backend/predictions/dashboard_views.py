@@ -2,9 +2,12 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from django.db.models import Count
 from taxonomy.models import NormalizedRole, Sector, HistoricalDemand, MacroIndicator, SectorEmployment
-from uploads.models import JobPosting
+from uploads.models import JobPosting, DataUpload
+from curriculum.models import CurriculumBulletin
+from accounts.models import User, Invitation
 from .models import ForecastRun, RoleForecast, SectorForecastRun, SectorForecast
 
 
@@ -48,7 +51,7 @@ class DashboardKPIView(APIView):
                     'employment_count': sf.employment_count,
                     'share_trend': sf.share_trend,
                     'employment_trend': sf.employment_trend,
-                    'posting_count': sf.posting_count,
+                    'posting_count': JobPosting.objects.filter(sector=sf.sector).count(),
                 }
                 for sf in sector_forecasts
             ]
@@ -148,5 +151,64 @@ class DashboardOverviewView(APIView):
                 'version': latest_run.model_version if latest_run else None,
                 'last_run': latest_run.created_at if latest_run else None,
                 'spearman': latest_run.accuracy_spearman if latest_run else None,
+            },
+        })
+
+
+@extend_schema(responses=OpenApiTypes.OBJECT)
+class AdminStatsView(APIView):
+    """
+    GET /api/dashboard/admin-stats/
+    Platform-level stats for the admin dashboard.
+    """
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        users = User.objects.filter(is_active=True)
+        users_by_role = dict(users.values_list('role').annotate(c=Count('id')).order_by())
+        total_users = users.count()
+
+        pending_invites = Invitation.objects.filter(status='pending').count()
+
+        recent_users = list(
+            User.objects.filter(is_active=True)
+            .order_by('-last_login')[:10]
+            .values('id', 'email', 'first_name', 'last_name', 'role', 'last_login')
+        )
+
+        uploads = DataUpload.objects.order_by('-created_at')
+        recent_uploads = list(
+            uploads[:10].values('id', 'original_filename', 'status', 'total_records', 'ict_records', 'created_at')
+        )
+        uploads_by_status = dict(uploads.values_list('status').annotate(c=Count('id')).order_by())
+
+        total_postings = JobPosting.objects.count()
+        total_roles = NormalizedRole.objects.count()
+        total_sectors = Sector.objects.count()
+        active_bulletins = CurriculumBulletin.objects.filter(is_active=True).count()
+
+        latest_forecast = ForecastRun.objects.order_by('-created_at').first()
+        latest_sector_forecast = SectorForecastRun.objects.order_by('-created_at').first()
+
+        return Response({
+            'users': {
+                'total': total_users,
+                'by_role': users_by_role,
+                'pending_invites': pending_invites,
+                'recent': recent_users,
+            },
+            'data': {
+                'total_postings': total_postings,
+                'total_roles': total_roles,
+                'total_sectors': total_sectors,
+                'active_bulletins': active_bulletins,
+                'uploads_by_status': uploads_by_status,
+                'recent_uploads': recent_uploads,
+            },
+            'forecasts': {
+                'last_role_forecast': latest_forecast.created_at if latest_forecast else None,
+                'last_sector_forecast': latest_sector_forecast.created_at if latest_sector_forecast else None,
+                'model_version': latest_forecast.model_version if latest_forecast else None,
+                'accuracy': latest_forecast.accuracy_spearman if latest_forecast else None,
             },
         })
