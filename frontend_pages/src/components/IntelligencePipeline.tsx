@@ -3,28 +3,28 @@ import { ClipboardList, Settings2, TrendingUp, Zap, LayoutGrid, ChevronRight, Ch
 const steps = [
   {
     icon: ClipboardList,
-    title: 'Ingest',
-    details: ['NISR labour surveys', 'Job board postings', 'TVET enrolment data'],
+    title: 'Collect',
+    details: ['NISR labour surveys', 'Job postings from 5 boards', 'University enrolment data'],
   },
   {
     icon: Settings2,
-    title: 'Process',
-    details: ['Role normalisation', 'Sector classification', 'Skill extraction'],
+    title: 'Clean & classify',
+    details: ['Normalise job titles into roles', 'Assign sectors automatically', 'Extract required skills'],
   },
   {
     icon: TrendingUp,
     title: 'Forecast',
-    details: ['1-yr / 3-yr demand', 'Sector growth trends', 'ICT employment share'],
+    details: ['1-yr and 3-yr demand per role', 'Sector growth trends', 'ICT employment share'],
   },
   {
     icon: Zap,
-    title: 'Analyse',
-    details: ['Curriculum gaps', 'Employability scores', 'Regional imbalance'],
+    title: 'Find the gaps',
+    details: ['Curriculum vs market alignment', 'Student employability scores', 'Regional hiring imbalance'],
   },
   {
     icon: LayoutGrid,
-    title: 'Deliver',
-    details: ['Role-based dashboards', 'PDF reports', 'Placement plans'],
+    title: 'Show the results',
+    details: ['Role-based dashboards', 'PDF reports', 'Student placement plans'],
   },
 ]
 
@@ -37,7 +37,7 @@ export default function IntelligencePipeline() {
             How SkillSense works
           </h2>
           <p className="text-base text-gray-500 mt-3">
-            From raw national data to actionable workforce intelligence in five stages.
+            How we turn labour surveys and job postings into forecasts you can act on.
           </p>
         </div>
 

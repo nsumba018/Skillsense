@@ -100,3 +100,11 @@ demand_outlook.csv
 
 # ---------- Prompt files (dev notes, not source code) ----------
 SkillSense_Job_Scraping_and_Role_Grouping_ETL_Prompt.md
+
+# ---------- Non-source files (local reference only) ----------
+*.pdf
+*.xlsx
+PROTOTYPE REVIEW 1.txt
+DEVELOPMENT_CHECKLIST.md
+PROJECT_SPEC.md
+backend/media/bulletins/

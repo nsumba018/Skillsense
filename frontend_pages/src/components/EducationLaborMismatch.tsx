@@ -9,12 +9,13 @@ export default function EducationLaborMismatch() {
       <div className="container-1200">
         <div className="max-w-2xl mb-12">
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
-            The Education–Labour Mismatch
+            Graduates without the skills employers need
           </h2>
           <p className="text-base text-gray-500 leading-relaxed">
-            Rwanda's education system is producing more graduates than ever, yet employers
-            report persistent difficulty filling technical and specialized roles. SkillSense
-            quantifies this gap so institutions can act on evidence, not assumptions.
+            Rwanda's universities are producing more graduates than ever, but many leave with
+            skills that don't match what the job market is hiring for. Without a reliable signal
+            showing which roles are growing and which are shrinking, curricula drift out of
+            alignment — and the gap widens quietly until graduates can't find work.
           </p>
         </div>
 

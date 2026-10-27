@@ -3,33 +3,33 @@ import { TrendingUp, GraduationCap, Globe2, MapPin } from 'lucide-react'
 const insights = [
   {
     icon: TrendingUp,
-    title: 'Supply–Demand Disparity',
+    title: 'Services dominate hiring',
     description:
-      'ICT roles show 38% excess demand while agriculture remains oversupplied, revealing where retraining investment is most urgent.',
+      'Services & Commerce accounts for 41% of all scraped postings (378 of 919), more than double any other sector.',
     bg: '#E2E7FB',
     color: '#2F4CDD',
   },
   {
     icon: GraduationCap,
-    title: 'Emerging Skills Gap',
+    title: 'ICT demand outpaces supply',
     description:
-      'Cloud engineering and data science demand grew 18% year-on-year, but fewer than 5% of TVET curricula cover these areas.',
+      'ICT & Technology is the second-largest sector with 198 postings, yet it represents only 3–5% of total employment in NISR surveys.',
     bg: '#EDEBFB',
     color: '#6D4FE0',
   },
   {
     icon: Globe2,
-    title: 'Data-Driven Alignment',
+    title: 'Five job boards, one picture',
     description:
-      'SkillSense analyses postings from 4 Rwandan job boards and matches them against NISR labour force surveys to ground every forecast.',
+      'SkillSense aggregates listings from BrighterMonday, JobInRwanda, RwandaJob, JobWebRwanda, and GreatRwandaJobs to build a single demand signal.',
     bg: '#DCF3ED',
     color: '#0F9D6E',
   },
   {
     icon: MapPin,
-    title: 'Regional Imbalance',
+    title: 'Kigali concentration',
     description:
-      'Over 70% of ICT job postings concentrate in Kigali, signalling an opportunity for decentralised training centres in secondary cities.',
+      '67% of all job postings are located in Kigali, highlighting the opportunity for decentralised skills development in secondary cities.',
     bg: '#E2E7FB',
     color: '#2F4CDD',
   },

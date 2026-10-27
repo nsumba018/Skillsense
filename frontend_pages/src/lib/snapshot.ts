@@ -12,9 +12,9 @@ export const SNAPSHOT = {
   roleGroups: 7,
   forecastHorizons: 3,
   totalPostings: 919,
-  ictPostings: 112,
+  ictPostings: 198,
   companies: 185,
-  jobBoards: ['RwandaJob', 'JobWebRwanda', 'GreatRwandaJobs', 'JobInRwanda'],
+  jobBoards: ['BrighterMonday', 'JobInRwanda', 'RwandaJob', 'JobWebRwanda', 'GreatRwandaJobs'],
   historyYears: '2005–2026',
   rankCorrelation: 0.9898,
   sectorNames: [
