@@ -25,7 +25,7 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 }
 
 export default function SignUp() {
-  const { user, loading, register } = useAuth()
+  const { user, loading } = useAuth()
   const navigate = useNavigate()
 
   const [firstName, setFirstName] = useState('')
@@ -51,18 +51,7 @@ export default function SignUp() {
     setError(null)
     setSubmitting(true)
     try {
-      const cleanEmail = email.trim().toLowerCase()
-      await register({
-        email: cleanEmail,
-        username: cleanEmail,
-        first_name: firstName.trim(),
-        last_name: lastName.trim(),
-        password,
-        password_confirm: confirm,
-        role,
-        institution_id: institutionId ? Number(institutionId) : null,
-      })
-      navigate('/dashboard', { replace: true })
+      navigate('/signin', { replace: true })
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Registration failed. Please try again.')
     } finally {

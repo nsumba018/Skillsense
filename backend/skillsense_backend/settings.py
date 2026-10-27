@@ -15,7 +15,9 @@ env = environ.Env(
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, ['localhost', '127.0.0.1']),
 )
-environ.Env.read_env(os.path.join(PROJECT_ROOT, '.env'))
+_env_file = os.path.join(PROJECT_ROOT, '.env')
+if os.path.isfile(_env_file):
+    environ.Env.read_env(_env_file)
 
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -112,6 +115,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[
     'http://localhost:5173',
     'http://localhost:3000',
+    'http://localhost',
 ])
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = (*default_headers, 'x-refresh-token')
@@ -174,5 +178,21 @@ ML_MODEL_PATH = PROJECT_ROOT / env('ML_MODEL_PATH', default='ml/skillsense_forec
 ML_CORRECTION_FACTORS_PATH = PROJECT_ROOT / env('ML_CORRECTION_FACTORS_PATH', default='ml/correction_factors.joblib')
 ML_ROLE_ENCODER_PATH = PROJECT_ROOT / env('ML_ROLE_ENCODER_PATH', default='ml/role_encoder.joblib')
 ML_FEATURE_LIST_PATH = PROJECT_ROOT / env('ML_FEATURE_LIST_PATH', default='ml/feature_list.joblib')
+
+STORAGES = {
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=False)
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
 
 

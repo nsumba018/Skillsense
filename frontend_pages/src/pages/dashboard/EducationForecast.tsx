@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { TrendingUp, TrendingDown, Sparkles, Gauge, GraduationCap, Minus, Briefcase } from 'lucide-react'
+import { TrendingUp, TrendingDown, Sparkles, Gauge, Minus, Briefcase } from 'lucide-react'
 import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { RoleForecastChart, type RoleChartPoint, EmploymentTrendChart, type EmploymentPoint } from './charts'
 import { EmptyState, QueryGate } from '../../components/ui/State'

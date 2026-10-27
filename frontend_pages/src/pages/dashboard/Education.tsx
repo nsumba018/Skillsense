@@ -13,7 +13,6 @@ import {
   Lightbulb,
   Loader2,
   Plus,
-  RefreshCw,
   Sparkles,
   Trash2,
   TrendingUp,
@@ -22,8 +21,7 @@ import {
   Zap,
 } from 'lucide-react'
 import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
-import { EmptyState, QueryGate } from '../../components/ui/State'
-import { useAuth } from '../../auth/AuthContext'
+import { QueryGate } from '../../components/ui/State'
 import { useCurricula, useBulletinAll, useBulletinList } from '../../services/queries'
 import { analyticsApi, bulletinApi } from '../../services/api'
 import { ApiError } from '../../services/http'
@@ -83,7 +81,6 @@ const MARKET_SKILLS: Record<Dept, string[]> = {
 
 const ALL_DEPTS: Dept[] = ['Software Engineering', 'Network & Info Management', 'Finance', 'Business Administration']
 const IT_DEPTS: Dept[] = ['Software Engineering', 'Network & Info Management']
-const BIZ_DEPTS: Dept[] = ['Finance', 'Business Administration']
 
 /* ── Types ── */
 interface CourseData { skills: string[]; desc: string }
@@ -268,13 +265,12 @@ function TransformationView({ cohort }: { cohort: Cohort }) {
    ══════════════════════════════════════════════════ */
 
 export default function Education() {
-  const { user } = useAuth()
   const queryClient = useQueryClient()
   const list = useCurricula()
-  const bulletin = useBulletinAll()
+  useBulletinAll()
   const bulletinList = useBulletinList()
   const bulFileRef = useRef<HTMLInputElement>(null)
-  const [bulFile, setBulFile] = useState<File | null>(null)
+  const [, setBulFile] = useState<File | null>(null)
   const [bulDragOver, setBulDragOver] = useState(false)
   const [showCurrMgmt, setShowCurrMgmt] = useState(false)
   const [bulUploadError, setBulUploadError] = useState<string | null>(null)

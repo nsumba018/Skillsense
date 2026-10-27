@@ -48,7 +48,7 @@ function AnimatedPlaceholder({ hints, active }: { hints: string[]; active: boole
   const [idx, setIdx] = useState(0)
   const [displayed, setDisplayed] = useState('')
   const [typing, setTyping] = useState(true)
-  const timer = useRef<ReturnType<typeof setTimeout>>()
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
     if (active) return

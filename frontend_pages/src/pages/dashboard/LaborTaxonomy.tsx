@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Briefcase, Building2, ChevronRight, MapPin, Network, Search, Sparkles } from 'lucide-react'
+import { Building2, ChevronRight, MapPin, Network, Search, Sparkles } from 'lucide-react'
 import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { useSectorParam } from '../../components/ui/SectorSelector'
 import { useSectorList } from '../../services/queries'

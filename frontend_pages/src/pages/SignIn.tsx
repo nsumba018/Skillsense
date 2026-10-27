@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { AtSign, Lock, Eye, EyeOff, ArrowRight, Loader2, AlertCircle } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
 import { ApiError } from '../services/http'
@@ -13,8 +13,7 @@ const DEMO_ACCOUNTS = [
 export default function SignIn() {
   const { user, loading, login } = useAuth()
   const navigate = useNavigate()
-  const location = useLocation()
-  const from = (location.state as { from?: string } | null)?.from ?? '/dashboard'
+  const from = '/dashboard'
 
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState('')
@@ -206,7 +205,7 @@ export default function SignIn() {
             </button>
           </form>
 
-          {/* Demo credentials for judges / reviewers */}
+          {/* Demo credentials */}
           <div className="mt-5 rounded-lg border border-blue-200 bg-blue-50/70 px-3 py-2.5">
             <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-blue-700">Demo accounts</p>
             <div className="space-y-1.5">

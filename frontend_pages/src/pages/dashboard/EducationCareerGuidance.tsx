@@ -15,9 +15,7 @@ import {
 import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { QueryGate } from '../../components/ui/State'
 import { useCareer, useTrends, useSectorPositions } from '../../services/queries'
-import { fmtNum, fmtPct } from '../../lib/format'
-import { TREND_LABEL, TREND_TONE } from '../../lib/derive'
-import type { Trend } from '../../types/api'
+import { fmtNum } from '../../lib/format'
 
 const AUCA_SE_COURSES = {
   'Semester 1': ['Applied Mathematics', 'Intro to Computer Applications', 'Principles of Accounting I'],
@@ -30,14 +28,6 @@ const AUCA_SE_COURSES = {
   'Semester 8': ['Best Programming Practice & Design Patterns', 'Internship', 'Final Year Project'],
 }
 
-const SE_SKILLS_TAUGHT = [
-  'Java', 'Java/SpringBoot', 'C', '.NET', 'C#', 'PL/SQL', 'Python', 'React',
-  'DBMS', 'Software Testing', 'QA', 'Software Security',
-  'Web Design', 'Mobile Programming',
-  'OOP', 'Data Structures', 'Algorithms', 'Design Patterns',
-  'Project Management', 'Requirements Engineering',
-  'Statistics', 'Git', 'Agile/Scrum', 'REST APIs',
-]
 
 const SE_SKILLS_MISSING = [
   'Cloud Computing (AWS/Azure/GCP)',
@@ -68,7 +58,7 @@ interface CourseRecommendation {
 }
 
 function generateRecommendations(
-  growingRoles: { role_name: string; demand_index: number; share_pct: number }[],
+  _growingRoles: { role_name: string; demand_index: number; share_pct: number }[],
   ictPositions: { title: string; count: number }[],
   bizPositions: { title: string; count: number }[],
 ): CourseRecommendation[] {

@@ -30,7 +30,10 @@ body {
   color: #0f172a;
 }
 
-/* Page container: fluid gutters, content capped at 1200px (the old 1440px rule shrank it to 960px) */
+h1, h2, h3 {
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+}
+
 .container-1200 {
   width: 100%;
   max-width: calc(1200px + 80px);
@@ -46,19 +49,6 @@ body {
   .container-1200 { padding-inline: 40px; }
 }
 
-/* Faint grid behind the hero, fading out toward the edges */
-.hero-grid {
-  background-image:
-    linear-gradient(to right, rgba(15, 23, 42, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 30%, transparent 75%);
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 30%, transparent 75%);
-}
-
-.no-scrollbar { scrollbar-width: none; }
-.no-scrollbar::-webkit-scrollbar { display: none; }
-
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
@@ -73,37 +63,29 @@ body {
   animation-play-state: paused;
 }
 
-/* Landing hero: soft gradient field with two blurred colour orbs */
-.hero-bg {
-  background:
-    radial-gradient(1100px 500px at 85% -10%, rgba(29, 78, 216, 0.1), transparent 60%),
-    radial-gradient(900px 480px at -10% 30%, rgba(16, 185, 129, 0.07), transparent 60%),
-    linear-gradient(180deg, #f4f7ff 0%, #fafbfe 100%);
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
-.hero-orb {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(70px);
-  pointer-events: none;
+button:focus-visible {
+  border-radius: 8px;
 }
-.hero-orb-a { width: 340px; height: 340px; top: 40px; right: 8%; background: rgba(59, 130, 246, 0.18); }
-.hero-orb-b { width: 280px; height: 280px; bottom: 60px; left: 4%; background: rgba(16, 185, 129, 0.12); }
 
-@keyframes hero-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+a:focus-visible {
+  border-radius: 4px;
 }
-.hero-float { animation: hero-float 7s ease-in-out infinite; }
 
 html {
   scroll-behavior: smooth;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .marquee,
-  .hero-float {
+  .marquee {
     animation: none;
+  }
+  * {
+    animation-duration: 0.01ms !important;
   }
   html {
     scroll-behavior: auto;

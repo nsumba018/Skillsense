@@ -1,0 +1,12 @@
+.git
+.env
+*.joblib
+__pycache__
+*.pyc
+node_modules
+frontend_pages/node_modules
+frontend_pages/dist
+.venv
+*.pdf
+*.xlsx
+.claude

@@ -4,44 +4,28 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   TrendingUp,
   TrendingDown,
-  BadgeCheck,
   Zap,
   Users,
   Briefcase,
   Download,
   Loader2,
-  ArrowUpRight,
-  ArrowDownRight,
   LayoutDashboard,
   Layers,
   Minus,
   Sparkles,
 } from 'lucide-react'
 import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
-import { Sparkline, EmploymentTrendChart, Donut, DONUT_COLORS, SectorEmploymentChart } from './charts'
+import { Donut, DONUT_COLORS, SectorEmploymentChart } from './charts'
 import { QueryGate } from '../../components/ui/State'
-import { ROLE_LABELS, useAuth } from '../../auth/AuthContext'
+import { useAuth } from '../../auth/AuthContext'
 import { ROLE_FOCUS } from '../../auth/access'
 import { useKpis, useMacro, useOverview, usePolicyInsights, useSectors, useSectorEmployment, useTrends } from '../../services/queries'
 import { predictionsApi, reportsApi } from '../../services/api'
-import { employmentChartData, employmentSeries, TREND_LABEL, TREND_TONE } from '../../lib/derive'
+import { TREND_LABEL, TREND_TONE } from '../../lib/derive'
 import { fmtInt, fmtPct } from '../../lib/format'
 import { ApiError } from '../../services/http'
 import type { SectorForecastKpi, Trend } from '../../types/api'
 
-
-function Delta({ value, unit = '' }: { value: number | null; unit?: string }) {
-  if (value === null) return null
-  const up = value >= 0
-  const Icon = up ? ArrowUpRight : ArrowDownRight
-  return (
-    <span className={`flex items-center gap-0.5 text-sm font-semibold ${up ? 'text-emerald-600' : 'text-red-500'}`}>
-      <Icon className="h-3.5 w-3.5" />
-      {Math.abs(value).toFixed(1)}
-      {unit}
-    </span>
-  )
-}
 
 function TrendBadge({ trend, label }: { trend: Trend; label: string }) {
   const Icon = trend === 'growing' ? TrendingUp : trend === 'declining' ? TrendingDown : Minus
@@ -91,9 +75,9 @@ export default function LaborDashboard() {
   const { user, isAdmin } = useAuth()
   const queryClient = useQueryClient()
   const kpis = useKpis()
-  const overview = useOverview()
-  const macro = useMacro()
-  const trends = useTrends()
+  useOverview()
+  useMacro()
+  useTrends()
   const sectors = useSectors()
   const sectorEmployment = useSectorEmployment()
   const policyInsights = usePolicyInsights()
@@ -108,15 +92,7 @@ export default function LaborDashboard() {
     },
   })
 
-  const series = macro.data ? employmentSeries(macro.data, 2015) : []
-  const latest = series.find((m) => m.year === kpis.data?.latest_year)
-  const prev = latest ? series.find((m) => m.year === latest.year - 1) : undefined
-  const empDelta = latest && prev ? ((latest.ict_employment - prev.ict_employment) / prev.ict_employment) * 100 : null
-  const shareDelta = latest && prev ? latest.ict_employment_share_pct - prev.ict_employment_share_pct : null
-
-  const top = overview.data?.forecast_summary['1y'] ?? []
   const sectorForecasts = kpis.data?.sector_forecasts ?? []
-  const totalSectorPostings = sectorForecasts.reduce((s, sf) => s + sf.posting_count, 0)
   const totalSectorEmployment = sectorForecasts.reduce((s, sf) => s + sf.employment_count, 0)
   const growingSectors = sectorForecasts.filter((sf) => sf.employment_trend === 'growing')
 

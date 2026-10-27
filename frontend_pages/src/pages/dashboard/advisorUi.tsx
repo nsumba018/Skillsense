@@ -13,7 +13,7 @@ export const SECTOR_OPTIONS = [
   { slug: 'finance-business', label: 'Finance & Business' },
 ]
 
-export const DEPT_SHORT: Record<DeptCode, string> = { se: 'SE', net: 'Network', fin: 'Finance', ba: 'BA' }
+export const DEPT_SHORT: Record<DeptCode, string> = { se: 'SE', net: 'Network', im: 'Info Mgmt', fin: 'Finance', ba: 'BA' }
 
 export const inputClass =
   'w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'

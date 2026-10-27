@@ -1,6 +1,6 @@
 /* Career & Training Advisor API types (backend/advisory). */
 
-export type DeptCode = 'se' | 'net' | 'fin' | 'ba'
+export type DeptCode = 'se' | 'net' | 'im' | 'fin' | 'ba'
 export type StudentStatus = 'active' | 'graduated' | 'placed' | 'inactive'
 export type ContractType = 'full_time' | 'internship' | 'freelance' | 'contract'
 

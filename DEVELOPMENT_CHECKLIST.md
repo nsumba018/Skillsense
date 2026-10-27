@@ -2,9 +2,40 @@
 
 **AI-Powered Labour-Market Intelligence & Employability Outlook Platform**
 
-Rwanda-focused. First sector: ICT / Computer Science / Digital Technology.
+Rwanda-focused. 9 economic sectors. NISR 2026 Big Data Hackathon submission (deadline: 30 Oct 2026).
 
-Last updated: Oct 24, 2026 (Phase 4C education planner pages complete, multi-sector expansion done, career advisor spec written, page isolation rule established)
+Last updated: Oct 27, 2026 (Landing page redesigned for hackathon, career advisor fully implemented, shared AUCA skill data extracted, role-based sidebar fixed, all 4 roles have dedicated pages)
+
+---
+
+## Current State (Oct 27, 2026)
+
+**Platform:** SkillSense — AI-powered workforce intelligence for Rwanda. Submitted to NISR 2026 Big Data Hackathon (deadline: 30 Oct 2026).
+
+**What's working:**
+- Full-stack app: React 19 (Vite, TypeScript, Tailwind v4) + Django REST + PostgreSQL
+- Two-Stage ML model: LightGBM trend + market correction factors → Spearman 0.99 validation
+- 919 job postings across 9 sectors from 4+ platforms, 22 roles, 185 companies
+- 4 user roles, each with completely isolated dashboard pages and role-based sidebar
+- Landing page redesigned for hackathon with multi-sector messaging and SNAPSHOT data
+- JWT auth with demo accounts on sign-in page (admin hidden)
+- All TypeScript compiles cleanly, dev server at localhost:5173
+
+**What's left:**
+- Labour market analyst pages need live API data (currently use mock/hardcoded data)
+- Invite-only auth flow (plan exists, not built — admin-invite instead of self-registration)
+- Layer 2: Emerging Skills Radar (global trends, new roles — Phase 8)
+- Testing & deployment (Phase 9)
+
+**Branch:** `develop` (PR target: `main`). Remote: `origin/develop`.
+
+**Database stats:** 919 total postings (112 ICT, 807 non-ICT), 22 roles, 9 sectors, 185 companies, 7 role groups.
+
+**Key entry points:**
+- Frontend: `frontend_pages/src/main.tsx` (routing), `frontend_pages/src/auth/access.ts` (22 routes, role-based)
+- Backend: `backend/skillsense_backend/urls.py`, `backend/advisory/` (career advisor app)
+- ML: `ml/phase2d_final_model.py` (production Two-Stage model)
+- Data: `frontend_pages/src/lib/snapshot.ts` (landing page numbers), `frontend_pages/src/data/auca-skills.ts` (shared AUCA curriculum data)
 
 ---
 
@@ -12,16 +43,16 @@ Last updated: Oct 24, 2026 (Phase 4C education planner pages complete, multi-sec
 
 When complete, SkillSense will:
 
-1. **Forecast ICT role demand** in Rwanda at 6-month, 1-year, and 2-year horizons using a trained ML model on 21 years of government-verified historical data
+1. **Forecast role demand across 9 sectors** in Rwanda at 6-month, 1-year, and 2-year horizons using a Two-Stage ML model (LightGBM + market correction) on 21 years of government-verified historical data (Spearman 0.99)
 2. **Alert users to emerging roles** (AI/ML Engineer, Prompt Engineer, etc.) that are trending globally but not yet present in Rwanda, with estimated arrival timelines
 3. **Score employability** of individual skill profiles against predicted market demand
 4. **Show geographic demand** by province and district on an interactive Rwanda map
-5. **Analyse education/training gaps** between what institutions teach and what employers need
-6. **Guide career decisions** with personalised recommendations based on skills gaps and forecasted demand
+5. **Analyse education/training gaps** between what AUCA teaches and what employers need — per-department curriculum alignment with employer-demanded skills
+6. **Guide career decisions** — advisors assess student skills against target roles, match students to jobs, build career pathways through AUCA Innovation Center courses, and track placement outcomes
 7. **Support policy makers** with decision dashboards for workforce planning and training investment
-8. **Generate exportable reports** (PDF, CSV) for all analytics
-9. **Accept new data via CSV upload** — admin uploads job postings, system classifies, normalizes, and updates forecasts
-10. **Serve 5 user roles** — Policy Maker, Education Planner, Career Advisor, Researcher, Admin — each with institution-scoped access
+8. **Generate exportable reports** (PDF, CSV) for all analytics — multi-sector reports with role demand, curriculum alignment, and placement outcomes
+9. **Accept new data via CSV upload** — admin uploads job postings from 4+ platforms, system classifies across 9 sectors, normalizes, and updates forecasts
+10. **Serve 4 user roles** — Labour Market Analyst, Education Curriculum Planner, Career & Training Advisor, Admin — each with completely isolated dashboard pages
 
 ---
 
@@ -341,9 +372,9 @@ When complete, SkillSense will:
 
 ---
 
-## Phase 4: Frontend Integration [IN PROGRESS]
+## Phase 4: Frontend Integration [NEARLY COMPLETE]
 
-*Connect React frontend to Django backend. Replace mock data with real API calls.*
+*Connect React frontend to Django backend. Replace mock data with real API calls. Only analyst live-data wiring remains.*
 
 **Depends on:** Phase 3 (done)
 
@@ -358,28 +389,31 @@ When complete, SkillSense will:
 
 ### 4B: Landing Page & Auth Pages [DONE]
 
-- [x] Landing page polished: hero section, statistics strip, stakeholder section, pipeline explainer, CTA, footer
+- [x] Landing page completely redesigned for NISR 2026 Big Data Hackathon submission
+- [x] New component set: Navbar, Hero (Rwanda map + hackathon badge), TheChallenge, OurData, IntelligencePipeline, Features, RoleShowcase, CallToAction, Footer
+- [x] Multi-sector language throughout (9 sectors, not ICT-only)
+- [x] Hero section: Rwanda map on right, animated KPI counters, hackathon badge, SNAPSHOT data references
+- [x] IntelligencePipeline: 5-stage pipeline cards with 0.99 Spearman correlation validation
+- [x] StatisticsStrip: live data from `SNAPSHOT` (22 roles, 9 sectors, 919 postings, 185 companies)
+- [x] Central data source: `frontend_pages/src/lib/snapshot.ts` — all landing page numbers reference SNAPSHOT
 - [x] "Built for" marquee with institution logos (MINICT, RDB, RISA, AUCA, MIFOTRA, NISR)
-- [x] Sign In page (no-scroll, split layout, connected to JWT auth)
-- [x] Sign Up page (institutional registration, connected to API)
+- [x] Navbar uses `useAuth()` for conditional CTA ("Open dashboard" vs "Try the demo")
+- [x] Sign In page: no-scroll split layout, 3 demo accounts (analyst, planner, advisor — admin hidden), compact styling
+- [x] Sign Up page redirects to Sign In (self-registration disabled in UI)
 - [x] Forgot Password page (multi-step OTP flow)
 
-### 4C: Dashboard Pages [PARTIAL — education planner done, career advisor spec written, analyst pages need live data]
+### 4C: Dashboard Pages [DONE — all 4 roles have dedicated pages]
 
-All dashboard pages exist with UI shells. Auth + routing + role-based sidebar filtering all work.
+All dashboard pages built. Auth + routing + role-based sidebar filtering all work. TypeScript compiles cleanly.
 
 **Page isolation rule (established Oct 24, 2026):**
-> Every role has its own standalone pages. No page is shared between roles except Settings.
+> Every role has its own standalone pages. No page is shared between roles except Settings and the Taxonomy/Reports pair (which render role-specific content via role-switching wrappers).
 
-- [x] Dashboard Layout — sidebar nav filtered by role, top header
-- [x] Main Dashboard — KPI cards, demand trend chart, top skills, role-specific quick links
-- [x] Skills Forecast — filter bar, AI advisory, demand index chart, rising/declining tables
-- [x] Employability — radar chart, sector probability bars, skill velocity table
-- [x] Career Guidance — personalised recommendations (career_training_advisor + admin)
-- [x] Sector Intelligence — industry breakdown charts (labor_market_analyst + admin)
-- [x] Geographic Intelligence — Rwanda map, district rankings (labor_market_analyst + admin)
-- [x] Policy & Planning — decision-support dashboard (labor_market_analyst + admin)
-- [x] Settings — profile, security, notifications (all roles — the ONLY shared page)
+- [x] Dashboard Layout — sidebar nav filtered by role, top header, animated search, mobile drawer
+- [x] Sidebar ordering correct for all roles: each role's Dashboard appears first, followed by their specific pages
+- [x] Role Taxonomy — shared route, role-switching wrapper renders `LaborTaxonomy` or `EducationTaxonomy` based on user role
+- [x] Reports — shared route, role-switching wrapper renders `LaborReports` or `EducationReports` based on user role
+- [x] Settings — profile, security, notifications (all roles — the ONLY truly shared page)
 - [x] Data Upload — CSV upload (admin only)
 - [x] User Management — admin panel (admin only)
 
@@ -425,10 +459,14 @@ Rewrote all education planner pages from generic shells into AUCA-specific tools
 - [x] Added 5th report template: "Curriculum Alignment" with per-department skills gap analysis
 - [x] Curriculum Alignment report includes: department overview table, per-department skill breakdown (covered/gaps), alignment progress bars, AI recommendations per department
 
-**EducationEmployability.tsx, EducationForecast.tsx, EducationCareerGuidance.tsx:**
+**EducationEmployability.tsx (666 lines), EducationForecast.tsx (738 lines), EducationCareerGuidance.tsx (428 lines):**
 - [x] Exist as role-specific pages for education planner (separate from analyst versions)
 
-**Key data structures shared across education pages:**
+**EducationDashboard.tsx (486 lines):**
+- [x] Education planner home page with KPIs, curriculum alignment overview, quick links
+
+**Shared AUCA skill data extracted (Oct 2026):**
+- [x] `frontend_pages/src/data/auca-skills.ts` (446 lines) — single source of truth for all AUCA curriculum and skill data
 - `DEPT_CURRICULA` — 4 AUCA departments with their course/skill sets
 - `ICT_ROLE_SKILLS` — 21 ICT roles with employer-demanded skills
 - `BIZ_ROLE_SKILLS` — 19 business roles with employer-demanded skills
@@ -436,6 +474,7 @@ Rewrote all education planner pages from generic shells into AUCA-specific tools
 - `INNOVATION_COURSES` — 12 Innovation Center courses with skill mappings
 - `isSkillTaught()` — word-boundary regex matching function
 - `AUCA_SECTORS = new Set(['ict-technology', 'finance-business'])`
+- Education.tsx and EducationTaxonomy.tsx import from this shared module (EducationEmployability uses it too)
 
 ### 4F: Career & Training Advisor — Developer Spec [DONE]
 
@@ -458,30 +497,56 @@ Created comprehensive developer handoff document for a colleague to build the ca
 - [x] Implementation order: 6 phases, estimated 6-9 working days
 - [x] Testing checklist with page isolation verification
 
-**Status:** Spec complete, ready for handoff. Implementation NOT started.
+**Status:** Spec complete. Implementation done — see Phase 4G below.
 
-### 4G: Career Advisor Implementation [NOT STARTED — assigned to colleague]
+### 4G: Career Advisor Implementation [DONE]
 
-- [ ] Phase 1: Create `advisory` Django app + models + migrations
-- [ ] Phase 2: Page isolation — remove `career_training_advisor` from old shared routes, add new routes
-- [ ] Phase 3: Build AdvisorAssessment.tsx with client-side fallback scoring
-- [ ] Phase 4: Build AdvisorDashboard.tsx + AdvisorJobs.tsx
-- [ ] Phase 5: Build AdvisorPathways.tsx + AdvisorPlacements.tsx
-- [ ] Phase 6: Build AdvisorReports.tsx, extract shared skill data, delete old Career*.tsx clones
+**Done by:** Team (PR #8 merged, commits 1f836ba → 2d25fd9)
+
+- [x] Created `advisory` Django app with models: StudentProfile, Assessment, SavedPathway, Placement
+- [x] Backend: scoring engine (`scoring.py`), PDF generation (`pdf.py`), skills data (`skills_data.py`), stats, permissions
+- [x] Backend: 14 API endpoints under `/api/advisory/` with priority skills, student-fit job search, placement rate, logos on PDFs
+- [x] Page isolation: `career_training_advisor` removed from old shared routes, 6 new advisor-only routes in `access.ts`
+- [x] AdvisorDashboard.tsx (240 lines) — KPIs, students needing attention, hot roles
+- [x] AdvisorAssessment.tsx (564 lines) — student skill assessment against target roles with scoring
+- [x] AdvisorJobs.tsx (307 lines) — job market navigator with student-fit filters
+- [x] AdvisorPathways.tsx (303 lines) — career pathway generation with Innovation Center course mapping
+- [x] AdvisorPlacements.tsx (496 lines) — placement recording, stats, CSV bulk import, sortable table, placement rate chart
+- [x] AdvisorReports.tsx (286 lines) — report templates with PDF generation
+- [x] Total: 2,196 lines of advisor frontend code
+- [x] Old `CareerGuidance.tsx` still exists (used as a wrapper for education planner's career guidance page)
+
+### 4H: Landing Page Redesign for Hackathon [DONE]
+
+**Done by:** IRAKOZE Nsumba Herve (Oct 2026, commit 609f3b2)
+
+- [x] Complete landing page redesign optimized for NISR 2026 Big Data Hackathon judging criteria
+- [x] New component architecture: Navbar → Hero → TheChallenge → OurData → IntelligencePipeline → Features → RoleShowcase → CallToAction → Footer
+- [x] Hero: Rwanda clean map on right, hackathon badge, animated counters, multi-sector messaging
+- [x] TheChallenge: problem statement with Rwanda workforce context
+- [x] OurData: data sources and methodology overview
+- [x] IntelligencePipeline: 5-stage pipeline (Collect → Classify → Model → Forecast → Deliver) with validation box (0.99 Spearman)
+- [x] Features: platform capability cards for all 4 user roles
+- [x] RoleShowcase: interactive role-specific previews
+- [x] Central SNAPSHOT data source at `frontend_pages/src/lib/snapshot.ts`
+- [x] All components reference SNAPSHOT for consistency: 22 roles, 9 sectors, 919 postings, 185 companies, 0.9898 rank correlation
+- [x] HeroDashboard: browser chrome frame with sidebar preview showing real KPIs from SNAPSHOT
 
 ### 4C Status Summary
 
 | Role | Pages | Status |
 |------|-------|--------|
-| Admin | User Management, Data Upload, Settings + access to all | DONE |
-| Labor Market Analyst | Dashboard, Forecast, Employability, Taxonomy, Reports, Sector, Geographic, Policy, Settings | UI built, needs live API data |
-| Education Planner | Education, EducationTaxonomy, EducationReports, EducationEmployability, EducationForecast, EducationCareerGuidance, Settings | **DONE — AUCA-integrated** |
-| Career Advisor | 6 unique Advisor pages + Settings | **Spec written, implementation not started** |
+| Admin | Dashboard, User Management, Data Upload, Settings | **DONE** |
+| Labor Market Analyst | Dashboard, Sector Overview, Geography, Policy & Planning, Role Taxonomy*, Reports*, Settings | **UI built, needs live API data** |
+| Education Planner | Dashboard, Role Forecast, Employability, Career Guidance, Education Alignment, Role Taxonomy*, Reports*, Settings | **DONE — AUCA-integrated** |
+| Career Advisor | Dashboard, Skill Assessment, Job Navigator, Career Pathways, Placement Tracker, Reports, Settings | **DONE — 2,196 lines** |
+
+\* Role Taxonomy and Reports are shared routes with role-switching wrappers (LaborTaxonomy/EducationTaxonomy, LaborReports/EducationReports)
 
 **Known issues:**
 - Analyst pages still use mock/hardcoded data — need live API integration
-- Old `Career*.tsx` files (clones of analyst pages) still exist — to be deleted when advisor pages are built
-- Shared skill data (ICT_ROLE_SKILLS, BIZ_ROLE_SKILLS, etc.) is duplicated across education pages — should be extracted to `frontend_pages/src/data/auca-skills.ts`
+- Old `CareerGuidance.tsx` wrapper still exists (used by education planner's career guidance routing)
+- Invite-only auth flow planned but not implemented (plan exists at `.claude/plans/fizzy-scribbling-ritchie.md`)
 
 ---
 
@@ -759,13 +824,14 @@ Phase 2D [DONE]     Model Iteration — Two-Stage model (Spearman 0.99)
 Phase 3  [DONE]     Django Backend (schema → API → auth → ML integration)
    ↓                  └── 7 apps, JWT auth, 4 seed users, all endpoints live
    ↓
-Phase 4  [IN PROGRESS]  Frontend Integration (wire React → Django)
+Phase 4  [NEARLY COMPLETE]  Frontend Integration (wire React → Django)
    ↓                  └── 4A Auth flow + API client — DONE
-   ↓                  └── 4B Landing + auth pages — DONE
+   ↓                  └── 4B Landing + auth pages — DONE (redesigned for hackathon)
    ↓                  └── 4D Multi-sector expansion (9 sectors, scrapers) — DONE
    ↓                  └── 4E Education planner pages (AUCA-integrated) — DONE
-   ↓                  └── 4F Career advisor developer spec — DONE (handoff ready)
-   ↓                  └── 4G Career advisor implementation — NOT STARTED (assigned to colleague)
+   ↓                  └── 4F Career advisor developer spec — DONE
+   ↓                  └── 4G Career advisor implementation — DONE (PR #8 merged)
+   ↓                  └── 4H Landing page hackathon redesign — DONE
    ↓                  └── TODO: Analyst pages need live API data
    ↓                  └── TODO: Invite-only auth flow (plan exists, not built)
    ↓
@@ -780,11 +846,11 @@ Phase 8             Layer 2: Emerging Skills Radar (global trends, new roles)
 Phase 9             Testing & Deployment (tests, Docker, CI/CD, security)
 ```
 
-**Critical path:** Phase 4G (career advisor build, parallel) → Phase 5 (live data for analyst) → everything else
+**Critical path:** Phase 5 (live API data for analyst pages) → remaining modules
 **Gate:** Phase 2D Spearman > 0.85 — **PASSED** (0.9898)
+**Hackathon deadline:** 30 Oct 2026
 
 **Can be parallelised:**
-- Phase 4G (career advisor build by colleague) runs in parallel with analyst live data work
 - Phase 6 + Phase 7 (independent modules, can be built simultaneously)
 - Phase 8 data collection can start now (research doesn't block development)
 - Invite-only auth flow can be built independently of any dashboard work
@@ -813,9 +879,9 @@ Phase 9             Testing & Deployment (tests, Docker, CI/CD, security)
 
 ### PR1-4: Career Advice — Keep or Remove?
 **Feedback:** Need to decide whether career advice should be in the system. If kept, define what information and methods will drive the advice. Review and remove unnecessary career pages.
-**Decision:** KEEP — but with 6 completely unique pages (not clones of analyst pages). Career advisor works at the individual student level: skill assessment, job matching, pathway building, placement tracking. Old shared Career*.tsx pages to be deleted.
-**Current state:** Full developer spec written (`docs/Career_Training_Advisor_Developer_Spec.md`). 6 unique pages designed with backend models, API endpoints, and implementation order. Assigned to colleague for implementation.
-**Status:** [x] Decision made — [ ] Implemented (spec done, build not started)
+**Decision:** KEEP — but with 6 completely unique pages (not clones of analyst pages). Career advisor works at the individual student level: skill assessment, job matching, pathway building, placement tracking.
+**Current state:** Fully implemented. Django `advisory` app with 4 models, 14 API endpoints, scoring engine, PDF generation. 6 frontend pages (2,196 lines total). PR #8 merged.
+**Status:** [x] Decision made — [x] Implemented (Phase 4G)
 
 ### PR1-5: Education Alignment
 **Feedback:** System should clearly show the relationship between education and labour market demand — which qualifications, courses, skills, and training programs are demanded by employers.
@@ -835,9 +901,9 @@ Phase 9             Testing & Deployment (tests, Docker, CI/CD, security)
 
 ### PR1-8: Page Audit — Remove Unnecessary Pages
 **Feedback:** Review current prototype, remove pages without clear purpose. Final system should be simple, organized, and focused on main objectives.
-**Decision:** Page isolation rule — every role gets its own standalone pages, no sharing except Settings. Old Career*.tsx clones (5 files, ~1668 lines) to be deleted when advisor pages are built. Education planner pages fully customized for AUCA.
-**Current state:** Education planner pages audited and rebuilt. Career advisor pages specified (6 unique). Old clone pages identified for deletion.
-**Status:** [x] Decision made — [x] Partially implemented (education done, career advisor pending)
+**Decision:** Page isolation rule — every role gets its own standalone pages, no sharing except Settings and the Taxonomy/Reports pair (which render role-specific content via wrappers). Education planner pages fully customized for AUCA.
+**Current state:** All roles fully isolated. Education planner has 7 unique pages. Career advisor has 6 unique pages. Labour analyst has 4 unique pages + shared taxonomy/reports. Admin has 3 pages. Old Career*.tsx clones replaced by advisor pages.
+**Status:** [x] Decision made — [x] Implemented
 
 ### PR1-9: System Redesign & Research
 **Feedback:** The group should sit down together and redesign/review the system before continuing. Clearly define: purpose, goals, users, data sources, how to measure demand, how to track employability, how to connect education and labour market, which features are necessary vs removable.
@@ -866,9 +932,12 @@ Phase 9             Testing & Deployment (tests, Docker, CI/CD, security)
 | Django settings | `backend/skillsense_backend/settings.py` |
 | Django apps | `backend/{core,accounts,taxonomy,predictions,uploads,analytics,reports}/` |
 | **Career advisor spec** | `docs/Career_Training_Advisor_Developer_Spec.md` |
-| **Education planner pages** | `frontend_pages/src/pages/dashboard/Education*.tsx` (6 files) |
-| **Career advisor pages (TODO)** | `frontend_pages/src/pages/dashboard/Advisor*.tsx` (6 files, not yet created) |
-| **Old career clones (to delete)** | `frontend_pages/src/pages/dashboard/Career*.tsx` (5 files) |
+| **Education planner pages** | `frontend_pages/src/pages/dashboard/Education*.tsx` (7 files, 3,622 lines) |
+| **Career advisor pages** | `frontend_pages/src/pages/dashboard/Advisor*.tsx` (6 files, 2,196 lines) |
+| **Advisory Django app** | `backend/advisory/` (models, views, scoring, pdf, skills_data, stats) |
+| **Shared AUCA skill data** | `frontend_pages/src/data/auca-skills.ts` (446 lines) |
+| **Landing page SNAPSHOT** | `frontend_pages/src/lib/snapshot.ts` |
+| **Role-based access control** | `frontend_pages/src/auth/access.ts` (single source of truth for all 22 routes) |
 | ML model integration | `backend/predictions/ml/` |
 | **Production model (Two-Stage)** | `ml/phase2d_final_model.py` |
 | ML training script (v1, superseded) | `ml/train_model.py` |
@@ -880,9 +949,9 @@ Phase 9             Testing & Deployment (tests, Docker, CI/CD, security)
 
 ### Seed User Credentials
 
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | `admin@skillsense.rw` | `Admin@1234` |
-| Career & Training Advisor | `advisor@skillsense.rw` | `Advisor@1234` |
-| Education / Curriculum Planner | `planner@skillsense.rw` | `Planner@1234` |
-| Labour Market Analyst | `analyst@skillsense.rw` | `Analyst@1234` |
+| Role | Email | Password | Notes |
+|------|-------|----------|-------|
+| Admin | `admin@skillsense.rw` | `admin123` | Hidden from demo UI (admin is the project owner) |
+| Career & Training Advisor | `advisor@skillsense.rw` | `advisor123` | Shown on sign-in demo panel |
+| Education / Curriculum Planner | `planner@skillsense.rw` | `planner123` | Shown on sign-in demo panel |
+| Labour Market Analyst | `analyst@skillsense.rw` | `analyst123` | Shown on sign-in demo panel |

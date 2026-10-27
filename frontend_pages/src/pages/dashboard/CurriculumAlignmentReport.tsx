@@ -17,6 +17,11 @@ const MARKET_SKILLS: Record<DeptCode, string[]> = {
     'SIEM', 'Firewall Management', 'Incident Response', 'Compliance (ISO 27001)',
     'Monitoring', 'Scripting (Bash/PowerShell)', 'VPN', 'Cloud Networking',
   ],
+  im: [
+    'DBMS', 'SQL', 'Data Warehousing', 'Business Intelligence', 'Power BI/Tableau',
+    'Python', 'Data Governance', 'Information Security', 'Cloud (AWS/Azure)',
+    'ETL Pipelines', 'Data Modeling', 'Excel (Advanced/VBA)',
+  ],
   fin: [
     'IFRS', 'Financial Reporting', 'Tax', 'Auditing', 'ERP Systems',
     'Financial Modeling', 'Excel (Advanced/VBA)', 'Power BI/Tableau',
@@ -31,8 +36,8 @@ const MARKET_SKILLS: Record<DeptCode, string[]> = {
   ],
 }
 
-export const DEPTS: DeptCode[] = ['se', 'net', 'fin', 'ba']
-const FACULTY: Record<DeptCode, string> = { se: 'IT', net: 'IT', fin: 'Business', ba: 'Business' }
+export const DEPTS: DeptCode[] = ['se', 'net', 'im', 'fin', 'ba']
+const FACULTY: Record<DeptCode, string> = { se: 'IT', net: 'IT', im: 'IT', fin: 'Business', ba: 'Business' }
 
 const toneOf = (pct: number) => (pct >= 70 ? 'emerald' : pct >= 40 ? 'amber' : 'red')
 const COLOR = { emerald: GREEN, amber: AMBER, red: RED } as const

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { BookOpen, Briefcase, Calculator, Check, GraduationCap, Lightbulb, Loader2, ShieldCheck, Sparkles, TrendingUp } from 'lucide-react'
+import { BookOpen, Briefcase, Calculator, Check, Lightbulb, Loader2, ShieldCheck, Sparkles, TrendingUp } from 'lucide-react'
 import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { ProfileRadar } from './charts'
 import { QueryGate } from '../../components/ui/State'

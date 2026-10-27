@@ -1,102 +1,94 @@
-import { ArrowRight, BadgeCheck, Sparkles } from 'lucide-react'
+import { ArrowRight, BadgeCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useAuth } from '../auth/AuthContext'
+import HeroDashboard from './HeroDashboard'
 import { SNAPSHOT } from '../lib/snapshot'
+import coatOfArmsLogo from '../assets/logos/coat-of-arms.webp'
+import mifotraLogo from '../assets/logos/mifotra.webp'
+import rdbLogo from '../assets/logos/rdb.webp'
+import nisrLogo from '../assets/logos/nisr.webp'
+import hecLogo from '../assets/logos/hec.webp'
+
+const institutions = [
+  { name: 'MIFOTRA', logo: mifotraLogo },
+  { name: 'RDB', logo: rdbLogo },
+  { name: 'NISR', logo: nisrLogo },
+  { name: 'MINEDUC', logo: coatOfArmsLogo },
+  { name: 'HEC', logo: hecLogo },
+]
+const logos = [...institutions, ...institutions]
 
 const proof = [
-  `Trained on ${SNAPSHOT.historyYears} NISR Labour Force Survey`,
-  `${SNAPSHOT.totalPostings} real job postings across ${SNAPSHOT.sectors} sectors`,
-  `${SNAPSHOT.rankCorrelation.toFixed(2)} Spearman rank correlation`,
+  `${SNAPSHOT.historyYears} of NISR Labour Force Survey data`,
+  `Job postings from ${SNAPSHOT.jobBoards.length} Rwandan job boards`,
+  `${SNAPSHOT.sectors} economic sectors tracked`,
 ]
 
 export default function Hero() {
-  const { user } = useAuth()
-
   return (
-    <section id="home" className="hero-bg relative isolate overflow-hidden scroll-mt-20">
-      <div className="absolute inset-x-0 top-0 -z-10 h-full" aria-hidden>
-        <div className="absolute inset-0 bg-gradient-to-b from-dark-navy/95 via-navy/85 to-navy/60" />
-        <div className="hero-orb hero-orb-a" />
+    <section id="home" className="relative min-h-[calc(100vh-110px)] flex items-center pt-1 pb-11 md:pb-14 scroll-mt-24 overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden>
+        <div className="absolute -right-32 -top-32 h-[500px] w-[500px] rounded-full bg-primary/[0.04] blur-3xl" />
+        <div className="absolute -left-24 bottom-0 h-[400px] w-[400px] rounded-full bg-accent/[0.04] blur-3xl" />
       </div>
 
-      <div className="container-1200 relative pb-16 pt-14 sm:pb-20 sm:pt-20 lg:pb-24">
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
-
-          {/* ── Left: copy ── */}
-          <div className="max-w-xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-blue-100 backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5 shrink-0" />
-              NISR 2026 Big Data Hackathon
-            </div>
-
-            <h1 className="text-[2.25rem] font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.5rem]">
-              Rwanda's workforce is transforming.{' '}
-              <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-sky-200 bg-clip-text text-transparent">
-                Who's tracking where the demand is heading?
-              </span>
+      <div className="container-1200 w-full">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+          <div className="lg:col-span-5 pt-4 lg:pt-8">
+            <h1 className="text-4xl md:text-5xl lg:text-[54px] font-extrabold text-gray-900 leading-[1.1] mb-5 tracking-tight">
+              Forecast which roles Rwanda will need
+              <span className="text-primary"> — before the skills gap opens</span>
             </h1>
 
-            <p className="mt-5 max-w-lg text-base leading-relaxed text-blue-100/90 sm:text-lg">
-              <strong className="text-white">SkillSense</strong> forecasts demand for roles across {SNAPSHOT.sectors} economic sectors using NISR Labour Force Survey data and {SNAPSHOT.totalPostings} real job postings — then turns those forecasts into plans for advisors, planners and analysts.
+            <p className="text-base text-gray-600 mb-2 leading-relaxed">
+              <strong className="text-gray-900">SkillSense</strong> turns NISR labour data and real job postings
+              into sector-level demand forecasts, curriculum alignment reports, and student placement plans.
             </p>
 
-            <ul className="mt-6 space-y-2">
+            <ul className="mt-5 space-y-2">
               {proof.map((p) => (
-                <li key={p} className="flex items-center gap-2 text-sm font-medium text-blue-100">
-                  <BadgeCheck className="h-4 w-4 shrink-0 text-emerald-300" />
+                <li key={p} className="flex items-center gap-2 text-sm text-gray-500">
+                  <BadgeCheck className="h-4 w-4 shrink-0 text-accent" />
                   {p}
                 </li>
               ))}
             </ul>
 
-            <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+            <div className="flex flex-wrap items-center justify-start gap-4 mt-8 mb-8">
               <Link
-                to={user ? '/dashboard' : '/signin'}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-bold text-navy shadow-lg shadow-black/20 transition-all hover:-translate-y-0.5 hover:bg-blue-50"
+                to="/signin"
+                className="inline-flex items-center gap-2 bg-navy hover:bg-primary-dark text-white font-semibold px-7 py-3.5 rounded-xl transition-colors shadow-lg shadow-navy/20 text-sm"
               >
-                {user ? 'Open dashboard' : 'Try the demo'}
-                <ArrowRight className="h-4 w-4" />
+                Sign in
+                <ArrowRight className="w-4 h-4" />
               </Link>
               <a
-                href="#challenge"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/10 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20"
+                href="#insights"
+                className="inline-flex items-center gap-2 border border-gray-200 hover:border-gray-300 text-gray-700 font-medium px-7 py-3.5 rounded-xl transition-colors text-sm"
               >
                 See the problem
               </a>
             </div>
           </div>
 
-          {/* ── Right: Rwanda map ── */}
-          <div className="relative flex items-center justify-center">
-            <div className="absolute -inset-4 rounded-3xl bg-white/5 blur-2xl" aria-hidden />
-            <div className="relative w-full max-w-lg rounded-2xl border border-white/15 bg-white/10 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-6 lg:max-w-none">
-              <div className="mb-3 flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-bold text-white">Skills Demand by District</h3>
-                  <p className="text-[11px] text-blue-200/70">Workforce Demand Heatmap · Rwanda</p>
-                </div>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[10px] font-bold text-emerald-300">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Live data
+          <div className="lg:col-span-7 pt-4 lg:pt-8">
+            <HeroDashboard />
+          </div>
+        </div>
+
+        <div className="text-center pt-14">
+          <p className="text-xs text-gray-400 mb-4 font-medium uppercase tracking-wider">
+            Built for Rwanda's key institutions
+          </p>
+          <div className="overflow-hidden">
+            <div className="marquee inline-flex">
+              {logos.map((inst, i) => (
+                <span key={i} className="inline-flex items-center gap-2 whitespace-nowrap mr-24">
+                  <img src={inst.logo} alt={inst.name} className="h-7 w-auto object-contain" />
+                  <span className="text-sm font-bold text-gray-700 tracking-wide">{inst.name}</span>
                 </span>
-              </div>
-              <img
-                src="/rwanda_map_clean.webp"
-                alt="Rwanda district-level workforce demand heatmap showing concentration in Kigali and secondary cities"
-                fetchPriority="high"
-                decoding="async"
-                className="w-full rounded-lg"
-              />
-              <div className="mt-3 flex items-center justify-between text-[10px] text-blue-200/60">
-                <div className="flex items-center gap-3">
-                  <span className="flex items-center gap-1"><span className="h-2 w-4 rounded-sm bg-blue-200" /> Low</span>
-                  <span className="flex items-center gap-1"><span className="h-2 w-4 rounded-sm bg-blue-500" /> Medium</span>
-                  <span className="flex items-center gap-1"><span className="h-2 w-4 rounded-sm bg-blue-800" /> High</span>
-                </div>
-                <span>{SNAPSHOT.sectors} sectors · {SNAPSHOT.totalPostings} postings</span>
-              </div>
+              ))}
             </div>
           </div>
-
         </div>
       </div>
     </section>

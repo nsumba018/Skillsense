@@ -254,7 +254,7 @@ export function SectorEmploymentChart({ data, height = 400 }: { data: SectorGapP
           {data.map((d) => (
             <Cell key={d.name} fill={d.color} />
           ))}
-          <LabelList dataKey="forecast" position="right" formatter={(v: number) => fmtCompact(v)} style={{ fill: NAVY, fontSize: 10, fontWeight: 800 }} />
+          <LabelList dataKey="forecast" position="right" formatter={(v: unknown) => fmtCompact(Number(v))} style={{ fill: NAVY, fontSize: 10, fontWeight: 800 }} />
         </Bar>
       </BarChart>
     </ResponsiveContainer>

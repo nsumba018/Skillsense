@@ -130,7 +130,6 @@ export default function RoleShowcase() {
     <section id="stakeholders" className="scroll-mt-20 bg-gradient-to-b from-white to-primary-light/40 py-20 sm:py-28">
       <div className="container-1200">
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-primary">Built for your role</p>
           <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">Everyone gets the pages they actually need</h2>
           <p className="mt-4 text-base text-gray-500">No shared clutter. Each role signs in to its own focused workspace.</p>
         </div>
@@ -155,10 +154,11 @@ export default function RoleShowcase() {
         </div>
 
         <div
+          key={role.id}
           role="tabpanel"
           id={`panel-${role.id}`}
           aria-labelledby={`tab-${role.id}`}
-          className="grid items-center gap-8 rounded-3xl border border-gray-200/80 bg-white p-6 shadow-xl shadow-gray-200/50 md:p-10 lg:grid-cols-2 lg:gap-14"
+          className="grid animate-[fadeIn_0.3s_ease] items-center gap-8 rounded-3xl border border-gray-200/80 bg-white p-6 shadow-xl shadow-gray-200/50 md:p-10 lg:grid-cols-2 lg:gap-14"
         >
           <div>
             <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 md:text-3xl">{role.headline}</h3>

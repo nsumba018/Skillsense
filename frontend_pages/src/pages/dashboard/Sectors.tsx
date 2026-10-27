@@ -394,7 +394,7 @@ export default function Sectors() {
   const [searchParams, setSearchParams] = useSearchParams()
   const selectedSlug = searchParams.get('sector') || null
   const [horizon, setHorizon] = useState<Horizon>('1y')
-  const kpis = useKpis()
+  useKpis()
   const sectorList = useSectorList()
   const sectorForecasts = useSectorForecasts()
 
