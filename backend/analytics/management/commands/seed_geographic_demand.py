@@ -17,5 +17,5 @@ class Command(BaseCommand):
         s = geographic_summary()
         self.stdout.write(self.style.SUCCESS(
             f"Geographic demand rebuilt: {rows} rows; "
-            f"{s['located_postings']} of {s['total_ict_postings']} ICT postings have a location in Rwanda"
+            f"{s['located_postings']} of {s['total_postings']} postings have a location in Rwanda"
         ))
