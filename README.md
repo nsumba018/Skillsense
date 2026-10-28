@@ -202,10 +202,7 @@ The REST API is documented with OpenAPI/Swagger at `/api/docs/` when the backend
 
 ## Team
 
-Built by AUCA students as a final-year project in Information Technology.
+**SkillSense Team**
 
-**Contact:** nsumbaherve11@gmail.com
-
-## License
-
-This project was developed for the NISR 2026 Big Data Hackathon. By entering the competition, participants agree to assign intellectual property rights in their submitted work to the National Institute of Statistics of Rwanda (NISR).
+- **Lead:** IRAKOZE NSUMBA Herve
+- **Contact:** nsumbaherve11@gmail.com
