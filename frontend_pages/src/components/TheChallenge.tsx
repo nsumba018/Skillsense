@@ -7,20 +7,20 @@ const challenges = [
   {
     icon: TrendingUp,
     color: 'bg-blue-50 text-blue-600',
-    title: 'Rapid sector growth',
-    text: "Rwanda's economy is diversifying fast across technology, finance, healthcare and more. New roles appear every year, but workforce planning still relies on outdated data.",
+    title: 'No real-time labour data',
+    text: "There's no centralized system tracking what employers are hiring for across Rwanda's 9 economic sectors. Workforce planning relies on outdated surveys instead of live market signals.",
   },
   {
     icon: AlertTriangle,
     color: 'bg-amber-50 text-amber-600',
-    title: 'Curricula lag behind',
-    text: "Universities design programmes based on yesterday's demand. Without forecasts, graduates finish training for roles that have already shifted.",
+    title: 'Graduates with mismatched skills',
+    text: "Universities produce more graduates every year, but many leave with skills that don't match employer demand. Without forecasts, curricula drift out of alignment with the job market.",
   },
   {
     icon: Target,
     color: 'bg-emerald-50 text-emerald-600',
-    title: 'Policy needs evidence',
-    text: 'NST2 and Vision 2050 call for a skilled, future-ready workforce. Government planners need sector-level data to know where to invest — not guesswork.',
+    title: 'Policy decisions without evidence',
+    text: 'Vision 2050 and NST2 target a knowledge-based economy, but policymakers lack sector-level data to know where to invest in training and workforce development.',
   },
 ]
 
@@ -33,7 +33,7 @@ export default function TheChallenge() {
             Rwanda's workforce is evolving — but who's planning for it?
           </h2>
           <p className="mt-4 text-base leading-relaxed text-gray-500 sm:text-lg">
-            Rwanda's <strong className="text-gray-700">National Strategy for Transformation (NST2)</strong> and <strong className="text-gray-700">Vision 2050</strong> set ambitious targets for a knowledge-based economy. Achieving them requires forecasting which skills employers will need across every sector — before the gap opens.
+            Rwanda is investing heavily in becoming a knowledge-based economy under <strong className="text-gray-700">Vision 2050</strong> and <strong className="text-gray-700">NST2</strong>. But there's a gap — universities are producing graduates whose skills don't match what employers are actually hiring for. Without a centralized system that tracks what the job market needs in real time, curricula drift out of alignment and graduates struggle to find work.
           </p>
         </div>
 
