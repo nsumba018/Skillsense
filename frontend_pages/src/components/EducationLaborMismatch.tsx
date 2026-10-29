@@ -9,13 +9,10 @@ export default function EducationLaborMismatch() {
       <div className="container-1200">
         <div className="max-w-2xl mb-12">
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
-            Graduates without the skills employers need
+            Why Rwanda needs workforce intelligence
           </h2>
           <p className="text-base text-gray-500 leading-relaxed">
-            Rwanda's universities are producing more graduates than ever, but many leave with
-            skills that don't match what the job market is hiring for. Without a reliable signal
-            showing which roles are growing and which are shrinking, curricula drift out of
-            alignment — and the gap widens quietly until graduates can't find work.
+            Rwanda is investing heavily in becoming a knowledge-based economy under <strong className="text-gray-700">Vision 2050</strong> and <strong className="text-gray-700">NST2</strong>. But there's a gap — universities are producing graduates whose skills don't match what employers are actually hiring for. There's no centralized system that tracks what the job market needs in real time. SkillSense solves this by collecting real job postings from five Rwandan job boards, combining them with NISR Labour Force Survey data, and using machine learning to forecast which roles will grow and where the skills gaps are forming.
           </p>
         </div>
 
