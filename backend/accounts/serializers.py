@@ -1,4 +1,7 @@
+from typing import Optional
+
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
@@ -137,7 +140,8 @@ class AdminUserSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'date_joined', 'last_login', 'invitation_status']
         extra_kwargs = {'username': {'required': False}}
 
-    def get_invitation_status(self, obj):
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_invitation_status(self, obj) -> Optional[str]:
         inv = getattr(obj, 'invitation', None)
         if inv is None:
             try:

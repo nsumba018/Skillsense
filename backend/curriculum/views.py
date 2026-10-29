@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -9,6 +11,7 @@ from .serializers import CurriculumBulletinSerializer, BulletinListSerializer
 from .parser import parse_uploaded_file
 
 
+@extend_schema(responses=BulletinListSerializer(many=True))
 class CurriculumListView(APIView):
     """
     GET  /api/curriculum/          → list active bulletins (no courses, lightweight)
@@ -21,6 +24,7 @@ class CurriculumListView(APIView):
         return Response(BulletinListSerializer(qs, many=True).data)
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 class CurriculumUploadView(APIView):
     """POST /api/curriculum/upload/ — upload an Excel bulletin."""
     permission_classes = [IsAuthenticated]
@@ -81,6 +85,7 @@ class CurriculumUploadView(APIView):
         }, status=status.HTTP_201_CREATED)
 
 
+@extend_schema(responses=CurriculumBulletinSerializer)
 class CurriculumDetailView(APIView):
     """GET /api/curriculum/<dept_code>/ — full bulletin with courses."""
     permission_classes = [IsAuthenticated]
@@ -94,6 +99,7 @@ class CurriculumDetailView(APIView):
         return Response(CurriculumBulletinSerializer(bulletin).data)
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 class CurriculumSkillsView(APIView):
     """
     GET /api/curriculum/skills/
@@ -116,6 +122,7 @@ class CurriculumSkillsView(APIView):
         return Response(result)
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 class CurriculumProgramsView(APIView):
     """
     GET /api/curriculum/programs/
@@ -142,6 +149,7 @@ class CurriculumProgramsView(APIView):
         return Response(faculties)
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 class CurriculumAllView(APIView):
     """
     GET /api/curriculum/all/

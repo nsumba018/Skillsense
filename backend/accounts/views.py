@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.mail import send_mail
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.exceptions import NotFound, ValidationError
@@ -39,6 +40,7 @@ from .tokens import active_tokens, refresh_jti, revoke_tokens
 User = get_user_model()
 
 
+@extend_schema(responses={403: OpenApiTypes.OBJECT})
 class RegisterView(APIView):
     """POST /api/auth/register/: Disabled — invite-only system."""
     permission_classes = [AllowAny]
@@ -259,6 +261,7 @@ class AcceptInviteView(generics.GenericAPIView):
         })
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 class ResendInviteView(APIView):
     """POST /api/auth/invite/resend/: Regenerate token and re-send the invitation email."""
     permission_classes = [IsAdminUser]

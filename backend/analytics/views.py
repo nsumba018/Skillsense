@@ -288,6 +288,7 @@ class SectorRoleDetailView(APIView):
         return Response(data)
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 class PolicyInsightsView(APIView):
     """
     GET /api/analytics/policy-insights/?sector=<slug>

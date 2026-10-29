@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from .models import Sector, RoleGroup, RoleFamily, NormalizedRole, HistoricalDemand, MacroIndicator, SectorEmployment
 
@@ -9,7 +10,8 @@ class SectorListSerializer(serializers.ModelSerializer):
         model = Sector
         fields = ['id', 'name', 'slug', 'description', 'sort_order', 'color', 'role_count']
 
-    def get_role_count(self, obj):
+    @extend_schema_field(serializers.IntegerField())
+    def get_role_count(self, obj) -> int:
         return NormalizedRole.objects.filter(
             role_family__role_group__sector=obj
         ).count()
