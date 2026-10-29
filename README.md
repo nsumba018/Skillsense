@@ -116,6 +116,14 @@ The app will be available at:
 - **Backend API:** http://localhost:8000
 - **API Documentation (Swagger):** http://localhost:8000/api/docs/
 
+### Live Deployment
+
+The platform is deployed and publicly accessible:
+
+- **Frontend:** https://skillsense-swart.vercel.app
+- **Backend API:** https://skillsense-api-kv6e.onrender.com
+- **API Documentation (Swagger):** https://skillsense-api-kv6e.onrender.com/api/docs/
+
 ### Run without Docker
 
 **Backend:**
