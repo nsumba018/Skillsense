@@ -103,6 +103,7 @@ SkillSense_Job_Scraping_and_Role_Grouping_ETL_Prompt.md
 
 # ---------- Non-source files (local reference only) ----------
 *.pdf
+!student_cards/*.pdf
 *.xlsx
 PROTOTYPE REVIEW 1.txt
 DEVELOPMENT_CHECKLIST.md
