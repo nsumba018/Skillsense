@@ -204,9 +204,9 @@ The REST API is documented with OpenAPI/Swagger at `/api/docs/` when the backend
 - `GET /api/analytics/forecasts/` — Demand forecasts
 - `GET /api/analytics/gap-analysis/` — Education–labour gap data
 
-## Screenshots
+## Demo
 
-> _A demo video of the platform is available in the `demo/` directory._
+A video walkthrough of the platform is available at [`demo/demo.webm`](demo/demo.webm) (under 3 minutes).
 
 ## Team
 
