@@ -208,6 +208,8 @@ The REST API is documented with OpenAPI/Swagger at `/api/docs/` when the backend
 
 A video walkthrough of the platform is available at [`demo/demo.webm`](demo/demo.webm) (under 3 minutes).
 
+You can also watch it on Google Drive: [SkillSense Demo Video](https://drive.google.com/file/d/1ogkDWs82vrrUyccRRTXOjpxwOXi-2JUg/view?usp=sharing)
+
 ## Team
 
 **SkillSense Team**
