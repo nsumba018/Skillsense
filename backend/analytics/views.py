@@ -1,4 +1,4 @@
-from django.db.models import Count, Q
+from django.db.models import Count
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -158,17 +158,12 @@ def _curricula_for(user):
     if not user.is_authenticated:
         return Curriculum.objects.none()
     qs = Curriculum.objects.select_related('institution', 'uploaded_by').prefetch_related('courses')
-    if user.is_admin_user:
-        return qs
-    q = Q(uploaded_by=user)
-    if user.institution_id:
-        q |= Q(institution_id=user.institution_id)
-    return qs.filter(q)
+    return qs.filter(uploaded_by=user)  # curricula are personal to the planner who submitted them
 
 
 class CurriculumListCreateView(generics.ListCreateAPIView):
     """
-    GET  /api/analytics/education/curricula/: Curricula visible to you (own, or your institution's; all for admins).
+    GET  /api/analytics/education/curricula/: Your own curricula.
     POST /api/analytics/education/curricula/: Submit a curriculum (CSV file and/or pasted course list).
     """
     permission_classes = [IsEducationPlanner]

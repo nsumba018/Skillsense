@@ -12,16 +12,27 @@ from curriculum.models import CurriculumBulletin, BulletinCourse
 from curriculum.parser import parse_excel
 
 
+from django.contrib.auth import get_user_model
+
+
 class Command(BaseCommand):
     help = 'Parse an Excel bulletin and seed the curriculum tables.'
 
     def add_arguments(self, parser):
         parser.add_argument('file', type=str, help='Path to the .xlsx bulletin file')
+        parser.add_argument('--owner-email', default='planner@skillsense.rw',
+                            help='Account the bulletins belong to (bulletins are personal). Default: the demo planner.')
 
     def handle(self, *args, **options):
         path = Path(options['file']).resolve()
         if not path.exists():
             self.stderr.write(self.style.ERROR(f'File not found: {path}'))
+            return
+
+        owner = get_user_model().objects.filter(email=options['owner_email']).first()
+        if not owner:
+            self.stderr.write(self.style.ERROR(
+                f'No user with email {options["owner_email"]}. Run seed_admin first, or pass --owner-email.'))
             return
 
         parsed = parse_excel(path)
@@ -31,7 +42,7 @@ class Command(BaseCommand):
 
         for dept in parsed:
             CurriculumBulletin.objects.filter(
-                department_code=dept['department_code'], is_active=True
+                uploaded_by=owner, department_code=dept['department_code'], is_active=True
             ).update(is_active=False)
 
             with open(path, 'rb') as f:
@@ -47,6 +58,7 @@ class Command(BaseCommand):
                 total_semesters=dept['total_semesters'],
                 total_courses=len(dept['courses']),
                 is_active=True,
+                uploaded_by=owner,
             )
             BulletinCourse.objects.bulk_create([
                 BulletinCourse(

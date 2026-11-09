@@ -3,7 +3,7 @@ from .views import (
     RegisterView, LoginView, RefreshView, LogoutView, ProfileView, InstitutionListView,
     ChangePasswordView, PasswordResetRequestView, PasswordResetConfirmView,
     SessionListView, SessionRevokeView, AdminUserListView, AdminUserDetailView,
-    InviteDetailView, AcceptInviteView, ResendInviteView,
+    InviteDetailView, AcceptInviteView, ResendInviteView, InviteLoginView,
 )
 
 urlpatterns = [
@@ -21,6 +21,7 @@ urlpatterns = [
     path('users/', AdminUserListView.as_view(), name='auth-users'),
     path('users/<int:pk>/', AdminUserDetailView.as_view(), name='auth-user-detail'),
     path('invite/', InviteDetailView.as_view(), name='auth-invite-detail'),
+    path('invite/login/', InviteLoginView.as_view(), name='auth-invite-login'),
     path('invite/accept/', AcceptInviteView.as_view(), name='auth-invite-accept'),
     path('invite/resend/', ResendInviteView.as_view(), name='auth-invite-resend'),
 ]

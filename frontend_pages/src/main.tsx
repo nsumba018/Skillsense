@@ -8,6 +8,8 @@ import { AuthProvider, useAuth } from './auth/AuthContext'
 import ProtectedRoute from './auth/ProtectedRoute'
 import SignIn from './pages/SignIn'
 import AcceptInvite from './pages/AcceptInvite'
+import InviteLogin from './pages/InviteLogin'
+import ChangePasswordRequired from './pages/ChangePasswordRequired'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import Dashboard from './pages/dashboard/Dashboard'
@@ -62,6 +64,8 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/signup" element={<Navigate to="/signin" replace />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/invite/accept" element={<AcceptInvite />} />
+            <Route path="/invite/login" element={<InviteLogin />} />
+            <Route path="/change-password" element={<ChangePasswordRequired />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
 

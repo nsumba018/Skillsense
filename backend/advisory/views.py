@@ -38,6 +38,10 @@ class AdvisoryView:
     permission_classes = [IsCareerAdvisorOrAdmin]
     pagination_class = AdvisoryPagination
 
+    def visible_students(self):
+        """Student records are personal: only the ones this user manages."""
+        return StudentProfile.objects.visible_to(self.request.user)
+
 
 # ── dashboard ────────────────────────────────────────────────────────
 
@@ -46,7 +50,7 @@ class AdvisorDashboardView(AdvisoryView, APIView):
     """GET /api/advisory/dashboard/: KPIs, students needing attention, hot roles, recent placements."""
 
     def get(self, request):
-        return Response(stats.dashboard())
+        return Response(stats.dashboard(self.visible_students()))
 
 
 # ── students ─────────────────────────────────────────────────────────
@@ -58,7 +62,7 @@ class StudentListCreateView(AdvisoryView, generics.ListCreateAPIView):
     search_fields = ['first_name', 'last_name', 'email']
 
     def get_queryset(self):
-        qs = StudentProfile.objects.all()
+        qs = self.visible_students()
         cohort = self.request.query_params.get('cohort')
         return qs.filter(innovation_center_cohort=cohort) if cohort else qs
 
@@ -68,7 +72,8 @@ class StudentListCreateView(AdvisoryView, generics.ListCreateAPIView):
 
 class StudentDetailView(AdvisoryView, generics.RetrieveUpdateDestroyAPIView):
     """GET/PATCH/DELETE /api/advisory/students/<id>/"""
-    queryset = StudentProfile.objects.prefetch_related('assessments', 'placements', 'pathways')
+    def get_queryset(self):
+        return self.visible_students().prefetch_related('assessments', 'placements', 'pathways')
 
     def get_serializer_class(self):
         return StudentDetailSerializer if self.request.method == 'GET' else StudentSerializer
@@ -80,7 +85,7 @@ class AssessmentListCreateView(AdvisoryView, generics.ListCreateAPIView):
     """GET /api/advisory/assessments/ (?student_id=)  ·  POST {student_id, target_role} scores and stores one."""
 
     def get_queryset(self):
-        qs = Assessment.objects.select_related('student')
+        qs = Assessment.objects.filter(student__in=self.visible_students()).select_related('student')
         sid = self.request.query_params.get('student_id')
         return qs.filter(student_id=sid) if sid and sid.isdigit() else qs
 
@@ -96,8 +101,10 @@ class AssessmentListCreateView(AdvisoryView, generics.ListCreateAPIView):
 
 
 class AssessmentDetailView(AdvisoryView, generics.RetrieveDestroyAPIView):
-    queryset = Assessment.objects.select_related('student')
     serializer_class = AssessmentSerializer
+
+    def get_queryset(self):
+        return Assessment.objects.filter(student__in=self.visible_students()).select_related('student')
 
 
 # ── pathways ─────────────────────────────────────────────────────────
@@ -106,14 +113,16 @@ class PathwayListCreateView(AdvisoryView, generics.ListCreateAPIView):
     serializer_class = PathwaySerializer
 
     def get_queryset(self):
-        qs = SavedPathway.objects.select_related('student')
+        qs = SavedPathway.objects.filter(student__in=self.visible_students()).select_related('student')
         sid = self.request.query_params.get('student_id')
         return qs.filter(student_id=sid) if sid and sid.isdigit() else qs
 
 
 class PathwayDetailView(AdvisoryView, generics.RetrieveUpdateDestroyAPIView):
-    queryset = SavedPathway.objects.select_related('student')
     serializer_class = PathwaySerializer
+
+    def get_queryset(self):
+        return SavedPathway.objects.filter(student__in=self.visible_students()).select_related('student')
 
 
 # ── placements ───────────────────────────────────────────────────────
@@ -129,12 +138,16 @@ class PlacementListCreateView(AdvisoryView, generics.ListCreateAPIView):
     serializer_class = PlacementSerializer
     search_fields = ['student__first_name', 'student__last_name', 'company', 'role_title']
     filterset_fields = ['contract_type']
-    queryset = Placement.objects.select_related('student')
+
+    def get_queryset(self):
+        return Placement.objects.filter(student__in=self.visible_students()).select_related('student')
 
 
 class PlacementDetailView(AdvisoryView, generics.RetrieveUpdateDestroyAPIView):
-    queryset = Placement.objects.select_related('student')
     serializer_class = PlacementSerializer
+
+    def get_queryset(self):
+        return Placement.objects.filter(student__in=self.visible_students()).select_related('student')
 
     def perform_destroy(self, instance):
         student = instance.student
@@ -164,7 +177,7 @@ class PlacementStatsView(AdvisoryView, APIView):
     """GET /api/advisory/placements/stats/: placement rate, time to placement, breakdowns."""
 
     def get(self, request):
-        return Response(stats.placement_stats(_stat_filters(request)))
+        return Response(stats.placement_stats(_stat_filters(request), self.visible_students()))
 
 
 CONTRACT_ALIASES = {
@@ -210,11 +223,12 @@ class PlacementBulkCreateView(AdvisoryView, APIView):
             return Response({'detail': f'Missing column(s): {", ".join(sorted(required - headers))}.'}, status=400)
 
         created, errors = 0, []
+        mine = self.visible_students()
         valid_contracts = set(Placement.ContractType.values)
         for line, raw in enumerate(reader, start=2):
             row = {(k or '').strip().lower(): (v or '').strip() for k, v in raw.items()}
             email = row.get('student_email', '').lower()
-            student = StudentProfile.objects.filter(email__iexact=email).first() if email else None
+            student = mine.filter(email__iexact=email).first() if email else None
             start = _parse_date(row.get('start_date', ''))
             contract = row.get('contract_type', '').lower() or 'full_time'
             contract = CONTRACT_ALIASES.get(contract, contract)
@@ -268,7 +282,7 @@ class JobListView(AdvisoryView, APIView):
         params = request.query_params
         qs = stats.filter_postings(params).select_related('sector').order_by('-posted_date', '-id')
         sid = params.get('student_id', '')
-        student = StudentProfile.objects.filter(pk=sid).first() if sid.isdigit() else None
+        student = self.visible_students().filter(pk=sid).first() if sid.isdigit() else None
         skills = student.skills if student else None
         only = params.get('only_matches') in ('1', 'true')
         best_first = params.get('sort') == 'match'
@@ -311,16 +325,16 @@ class AdvisorReportView(AdvisoryView, APIView):
     def build(self, request, report_type):
         if report_type == 'student_readiness':
             sid = request.query_params.get('student_id', '')
-            student = StudentProfile.objects.filter(pk=sid).first() if sid.isdigit() else None
+            student = self.visible_students().filter(pk=sid).first() if sid.isdigit() else None
             if not student:
                 return None, Response({'detail': 'student_id is required and must exist.'}, status=400)
             return stats.student_readiness_report(student), None
         if report_type == 'cohort_outcomes':
-            return stats.cohort_outcomes_report(_stat_filters(request)), None
+            return stats.cohort_outcomes_report(_stat_filters(request), self.visible_students()), None
         if report_type == 'employer_demand':
             return stats.employer_demand_report(request.query_params.get('sector')), None
         if report_type == 'skills_gap':
-            return stats.skills_gap_report(), None
+            return stats.skills_gap_report(self.visible_students()), None
         return None, Response({'detail': f'Unknown report "{report_type}".'}, status=404)
 
     def get(self, request, report_type, fmt=None):

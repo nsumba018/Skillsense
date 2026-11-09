@@ -11,6 +11,14 @@ from .serializers import CurriculumBulletinSerializer, BulletinListSerializer
 from .parser import parse_uploaded_file
 
 
+def visible_bulletins(user, prefetch=False):
+    """The user's own active bulletins, ordered by department name."""
+    qs = CurriculumBulletin.objects.visible_to(user).filter(is_active=True)
+    if prefetch:
+        qs = qs.prefetch_related('courses')
+    return list(qs.order_by('department_name'))
+
+
 @extend_schema(responses=BulletinListSerializer(many=True))
 class CurriculumListView(APIView):
     """
@@ -20,8 +28,7 @@ class CurriculumListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        qs = CurriculumBulletin.objects.filter(is_active=True)
-        return Response(BulletinListSerializer(qs, many=True).data)
+        return Response(BulletinListSerializer(visible_bulletins(request.user), many=True).data)
 
 
 @extend_schema(responses=OpenApiTypes.OBJECT)
@@ -50,9 +57,9 @@ class CurriculumUploadView(APIView):
         created = []
         for dept in parsed:
             # Deactivate previous bulletins for this department
+            # Replace only this user's previous copy; other users' bulletins are untouched.
             CurriculumBulletin.objects.filter(
-                department_code=dept['department_code'],
-                is_active=True,
+                uploaded_by=request.user, department_code=dept['department_code'], is_active=True,
             ).update(is_active=False)
 
             bulletin = CurriculumBulletin.objects.create(
@@ -91,9 +98,7 @@ class CurriculumDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, dept_code):
-        bulletin = CurriculumBulletin.objects.filter(
-            department_code=dept_code, is_active=True
-        ).prefetch_related('courses').first()
+        bulletin = next((b for b in visible_bulletins(request.user, prefetch=True) if b.department_code == dept_code), None)
         if not bulletin:
             return Response({'detail': 'No active bulletin for this department.'}, status=status.HTTP_404_NOT_FOUND)
         return Response(CurriculumBulletinSerializer(bulletin).data)
@@ -108,7 +113,7 @@ class CurriculumSkillsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        bulletins = CurriculumBulletin.objects.filter(is_active=True).prefetch_related('courses')
+        bulletins = visible_bulletins(request.user, prefetch=True)
         result = {}
         for b in bulletins:
             skills = set()
@@ -131,7 +136,7 @@ class CurriculumProgramsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        bulletins = CurriculumBulletin.objects.filter(is_active=True).order_by('department_name')
+        bulletins = visible_bulletins(request.user)
         faculties: dict[str, list] = {}
         for b in bulletins:
             faculty_label = dict(CurriculumBulletin.FACULTY_CHOICES).get(b.faculty, b.faculty)
@@ -158,7 +163,7 @@ class CurriculumAllView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        bulletins = CurriculumBulletin.objects.filter(is_active=True).prefetch_related('courses').order_by('department_name')
+        bulletins = visible_bulletins(request.user, prefetch=True)
 
         departments = []
         programs_by_faculty: dict[str, list[str]] = {}

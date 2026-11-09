@@ -18,9 +18,12 @@ from .serializers import GeneratedReportSerializer
 
 class ReportListView(generics.ListAPIView):
     """GET /api/reports/ — List available and past reports."""
-    queryset = GeneratedReport.objects.all()
     serializer_class = GeneratedReportSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Report history is personal: only the reports you generated."""
+        return GeneratedReport.objects.filter(generated_by=self.request.user)
 
 
 @extend_schema(parameters=[OpenApiParameter('role_id', OpenApiTypes.INT, description='Required for role_deep_dive')], responses=OpenApiTypes.OBJECT)

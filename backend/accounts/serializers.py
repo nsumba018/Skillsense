@@ -33,16 +33,16 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'email', 'username', 'first_name', 'last_name',
             'role', 'institution', 'institution_id',
-            'is_active', 'date_joined',
+            'is_active', 'date_joined', 'must_change_password',
         ]
-        read_only_fields = ['id', 'is_active', 'date_joined']
+        read_only_fields = ['id', 'is_active', 'date_joined', 'must_change_password']
 
 
 class ProfileSerializer(UserSerializer):
     """Self-service profile update: users cannot change their own role."""
 
     class Meta(UserSerializer.Meta):
-        read_only_fields = ['id', 'role', 'is_active', 'date_joined']
+        read_only_fields = ['id', 'role', 'is_active', 'date_joined', 'must_change_password']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -87,7 +87,7 @@ class LogoutSerializer(serializers.Serializer):
 
 
 class ChangePasswordSerializer(serializers.Serializer):
-    old_password = serializers.CharField(write_only=True)
+    old_password = serializers.CharField(write_only=True, required=False)
     new_password = serializers.CharField(write_only=True, min_length=8)
     refresh = serializers.CharField(
         write_only=True, required=False,
@@ -99,8 +99,15 @@ class ChangePasswordSerializer(serializers.Serializer):
         return value
 
     def validate(self, attrs):
-        if not self.context['request'].user.check_password(attrs['old_password']):
-            raise serializers.ValidationError({'old_password': 'Current password is incorrect.'})
+        user = self.context['request'].user
+        # Someone arriving through their invitation link has not typed a password yet, so none is asked for.
+        if not user.must_change_password:
+            if not attrs.get('old_password'):
+                raise serializers.ValidationError({'old_password': 'Enter your current password.'})
+            if not user.check_password(attrs['old_password']):
+                raise serializers.ValidationError({'old_password': 'Current password is incorrect.'})
+        if user.check_password(attrs['new_password']):
+            raise serializers.ValidationError({'new_password': 'Choose a password different from the current one.'})
         return attrs
 
 
@@ -129,15 +136,19 @@ class AdminUserSerializer(serializers.ModelSerializer):
         write_only=True, required=False, allow_null=True,
     )
     invitation_status = serializers.SerializerMethodField()
+    password = serializers.CharField(
+        write_only=True, required=False, allow_blank=True,
+        help_text="Optional temporary password. Leave blank to generate one. It is emailed to the user.",
+    )
 
     class Meta:
         model = User
         fields = [
             'id', 'email', 'username', 'first_name', 'last_name', 'role',
             'institution', 'institution_id', 'is_active', 'date_joined', 'last_login',
-            'invitation_status',
+            'invitation_status', 'must_change_password', 'password',
         ]
-        read_only_fields = ['id', 'date_joined', 'last_login', 'invitation_status']
+        read_only_fields = ['id', 'date_joined', 'last_login', 'invitation_status', 'must_change_password']
         extra_kwargs = {'username': {'required': False}}
 
     @extend_schema_field(serializers.CharField(allow_null=True))
@@ -152,7 +163,14 @@ class AdminUserSerializer(serializers.ModelSerializer):
             return 'expired'
         return inv.status
 
+    def validate_password(self, value):
+        if value:
+            validate_password(value)
+        return value
+
     def create(self, validated_data):
+        # The temporary password is applied and emailed by create_invitation.
+        self._temp_password = validated_data.pop('password', '') or None
         validated_data.setdefault('username', validated_data['email'])
         user = User(**validated_data)
         user.set_unusable_password()
@@ -160,6 +178,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
+        validated_data.pop('password', None)  # passwords are never changed through this endpoint
         request = self.context.get('request')
         if request and instance.pk == request.user.pk:
             if validated_data.get('role', instance.role) != instance.role and instance.role == User.UserRole.ADMIN:
@@ -202,3 +221,7 @@ class AcceptInviteSerializer(serializers.Serializer):
             raise serializers.ValidationError({'password': list(e.messages)})
         attrs['invitation'] = invitation
         return attrs
+
+
+class DeleteUserSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True, help_text="The administrator's own password, as verification.")

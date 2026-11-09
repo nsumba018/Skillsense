@@ -74,7 +74,7 @@ export const authApi = {
   logout: (refresh: string) => request<void>('/api/auth/logout/', { method: 'POST', body: { refresh } }),
   me: () => request<User>('/api/auth/me/'),
   institutions: () => request<Institution[]>('/api/auth/institutions/', { auth: false }),
-  changePassword: (old_password: string, new_password: string, refresh: string | null) =>
+  changePassword: (old_password: string | undefined, new_password: string, refresh: string | null) =>
     request<{ detail: string; other_sessions_signed_out: number }>('/api/auth/change-password/', {
       method: 'POST',
       body: { old_password, new_password, refresh: refresh ?? undefined },
@@ -100,12 +100,20 @@ export const authApi = {
     last_name: string
     role: string
     institution_id?: number | null
+    password?: string
   }) => request<AdminUser>('/api/auth/users/', { method: 'POST', body: data }),
+  /** Permanently deletes a user; `password` is the administrator's own, as verification. */
+  deleteUser: (id: number, password: string) =>
+    request<void>(`/api/auth/users/${id}/`, { method: 'DELETE', body: { password } }),
   inviteDetail: (token: string) =>
     request<InviteInfo>('/api/auth/invite/', { params: { token }, auth: false }),
   acceptInvite: (token: string, password: string, password_confirm: string) =>
     request<{ access: string; refresh: string; user: import('../types/api').User }>('/api/auth/invite/accept/', {
       method: 'POST', body: { token, password, password_confirm }, auth: false,
+    }),
+  inviteLogin: (token: string) =>
+    request<{ access: string; refresh: string; user: import('../types/api').User }>('/api/auth/invite/login/', {
+      method: 'POST', body: { token }, auth: false,
     }),
   resendInvite: (userId: number) =>
     request<{ detail: string }>('/api/auth/invite/resend/', { method: 'POST', body: { user_id: userId } }),

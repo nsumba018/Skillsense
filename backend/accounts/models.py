@@ -46,6 +46,8 @@ class User(AbstractUser):
         blank=True,
         related_name='users',
     )
+    # True while the account still uses an admin-issued temporary password.
+    must_change_password = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']

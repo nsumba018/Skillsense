@@ -185,6 +185,11 @@ ML_ROLE_ENCODER_PATH = PROJECT_ROOT / env('ML_ROLE_ENCODER_PATH', default='ml/ro
 ML_FEATURE_LIST_PATH = PROJECT_ROOT / env('ML_FEATURE_LIST_PATH', default='ml/feature_list.joblib')
 
 STORAGES = {
+    # Uploaded files (curriculum bulletins, generated reports) go to MEDIA_ROOT. Without this entry,
+    # overriding STORAGES leaves Django with no default storage and every FileField save crashes.
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
     'staticfiles': {
         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },

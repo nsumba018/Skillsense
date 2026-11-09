@@ -29,6 +29,7 @@ export interface User {
   institution: Institution | null
   is_active: boolean
   date_joined: string
+  must_change_password: boolean
 }
 
 export interface TokenPair {

@@ -25,6 +25,7 @@ from .serializers import (
     AcceptInviteSerializer,
     AdminUserSerializer,
     ChangePasswordSerializer,
+    DeleteUserSerializer,
     InstitutionSerializer,
     InviteDetailSerializer,
     LogoutSerializer,
@@ -107,7 +108,11 @@ class ChangePasswordView(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         request.user.set_password(serializer.validated_data['new_password'])
-        request.user.save(update_fields=['password'])
+        request.user.must_change_password = False
+        request.user.save(update_fields=['password', 'must_change_password'])
+        Invitation.objects.filter(user=request.user, status=Invitation.Status.PENDING).update(
+            status=Invitation.Status.ACCEPTED,
+        )
         revoked = revoke_tokens(request.user, except_jti=refresh_jti(serializer.validated_data.get('refresh')))
         return Response({'detail': 'Password updated.', 'other_sessions_signed_out': revoked})
 
@@ -207,14 +212,27 @@ class AdminUserListView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         user = serializer.save()
-        create_invitation(user, self.request.user)
+        create_invitation(user, self.request.user, getattr(serializer, '_temp_password', None))
 
 
-class AdminUserDetailView(generics.RetrieveUpdateAPIView):
-    """GET/PATCH /api/auth/users/:id/: Change a user's role, institution or active status (administrators only)."""
+class AdminUserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """GET/PATCH/DELETE /api/auth/users/:id/: Change or delete a user (administrators only).
+    DELETE needs the administrator's own password in the body as verification."""
     queryset = User.objects.select_related('institution').all()
     serializer_class = AdminUserSerializer
     permission_classes = [IsAdminUser]
+
+    @extend_schema(request=DeleteUserSerializer, responses={204: None})
+    def delete(self, request, *args, **kwargs):
+        target = self.get_object()
+        if target.pk == request.user.pk:
+            raise ValidationError({'detail': "You can't delete your own account."})
+        serializer = DeleteUserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        if not request.user.check_password(serializer.validated_data['password']):
+            raise ValidationError({'password': 'Your password is incorrect.'})
+        target.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class InviteDetailView(APIView):
@@ -258,6 +276,30 @@ class AcceptInviteView(generics.GenericAPIView):
             'access': str(tokens.access_token),
             'refresh': str(tokens),
             'user': UserSerializer(user).data,
+        })
+
+
+@extend_schema(request=OpenApiTypes.OBJECT, responses=OpenApiTypes.OBJECT)
+class InviteLoginView(APIView):
+    """POST /api/auth/invite/login/ {token}: Sign in straight from the emailed link.
+    Works only while the invitation is pending and unexpired and the user has not yet chosen a password."""
+    permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'password_reset'
+
+    def post(self, request):
+        token = request.data.get('token')
+        invitation = Invitation.objects.select_related('user').filter(
+            token=token or '', status=Invitation.Status.PENDING,
+        ).first()
+        if (not invitation or invitation.is_expired
+                or not invitation.user.must_change_password or not invitation.user.is_active):
+            raise ValidationError({'detail': 'This sign-in link is invalid or has expired. Ask your administrator to resend it.'})
+        tokens = RefreshToken.for_user(invitation.user)
+        return Response({
+            'access': str(tokens.access_token),
+            'refresh': str(tokens),
+            'user': UserSerializer(invitation.user).data,
         })
 
 

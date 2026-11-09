@@ -28,6 +28,14 @@ def _validate_str_list(value, label):
     return cleaned
 
 
+class VisibleStudentField(serializers.PrimaryKeyRelatedField):
+    """A student reference that only accepts students the signed-in user is allowed to see."""
+
+    def get_queryset(self):
+        request = self.context.get('request')
+        return StudentProfile.objects.visible_to(request.user) if request else StudentProfile.objects.none()
+
+
 class StudentSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='full_name', read_only=True)
 
@@ -52,7 +60,9 @@ class StudentSerializer(serializers.ModelSerializer):
     def validate_email(self, value):
         value = (value or '').strip().lower()
         if value:
-            clash = StudentProfile.objects.filter(email__iexact=value)
+            # unique per advisor: another advisor may have a student with the same email
+            request = self.context.get('request')
+            clash = StudentProfile.objects.filter(advisor=request.user if request else None, email__iexact=value)
             if self.instance:
                 clash = clash.exclude(pk=self.instance.pk)
             if clash.exists():
@@ -81,7 +91,7 @@ class AssessmentSerializer(serializers.ModelSerializer):
 
 
 class AssessmentCreateSerializer(serializers.Serializer):
-    student_id = serializers.PrimaryKeyRelatedField(queryset=StudentProfile.objects.all(), source='student')
+    student_id = VisibleStudentField(source='student')
     target_role = serializers.CharField()
 
     def validate_target_role(self, value):
@@ -121,8 +131,8 @@ def _clean_steps(steps):
 
 class PathwaySerializer(serializers.ModelSerializer):
     student = serializers.SerializerMethodField()
-    student_id = serializers.PrimaryKeyRelatedField(
-        queryset=StudentProfile.objects.all(), source='student', write_only=True,
+    student_id = VisibleStudentField(
+        source='student', write_only=True,
     )
     estimated_months = serializers.IntegerField(required=False, min_value=1)
     progress_pct = serializers.FloatField(read_only=True)
@@ -169,8 +179,8 @@ class PathwaySerializer(serializers.ModelSerializer):
 
 class PlacementSerializer(serializers.ModelSerializer):
     student = serializers.SerializerMethodField()
-    student_id = serializers.PrimaryKeyRelatedField(
-        queryset=StudentProfile.objects.all(), source='student', write_only=True,
+    student_id = VisibleStudentField(
+        source='student', write_only=True,
     )
 
     class Meta:

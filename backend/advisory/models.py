@@ -5,8 +5,16 @@ from django.db.models import Q
 from core.models import TimestampedModel
 
 
+class StudentQuerySet(models.QuerySet):
+    def visible_to(self, user):
+        """Students are personal: a user sees only the students they manage, nobody else's (admins included)."""
+        if not user.is_authenticated:
+            return self.none()
+        return self.filter(advisor=user)
+
+
 class StudentProfile(TimestampedModel):
-    """A student/trainee being advised."""
+    """A student/trainee being advised. Personal to the advisor who manages the record."""
 
     class Department(models.TextChoices):
         SE = 'se', 'Software Engineering'
@@ -57,11 +65,14 @@ class StudentProfile(TimestampedModel):
         blank=True, default='',
     )
 
+    objects = StudentQuerySet.as_manager()
+
     class Meta:
         ordering = ['last_name', 'first_name']
         constraints = [
+            # the same email may exist in two advisors' lists; it can't repeat within one advisor's list
             models.UniqueConstraint(
-                fields=['email'], condition=~Q(email=''), name='advisory_student_unique_email',
+                fields=['advisor', 'email'], condition=~Q(email=''), name='advisory_student_unique_email_per_advisor',
             ),
         ]
 

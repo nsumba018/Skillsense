@@ -18,6 +18,8 @@ export default function ProtectedRoute({ children, path }: { children: React.Rea
     )
   }
   if (!user) return <Navigate to="/signin" replace state={{ from: location.pathname }} />
+  // Accounts created by an admin must replace their temporary password before using anything else.
+  if (user.must_change_password) return <Navigate to="/change-password" replace />
 
   if (roles && !roles.includes(user.role)) {
     return (

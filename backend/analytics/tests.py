@@ -218,7 +218,8 @@ class CurriculumTests(DataMixin, APITestCase):
         self.make('root@x.rw', User.UserRole.ADMIN)
         self.auth('a1@x.rw')
         cid = self.submit(text='Python').data['id']
-        for email, sees in [('a1@x.rw', True), ('a2@x.rw', True), ('b1@x.rw', False), ('root@x.rw', True)]:
+        # curricula are personal: only the planner who submitted it sees it, not institution mates or admins
+        for email, sees in [('a1@x.rw', True), ('a2@x.rw', False), ('b1@x.rw', False), ('root@x.rw', False)]:
             self.auth(email)
             listed = [c['id'] for c in self.client.get('/api/analytics/education/curricula/').data['results']]
             self.assertEqual(cid in listed, sees, email)
@@ -226,6 +227,8 @@ class CurriculumTests(DataMixin, APITestCase):
         self.auth('b1@x.rw')
         self.assertEqual(self.client.delete(f'/api/analytics/education/curricula/{cid}/').status_code, 404)
         self.auth('a2@x.rw')
+        self.assertEqual(self.client.delete(f'/api/analytics/education/curricula/{cid}/').status_code, 404)
+        self.auth('a1@x.rw')
         self.assertEqual(self.client.delete(f'/api/analytics/education/curricula/{cid}/').status_code, 204)
         self.assertFalse(Curriculum.objects.filter(pk=cid).exists())
 

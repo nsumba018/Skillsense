@@ -230,10 +230,71 @@ class UserManagementTests(AuthMixin, APITestCase):
         self.assertEqual(self.client.post('/api/auth/login/', {'email': 'boss@x.rw', 'password': PW}, format='json').status_code, 200)
         self.assertTrue(User.objects.get(email='boss@x.rw').is_admin_user)
 
-    def test_create_requires_password(self):
+    def test_create_emails_generated_temp_password_and_forces_change(self):
+        from django.core import mail
         self.auth('admin@x.rw')
-        r = self.client.post('/api/auth/users/', {'email': 'np@x.rw', 'role': 'admin'}, format='json')
-        self.assertEqual(r.status_code, 400)
+        r = self.client.post('/api/auth/users/', {'email': 'np@x.rw', 'first_name': 'N', 'role': 'labor_market_analyst'}, format='json')
+        self.assertEqual(r.status_code, 201, r.content)
+        self.assertNotIn('password', r.data)
+        self.assertTrue(r.data['must_change_password'])
+        self.assertEqual(len(mail.outbox), 1)
+        body = mail.outbox[0].body
+        temp = body.split('Temporary password: ')[1].split(chr(10))[0]
+        self.client.credentials()
+        self.assertEqual(self.client.post('/api/auth/login/', {'email': 'np@x.rw', 'password': temp}, format='json').status_code, 200)
+
+    def test_first_login_must_change_password(self):
+        self.auth('admin@x.rw')
+        self.client.post('/api/auth/users/', {'email': 'fp@x.rw', 'first_name': 'F', 'role': 'labor_market_analyst', 'password': 'Temp-Pass-91x'}, format='json')
+        self.client.credentials()
+        tokens = self.client.post('/api/auth/login/', {'email': 'fp@x.rw', 'password': 'Temp-Pass-91x'}, format='json').data
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
+        self.assertTrue(self.client.get('/api/auth/me/').data['must_change_password'])
+        same = self.client.post('/api/auth/change-password/', {'old_password': 'Temp-Pass-91x', 'new_password': 'Temp-Pass-91x'}, format='json')
+        self.assertEqual(same.status_code, 400)
+        ok = self.client.post('/api/auth/change-password/', {'old_password': 'Temp-Pass-91x', 'new_password': 'Brand-New-Pw-77!'}, format='json')
+        self.assertEqual(ok.status_code, 200, ok.content)
+        self.assertFalse(self.client.get('/api/auth/me/').data['must_change_password'])
+
+    def test_email_link_signs_in_and_password_can_be_set_without_old_one(self):
+        from django.core import mail
+        from accounts.models import Invitation
+        self.auth('admin@x.rw')
+        self.client.post('/api/auth/users/', {'email': 'ml@x.rw', 'first_name': 'M', 'role': 'labor_market_analyst'}, format='json')
+        link = [l for l in mail.outbox[-1].body.splitlines() if '/invite/login?token=' in l][0]
+        token = link.split('token=')[1]
+        self.client.credentials()
+        self.assertEqual(self.client.post('/api/auth/invite/login/', {'token': 'bogus'}, format='json').status_code, 400)
+        r = self.client.post('/api/auth/invite/login/', {'token': token}, format='json')
+        self.assertEqual(r.status_code, 200, r.content)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {r.data['access']}")
+        ok = self.client.post('/api/auth/change-password/', {'new_password': 'Brand-New-Pw-77!'}, format='json')
+        self.assertEqual(ok.status_code, 200, ok.content)
+        self.assertEqual(Invitation.objects.get(user__email='ml@x.rw').status, 'accepted')
+        # link is dead once the password is chosen
+        self.client.credentials()
+        self.assertEqual(self.client.post('/api/auth/invite/login/', {'token': token}, format='json').status_code, 400)
+        # a normal user must still give the old password
+        self.auth('adv@x.rw')
+        self.assertEqual(self.client.post('/api/auth/change-password/', {'new_password': 'Brand-New-Pw-77!'}, format='json').status_code, 400)
+
+    def test_delete_requires_admin_password(self):
+        self.auth('admin@x.rw')
+        uid = User.objects.get(email='ana@x.rw').id
+        url = f'/api/auth/users/{uid}/'
+        self.assertEqual(self.client.delete(url, {}, format='json').status_code, 400)
+        self.assertEqual(self.client.delete(url, {'password': 'wrong'}, format='json').status_code, 400)
+        self.assertTrue(User.objects.filter(id=uid).exists())
+        self.assertEqual(self.client.delete(url, {'password': PW}, format='json').status_code, 204)
+        self.assertFalse(User.objects.filter(id=uid).exists())
+
+    def test_admin_cannot_delete_self_and_others_cannot_delete(self):
+        self.auth('admin@x.rw')
+        self.assertEqual(self.client.delete(f'/api/auth/users/{self.admin.id}/', {'password': PW}, format='json').status_code, 400)
+        self.assertTrue(User.objects.filter(id=self.admin.id).exists())
+        uid = User.objects.get(email='ana@x.rw').id
+        self.auth('adv@x.rw')
+        self.assertEqual(self.client.delete(f'/api/auth/users/{uid}/', {'password': PW}, format='json').status_code, 403)
 
     def test_admin_changes_role_and_deactivates(self):
         self.auth('admin@x.rw')

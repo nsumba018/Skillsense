@@ -242,13 +242,13 @@ def posting_card(p, student_skills=None):
 
 # ── dashboard ────────────────────────────────────────────────────────
 
-def dashboard():
+def dashboard(students):
+    """`students` is the caller's visible StudentProfile queryset: every figure is limited to it."""
     today = timezone.localdate()
     open_qs = tracked_postings().filter(Q(closing_date__isnull=True) | Q(closing_date__gte=today))
 
-    students = StudentProfile.objects.all()
     active = students.filter(status__in=[StudentProfile.Status.ACTIVE, StudentProfile.Status.GRADUATED])
-    latest = latest_assessments()
+    latest = latest_assessments(students.values_list('id', flat=True))
 
     by_dept = {d: 0 for d in DEPARTMENTS}
     for row in active.values('department').annotate(n=Count('id')):
@@ -257,7 +257,7 @@ def dashboard():
     scores = [latest[s.id].readiness_score for s in active if s.id in latest]
     now = timezone.now()
     stalled = {}
-    for pw in SavedPathway.objects.filter(progress_pct__lt=100, updated_at__lt=now - timedelta(days=STALLED_DAYS)):
+    for pw in SavedPathway.objects.filter(student__in=students, progress_pct__lt=100, updated_at__lt=now - timedelta(days=STALLED_DAYS)):
         stalled[pw.student_id] = max(stalled.get(pw.student_id, 0), (now - pw.updated_at).days)
     attention = []
     for s in active:
@@ -284,7 +284,7 @@ def dashboard():
             'student': p.student.full_name, 'role': p.role_title, 'company': p.company,
             'date': p.start_date.isoformat(),
         }
-        for p in Placement.objects.select_related('student')[:10]
+        for p in Placement.objects.filter(student__in=students).select_related('student')[:10]
     ]
 
     tracked = tracked_postings()
@@ -292,7 +292,7 @@ def dashboard():
         'active_students': active.count(),
         'average_readiness': round(sum(scores) / len(scores), 1) if scores else None,
         'assessed_students': len(scores),
-        'placement_rate': placement_stats()['placement_rate'],
+        'placement_rate': placement_stats({}, students)['placement_rate'],
         'open_positions': open_qs.count(),
         'students_by_department': by_dept,
         'students_needing_attention': attention[:ATTENTION_LIMIT],
@@ -305,8 +305,8 @@ def dashboard():
 
 # ── placements ───────────────────────────────────────────────────────
 
-def _eligible_students(filters):
-    qs = StudentProfile.objects.filter(
+def _eligible_students(filters, students):
+    qs = students.filter(
         status__in=[StudentProfile.Status.GRADUATED, StudentProfile.Status.PLACED]
     )
     if filters.get('graduation_year'):
@@ -318,9 +318,9 @@ def _eligible_students(filters):
     return qs
 
 
-def placement_stats(filters=None):
+def placement_stats(filters, students):
     filters = filters or {}
-    eligible = list(_eligible_students(filters))
+    eligible = list(_eligible_students(filters, students))
     ids = [s.id for s in eligible]
     placed_ids = {s.id for s in eligible if s.status == StudentProfile.Status.PLACED}
     placements = list(Placement.objects.filter(student_id__in=ids).select_related('student').order_by('start_date'))
@@ -397,7 +397,7 @@ def _stamp():
     return timezone.now().isoformat(timespec='seconds')
 
 
-def student_readiness_report(student):
+def student_readiness_report(student):  # caller has already checked the student is visible to the user
     roles = student.target_roles or [
         a['role'] for a in sorted(
             ({'role': r['name'], 'score': scoring.score_role(student.skills, r['name'])[0]} for r in scoring.ROLES),
@@ -434,9 +434,9 @@ def student_readiness_report(student):
     }
 
 
-def cohort_outcomes_report(filters):
-    stats = placement_stats(filters)
-    students = _eligible_students(filters)
+def cohort_outcomes_report(filters, visible):
+    stats = placement_stats(filters, visible)
+    students = _eligible_students(filters, visible)
     latest = latest_assessments([s.id for s in students])
     scores = [a.readiness_score for a in latest.values()]
     label = ', '.join(
@@ -473,9 +473,9 @@ def employer_demand_report(sector=None):
     }
 
 
-def skills_gap_report():
-    latest = latest_assessments()
-    students = {s.id: s for s in StudentProfile.objects.filter(id__in=latest.keys())}
+def skills_gap_report(visible):
+    latest = latest_assessments(visible.values_list('id', flat=True))
+    students = {s.id: s for s in visible.filter(id__in=latest.keys())}
     missing = Counter()
     by_role = defaultdict(list)
     by_dept = defaultdict(list)

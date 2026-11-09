@@ -3,8 +3,16 @@ from django.db import models
 from core.models import TimestampedModel
 
 
+class BulletinQuerySet(models.QuerySet):
+    def visible_to(self, user):
+        """Bulletins are personal: a user sees only the ones they uploaded."""
+        if not user.is_authenticated:
+            return self.none()
+        return self.filter(uploaded_by=user)
+
+
 class CurriculumBulletin(TimestampedModel):
-    """An uploaded department bulletin — one active per department at a time."""
+    """An uploaded department bulletin: one active per department per user at a time. Personal to its uploader."""
 
     FACULTY_CHOICES = [
         ('it', 'Faculty of Information Technology'),
@@ -26,6 +34,7 @@ class CurriculumBulletin(TimestampedModel):
         null=True, blank=True,
         related_name='uploaded_bulletins',
     )
+    objects = BulletinQuerySet.as_manager()
 
     class Meta:
         ordering = ['-created_at']

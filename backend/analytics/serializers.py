@@ -114,13 +114,20 @@ class CurriculumCreateSerializer(serializers.Serializer):
         attrs['courses'] = courses
         return attrs
 
+    def _institution(self, validated_data):
+        """Only administrators may file a curriculum under another institution."""
+        user = self.context['request'].user
+        if user.is_admin_user:
+            return validated_data.get('institution') or user.institution
+        return user.institution
+
     @transaction.atomic
     def create(self, validated_data):
         upload = validated_data.get('file')
         curriculum = Curriculum.objects.create(
             name=validated_data['name'],
             level=validated_data['level'],
-            institution=validated_data.get('institution') or getattr(self.context['request'].user, 'institution', None),
+            institution=self._institution(validated_data),
             uploaded_by=self.context['request'].user,
             source_filename=upload.name if upload else '',
         )

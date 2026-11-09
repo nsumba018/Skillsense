@@ -24,6 +24,7 @@ class SpecGapTests(APITestCase):
         self.ict = Sector.objects.get_or_create(slug='ict-technology', defaults={'name': 'ICT & Technology'})[0]
 
     def student(self, first='Jean', last='Mugabo', dept='se', skills=None, **kw):
+        kw.setdefault('advisor', self.advisor)  # students are private to their advisor's institution
         return StudentProfile.objects.create(first_name=first, last_name=last, department=dept, skills=skills or [], **kw)
 
     def posting(self, title, text, location='Kigali'):

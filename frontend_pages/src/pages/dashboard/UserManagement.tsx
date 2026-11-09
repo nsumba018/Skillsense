@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Loader2, Search, Users, UserPlus } from 'lucide-react'
+import { Loader2, Search, Trash2, Users, UserPlus } from 'lucide-react'
 import DashboardLayout, { Card, PageHeader } from './DashboardLayout'
 import { EmptyState, QueryGate } from '../../components/ui/State'
 import { ROLE_LABELS, useAuth } from '../../auth/AuthContext'
@@ -9,7 +9,7 @@ import { authApi } from '../../services/api'
 import { ApiError } from '../../services/http'
 import { useInstitutions } from '../../services/queries'
 import { fmtDate } from '../../lib/format'
-import type { UserRole } from '../../types/api'
+import type { AdminUser, UserRole } from '../../types/api'
 
 const inputClass = 'mt-2 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
 
@@ -35,15 +35,16 @@ export default function UserManagement() {
 
   const [showCreate, setShowCreate] = useState(false)
   const [inviteSent, setInviteSent] = useState<string | null>(null)
-  const [form, setForm] = useState({ first_name: '', last_name: '', email: '', role: 'career_training_advisor', institution: '' })
+  const [form, setForm] = useState({ first_name: '', last_name: '', email: '', role: 'career_training_advisor', institution: '', password: '' })
   const create = useMutation({
     mutationFn: () => authApi.createUser({
       first_name: form.first_name.trim(), last_name: form.last_name.trim(), email: form.email.trim().toLowerCase(),
       role: form.role, institution_id: form.institution ? Number(form.institution) : null,
+      password: form.password || undefined,
     }),
     onSuccess: () => {
       const email = form.email.trim().toLowerCase()
-      setForm({ first_name: '', last_name: '', email: '', role: 'career_training_advisor', institution: '' })
+      setForm({ first_name: '', last_name: '', email: '', role: 'career_training_advisor', institution: '', password: '' })
       setShowCreate(false)
       setInviteSent(email)
       queryClient.invalidateQueries({ queryKey: ['users'] })
@@ -55,6 +56,20 @@ export default function UserManagement() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
     onError: (e) => setRowError(e instanceof ApiError ? e.message : 'Could not resend invitation.'),
   })
+  const [toDelete, setToDelete] = useState<AdminUser | null>(null)
+  const [deletePw, setDeletePw] = useState('')
+  const [deleted, setDeleted] = useState<string | null>(null)
+  const remove = useMutation({
+    mutationFn: () => authApi.deleteUser(toDelete!.id, deletePw),
+    onSuccess: () => {
+      setDeleted(toDelete!.email)
+      setToDelete(null)
+      setDeletePw('')
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      setTimeout(() => setDeleted(null), 6000)
+    },
+  })
+  const closeDelete = () => { setToDelete(null); setDeletePw(''); remove.reset() }
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm({ ...form, [k]: e.target.value })
 
   return (
@@ -80,6 +95,9 @@ export default function UserManagement() {
               <select value={form.role} onChange={set('role')} className={inputClass} aria-label="Role">{ALL_ROLES.map((r) => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}</select></label>
             <label className="block"><span className="text-[11px] font-bold uppercase tracking-wider text-navy">Institution</span>
               <select value={form.institution} onChange={set('institution')} className={inputClass} aria-label="Institution"><option value="">None</option>{(institutions.data ?? []).map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}</select></label>
+            <label className="block md:col-span-3"><span className="text-[11px] font-bold uppercase tracking-wider text-navy">Temporary password (optional)</span>
+              <input type="text" autoComplete="off" value={form.password} onChange={set('password')} placeholder="Leave blank to generate one automatically" className={inputClass} aria-label="Temporary password" />
+              <span className="mt-1 block text-xs text-gray-500">It is emailed to the user with a sign-in link. They must replace it the first time they sign in.</span></label>
             <div className="md:col-span-3 flex flex-wrap items-center justify-end gap-4">
               {create.isError && <span role="alert" data-testid="create-error" className="text-sm font-medium text-red-600">{create.error instanceof ApiError ? create.error.message : 'Could not send invitation.'}</span>}
               <button type="submit" disabled={!form.first_name || !form.email || create.isPending} className="flex items-center gap-2 rounded-lg bg-navy px-6 py-3 text-sm font-bold text-white hover:bg-dark-navy disabled:opacity-50">
@@ -90,9 +108,14 @@ export default function UserManagement() {
         </Card>
       )}
 
+      {deleted && (
+        <div className="mt-4 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+          Deleted {deleted}
+        </div>
+      )}
       {inviteSent && (
         <div className="mt-4 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
-          Invitation sent to {inviteSent}
+          Invitation with sign-in details sent to {inviteSent}
         </div>
       )}
 
@@ -118,7 +141,7 @@ export default function UserManagement() {
                 <table className="w-full min-w-[820px] text-left" data-testid="users-table">
                   <thead>
                     <tr className="border-b border-gray-200 bg-gray-50/60 text-[11px] font-bold uppercase tracking-wider text-gray-500">
-                      <th className="px-6 py-4 font-bold">User</th><th className="px-6 py-4 font-bold">Role</th><th className="px-6 py-4 font-bold">Institution</th><th className="px-6 py-4 font-bold">Invite</th><th className="px-6 py-4 font-bold">Joined</th><th className="px-6 py-4 font-bold">Last sign-in</th><th className="px-6 py-4 font-bold">Status</th>
+                      <th className="px-6 py-4 font-bold">User</th><th className="px-6 py-4 font-bold">Role</th><th className="px-6 py-4 font-bold">Institution</th><th className="px-6 py-4 font-bold">Invite</th><th className="px-6 py-4 font-bold">Joined</th><th className="px-6 py-4 font-bold">Last sign-in</th><th className="px-6 py-4 font-bold">Status</th><th className="px-6 py-4 font-bold"><span className="sr-only">Actions</span></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -157,6 +180,13 @@ export default function UserManagement() {
                               {row.is_active ? 'Active' : 'Inactive'}
                             </button>
                           </td>
+                          <td className="px-6 py-4 text-right">
+                            {!self && (
+                              <button onClick={() => setToDelete(row)} aria-label={`Delete ${row.email}`} title="Delete user" className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-600">
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            )}
+                          </td>
                         </tr>
                       )
                     })}
@@ -174,6 +204,31 @@ export default function UserManagement() {
           }
         </QueryGate>
       </Card>
+
+      {toDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+          <form
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+            onSubmit={(e) => { e.preventDefault(); remove.mutate() }}
+          >
+            <h2 id="delete-title" className="text-lg font-extrabold text-navy">Delete this user?</h2>
+            <p className="mt-2 text-sm text-gray-600">
+              <span className="font-bold">{`${toDelete.first_name} ${toDelete.last_name}`.trim() || toDelete.email}</span> ({toDelete.email}) will lose access and the account will be permanently removed. This cannot be undone.
+            </p>
+            <label className="mt-5 block">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-navy">Enter your password to confirm</span>
+              <input type="password" autoFocus autoComplete="current-password" value={deletePw} onChange={(e) => setDeletePw(e.target.value)} className={inputClass} aria-label="Your password" />
+            </label>
+            {remove.isError && <p role="alert" className="mt-3 text-sm font-medium text-red-600">{remove.error instanceof ApiError ? remove.error.message : 'Could not delete the user.'}</p>}
+            <div className="mt-6 flex justify-end gap-3">
+              <button type="button" onClick={closeDelete} className="rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-bold text-gray-700 hover:bg-gray-50">Cancel</button>
+              <button type="submit" disabled={!deletePw || remove.isPending} className="flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-red-700 disabled:opacity-50">
+                {remove.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Delete user
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </DashboardLayout>
   )
 }
